@@ -172,6 +172,15 @@ then `Content-Range` header has `start-end/total`.
 
 ## General tips
 
+- **Surface workflow links wherever possible.** When summarising a tip,
+  practical material trumps abstract advice. Look hard for URLs in the
+  matched messages — Hugging Face, Civitai, ComfyWorkflows, Discord
+  attachments, YouTube, GitHub PRs (especially Comfy-Org/ComfyUI PRs and
+  Kijai's wrappers). If a user asks "how do I do X", a one-line "use the
+  Sapiens2 pose model" is half an answer; a "use Sapiens2 — here's the
+  workflow JSON: <link>" is a complete one. Always include the link if
+  you can find one. If you can't find one, say so plainly — never invent
+  a URL.
 - **Quote attributions.** Banodoco messages are public-but-attributed; if you
   surface a tip to the user, name the author and link via the Discord URL when
   one is in the message. Daily summaries always include a permalink.
