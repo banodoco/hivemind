@@ -1,4 +1,4 @@
-# banodoco/discord-search
+# banodoco/hivemind
 
 A drop-in skill that lets a coding agent (Claude Code, Codex, etc.) search the
 **Banodoco Discord message feed** — a public, read-only PostgREST mirror of
@@ -16,7 +16,7 @@ other. This skill teaches your agent how to query it.
 ## Install (paste this to your agent)
 
 ```
-Install the banodoco-search skill: clone https://github.com/banodoco/discord-search and copy the banodoco-search/ folder into ~/.claude/skills/ (or your agent's skills directory). Then verify by running the smoke-test curl in SKILL.md. After that, use the skill whenever I ask about Banodoco / community best practices for any video or image generation tool.
+Install the hivemind skill: clone https://github.com/banodoco/hivemind and copy the hivemind/ folder into ~/.claude/skills/ (or your agent's skills directory). Then verify by running the smoke-test curl in SKILL.md. After that, use the skill whenever I ask about Banodoco / community best practices for any video or image generation tool.
 ```
 
 That's it — the agent will do the rest.
@@ -24,15 +24,15 @@ That's it — the agent will do the rest.
 ### Or run the one-liner yourself
 
 ```bash
-git clone https://github.com/banodoco/discord-search /tmp/banodoco-discord-search \
+git clone https://github.com/banodoco/hivemind /tmp/hivemind-skill-tmp \
   && mkdir -p ~/.claude/skills \
-  && cp -r /tmp/banodoco-discord-search/banodoco-search ~/.claude/skills/ \
-  && rm -rf /tmp/banodoco-discord-search \
-  && echo "Installed. Restart Claude Code, then try: /banodoco-search"
+  && cp -r /tmp/hivemind-skill-tmp/hivemind ~/.claude/skills/ \
+  && rm -rf /tmp/hivemind-skill-tmp \
+  && echo "Installed. Restart Claude Code, then try: /hivemind"
 ```
 
 For **Codex** or any agent that loads instruction files instead of skills,
-copy `banodoco-search/SKILL.md` into your `AGENTS.md` (or equivalent
+copy `hivemind/SKILL.md` into your `AGENTS.md` (or equivalent
 instruction file) — the content is self-contained.
 
 ---
@@ -58,7 +58,7 @@ instruction file) — the content is self-contained.
   Kijai-by-author, then topic channels, then cross-check
   [wanx-troopers.github.io](https://wanx-troopers.github.io/).
 
-See [`banodoco-search/SKILL.md`](banodoco-search/SKILL.md) for the full
+See [`hivemind/SKILL.md`](hivemind/SKILL.md) for the full
 contents.
 
 ---

@@ -1,5 +1,5 @@
 ---
-name: banodoco-search
+name: hivemind
 description: >
   Search the Banodoco Discord message feed — a public PostgREST endpoint
   mirroring a Discord server where lots of practitioners discuss generative
@@ -12,7 +12,7 @@ description: >
   *_resources are the goldmine.
 ---
 
-# banodoco-search
+# hivemind
 
 A read-only PostgREST endpoint exposes the Banodoco Discord message feed.
 This is community knowledge about video/image generation that you can't get
