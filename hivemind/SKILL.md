@@ -71,6 +71,8 @@ These names come up repeatedly with authoritative answers — weight their messa
 ## Query patterns (PostgREST)
 
 Always URL-encode spaces (`%20`). Use `Accept: application/json` implicitly.
+Prefer `curl --get --data-urlencode` for anything with parentheses, spaces, or
+multiple filters; hand-built URLs are easy to get subtly wrong.
 
 ### 1. Basic substring search
 
@@ -89,6 +91,20 @@ asterisks are SQL `%` wildcards.
 
 ```bash
 &channel_name=in.(daily_summaries,wan_comfyui,wan_chatter,wan_gens,resources,wan_resources)
+```
+
+For first-pass research, use `daily_summaries` as a narrow equality filter
+before broadening. It is faster and usually more useful than a wide OR across
+all channels:
+
+```bash
+curl -sG "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed" \
+  -H "apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx" \
+  --data-urlencode "select=content,author_name,channel_name,created_at" \
+  --data-urlencode "channel_name=eq.daily_summaries" \
+  --data-urlencode "content=ilike.*VACE*" \
+  --data-urlencode "order=created_at.desc" \
+  --data-urlencode "limit=10"
 ```
 
 ### 3. Compose AND across multiple content terms
@@ -142,6 +158,10 @@ then `Content-Range` header has `start-end/total`.
 
 - **`fts` / full-text search** (`content=fts.foo`) — **times out** on this table.
   Stick with `ilike`.
+- Very broad `or=(...)` searches across all channels can also time out,
+  especially with many spelling variants. If this happens, narrow first by
+  `channel_name=eq.daily_summaries`, use one or two `content=ilike.*term*`
+  filters, and only then widen to topic channels.
 - `reactions` is mostly `null` — you can't rank by popularity.
 - No pagination cursor — use `offset=N` with `limit` if you need to page back.
 - Messages are imported in batches; very recent (last few minutes) messages may
