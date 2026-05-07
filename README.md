@@ -53,7 +53,9 @@ instruction file) — the content is self-contained.
   spelling variants like `wan animate` vs `wananimate`, author + time
   filtering.
 - Gotchas — most importantly that `fts` (full-text search) **times out**
-  on this table, so use `ilike` only.
+  on this table, and very broad all-channel `or=(...)` searches can also
+  time out. Start with `daily_summaries` and narrow `ilike` filters, then
+  widen.
 - A "best practices for X" recipe: hit `daily_summaries` first, then
   Kijai-by-author, then topic channels, then cross-check
   [wanx-troopers.github.io](https://wanx-troopers.github.io/).
