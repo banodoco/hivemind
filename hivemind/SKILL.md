@@ -101,6 +101,55 @@ to this order:
 4. Only use all-channel search as a quick broad sweep for common terms, or after
    scoped searches fail.
 
+### 0a. Route ambiguous prompts with cheap probes
+
+When a prompt could belong to several areas, do not guess the channel from the
+English wording alone. Run small scoped probes for the most distinctive term
+across channel groups, then follow the group with the densest relevant hits.
+
+Use exact counts only for routing probes, with `limit=0`:
+
+```
+?select=message_id&channel_name=in.(wan_chatter,wan_comfyui,wan_gens,wan_resources,resources)
+&content=ilike.*lightx2v*&limit=0
+Prefer: count=exact
+```
+
+Good probe groups:
+
+```
+daily:    channel_name=eq.daily_summaries
+wan:      channel_name=in.(wan_chatter,wan_comfyui,wan_gens,wan_resources,resources)
+ltx:      channel_name=in.(ltx_chatter,ltx_resources,ltx_gens,ltx_training,resources)
+comfy:    channel_name=in.(comfyui,wan_comfyui,ltx_chatter,resources)
+training: channel_name=in.(training_control_loras,ltx_training,wan_training,comfyui)
+general:  channel_name=in.(chatter,nsfw)
+```
+
+For example, "What settings has Kijai recommended for the lightx2v LoRA?" sounds
+like it might be LoRA-training related, but routing probes showed `lightx2v` is
+mostly a Wan topic:
+
+```
+daily=3, wan=1974, ltx=19, comfy=129, training=52, general=112
+```
+
+The right follow-up is therefore:
+
+```
+?channel_name=in.(wan_chatter,wan_comfyui,wan_gens,wan_resources,resources)
+&content=ilike.*lightx2v*&order=created_at.desc&limit=30
+```
+
+Then ask Kijai directly:
+
+```
+?author_name=eq.Kijai&content=ilike.*lightx2v*&order=created_at.desc&limit=30
+```
+
+If the user asks for "settings", add `content=ilike.*cfg*`, `content=ilike.*steps*`,
+or `content=ilike.*settings*` only after the route is known.
+
 ### 1. Basic substring search
 
 ```bash
