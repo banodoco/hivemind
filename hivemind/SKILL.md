@@ -63,6 +63,20 @@ Other narrower channels: `hunyuanvideo`, `qwen-image`, `chroma`, `flux`,
 `art_sharing`, `introductions`, `music`, `off-topic`, `res4lyf`,
 `become-a-speaker`, `welcome`.
 
+For broader searches, use this map first. The API does not expose a cheap
+`distinct channel_name` query; refreshing a full channel inventory should be a
+maintenance task, not part of a normal user answer. With DB access, use:
+
+```
+select channel_name, count(*)
+from message_feed
+group by channel_name
+order by count(*) desc;
+```
+
+If only the public API is available, fetch `select=channel_name` in pages and
+dedupe offline, or add a read-only `message_feed_channels` view upstream.
+
 ## Power users to watch
 
 - **Kijai** — author of WanVideoWrapper / many Wan and LTX ComfyUI nodes.
