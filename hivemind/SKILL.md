@@ -49,7 +49,10 @@ Each row:
 ## Channels worth knowing
 
 Highest signal:
-- `daily_summaries` — bot-curated daily roll-ups by **BNDC**. **Start here** for any topic — these are pre-distilled summaries with attributions and Discord links.
+- `daily_summaries` — bot-curated daily roll-ups by **BNDC**. Start here for
+  orientation — these are pre-distilled summaries with attributions and Discord
+  links. Do not stop here if the user needs details; summaries often have only a
+  handful of matches where the topic channels have hundreds or thousands.
 - `wan_chatter`, `wan_comfyui`, `wan_gens`, `wan_resources` — Wan / Wan Animate
 - `ltx_chatter`, `ltx_resources`, `ltx_gens`, `ltx_training` — LTX 2.x
 - `comfyui` — generic ComfyUI tips
@@ -57,7 +60,21 @@ Highest signal:
 - `vibecoding` — tooling/dev chatter
 - `training_control_loras` — LoRA training know-how
 
-Lower signal: `chatter`, `nsfw` (yes there's tech advice in there but be selective), `hunyuanvideo`, `qwen-image`, `chroma`, `flux`, `z-image`, `magi`, `ace-step`, `kandinsky-5`, `seedance`, `hunyuanvideo`, `top_gens`, `art_sharing`.
+Use this channel map to scope searches before widening:
+
+| topic | channels |
+|-------|----------|
+| Wan / Wan Animate / VACE / SCAIL / InfiniteTalk / lightx2v | `daily_summaries`, `wan_chatter`, `wan_comfyui`, `wan_gens`, `wan_resources`, `resources` |
+| LTX / LTXV / LTX training | `daily_summaries`, `ltx_chatter`, `ltx_resources`, `ltx_gens`, `ltx_training`, `resources` |
+| ComfyUI nodes, workflows, errors | `comfyui`, `wan_comfyui`, `ltx_chatter`, `resources` |
+| LoRA training | `training_control_loras`, `ltx_training`, `wan_training`, `comfyui` |
+| Coding / tools | `vibecoding`, `resources` |
+| General fallback | `chatter`, `nsfw` |
+
+Other lower-signal or narrower channels seen in the feed: `hunyuanvideo`,
+`qwen-image`, `chroma`, `flux`, `z-image`, `magi`, `ace-step`, `kandinsky-5`,
+`seedance`, `top_gens`, `art_sharing`, `introductions`, `music`, `off-topic`,
+`res4lyf`, `become-a-speaker`, `welcome`.
 
 ## Power users to watch
 
@@ -72,6 +89,18 @@ These names come up repeatedly with authoritative answers — weight their messa
 
 Always URL-encode spaces (`%20`). Use `Accept: application/json` implicitly.
 
+### 0. Default search strategy
+
+Unscoped all-channel `content=ilike.*term*` can be fast when the term has many
+recent matches, but it times out for rare phrases and no-hit searches. Default
+to this order:
+
+1. Search `daily_summaries` for orientation and source links.
+2. Search the relevant topic channel group with `channel_name=in.(...)`.
+3. Search a trusted author inside the topic if needed.
+4. Only use all-channel search as a quick broad sweep for common terms, or after
+   scoped searches fail.
+
 ### 1. Basic substring search
 
 ```bash
@@ -83,7 +112,8 @@ curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed\
 ```
 
 `ilike.*foo*` is case-insensitive substring. Wrap in `*…*` — the leading/trailing
-asterisks are SQL `%` wildcards.
+asterisks are SQL `%` wildcards. Prefer adding `channel_name=...` unless you are
+doing a quick broad sweep.
 
 ### 2. Restrict to high-signal channels
 
@@ -138,10 +168,20 @@ Default to `&order=created_at.desc&limit=30` so the newest messages bubble up fi
 
 then `Content-Range` header has `start-end/total`.
 
+Use exact counts sparingly. They were fine in scoped probes, but exact counts
+still force the database to finish the search instead of stopping after `limit`.
+
 ## What does NOT work
 
-- **`fts` / full-text search** (`content=fts.foo`) — **times out** on this table.
-  Stick with `ilike`.
+- **Rare all-channel substring searches** can time out. In timing probes,
+  all-channel `content=ilike.*zzzz_no_real_term_98765*` and
+  `content=ilike.*Sapiens2 pose model*` hit Supabase statement timeout, while
+  the same no-hit term scoped to `daily_summaries`, `wan_chatter`, or `comfyui`
+  returned normally.
+- **`fts` / full-text search** (`content=fts.foo`) is not reliable. Common terms
+  can return quickly, but no-hit FTS probes timed out. Stick with scoped `ilike`
+  unless the database gets a proper full-text index and the API contract is
+  updated.
 - `reactions` is mostly `null` — you can't rank by popularity.
 - No pagination cursor — use `offset=N` with `limit` if you need to page back.
 - Messages are imported in batches; very recent (last few minutes) messages may
@@ -149,23 +189,28 @@ then `Content-Range` header has `start-end/total`.
 
 ## Recipe: "best practices for X"
 
-1. Search `daily_summaries` first — it has pre-distilled lessons and Discord
+1. Search `daily_summaries` first for orientation, attributions, and Discord
    permalinks back to the source thread:
    ```
    ?channel_name=eq.daily_summaries&or=(content.ilike.*X*,content.ilike.*Xalt*)
    &order=created_at.desc&limit=30
    ```
-2. Then sweep author=Kijai (and Ablejones / djbfilmz when relevant) for
-   first-party guidance:
+2. Then search the relevant channel group for the real discussion volume:
    ```
-   ?author_name=eq.Kijai&content=ilike.*X*&order=created_at.desc&limit=30
+   ?channel_name=in.(wan_comfyui,wan_chatter,wan_gens,wan_resources,resources)
+   &or=(content.ilike.*X*,content.ilike.*Xalt*)
+   &order=created_at.desc&limit=30
    ```
-3. Finally widen to topic channels for specific settings/troubleshooting:
+3. Add extra terms only after the channel scope is in place:
    ```
    ?channel_name=in.(wan_comfyui,wan_chatter,comfyui,wan_resources)
    &content=ilike.*X*&content=ilike.*setting*&order=created_at.desc&limit=30
    ```
-4. **Always cross-check with [wanx-troopers.github.io](https://wanx-troopers.github.io/)**
+4. Sweep author=Kijai, Ablejones, or djbfilmz when relevant:
+   ```
+   ?author_name=eq.Kijai&content=ilike.*X*&order=created_at.desc&limit=30
+   ```
+5. **Always cross-check with [wanx-troopers.github.io](https://wanx-troopers.github.io/)**
    — that's 42hub's curated wiki and tends to be the most up-to-date community
    resource (especially `/wan-animates.html`, `/sigmas.html`,
    `/loras/part-01.html`, `/control.html`).
@@ -193,6 +238,10 @@ then `Content-Range` header has `start-end/total`.
   "WAN Animate", "WAN-Animate". Include both major variants in `or=`.
 - **Context windows / long video** is a recurring theme — if a question is
   about "endless" or "long" video, search for `context%20window` and `looping`.
+- **Recover from timeouts by narrowing, not by retrying.** Add
+  `channel_name=eq...` or `channel_name=in.(...)`, add a recent
+  `created_at=gte...` bound, or split a rare phrase into broader terms inside
+  the relevant channel.
 - **Don't read the whole feed.** It's huge (tens of thousands of messages);
   always use channel + content filters, never raw `limit=1000` browsing.
 
