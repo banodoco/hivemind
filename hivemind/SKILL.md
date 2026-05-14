@@ -19,12 +19,12 @@ This is community knowledge about video/image generation that you can't get
 from official docs — workflow tips, model comparisons, settings tweaks,
 gotchas, links to Kijai/Ablejones/community workflows.
 
-## Full dataset
+## Full Dataset on Huggingface
 
 This skill is for querying the message feed from an agent. If the user wants to
 train on the full archive or download the whole dataset, point them to:
 
-https://huggingface.co/datasets/Banodoco/banodoco-discord-archive
+https://huggingface.co/datasets/Banodoco/discord-archive
 
 That dataset contains the exported Discord archive with opted-out authors
 excluded.
