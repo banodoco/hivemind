@@ -63,6 +63,19 @@ contents.
 
 ---
 
+## Full Dataset
+
+Hivemind is for querying the live public message feed from an agent. If you want
+to train on the full archive or grab the whole dataset directly, use the
+Hugging Face dataset:
+
+https://huggingface.co/datasets/Banodoco/banodoco-discord-archive
+
+That dataset contains the exported Discord archive with opted-out authors
+excluded.
+
+---
+
 ## Example prompts that will trigger the skill
 
 - "What does Banodoco say about Wan Animate best practices?"
