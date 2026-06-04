@@ -1,0 +1,11 @@
+# Excluded from `astrid packs install` copies (same syntax as .gitignore).
+# The installed pack only needs: pack.yaml, executors/, skill/, AGENTS.md,
+# README.md, LICENSE, __init__.py.
+assets/
+supabase/
+schema/
+tests/
+scripts/
+.megaplan/
+install.sh
+DESIGN.md

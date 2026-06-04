@@ -15,7 +15,7 @@ git clone --depth 1 https://github.com/banodoco/hivemind "$TMP_DIR/repo" >/dev/n
 
 mkdir -p "$SKILL_DIR"
 rm -rf "$SKILL_DIR/hivemind"
-cp -r "$TMP_DIR/repo/hivemind" "$SKILL_DIR/hivemind"
+cp -r "$TMP_DIR/repo/skill" "$SKILL_DIR/hivemind"
 
 echo "✓ Installed to $SKILL_DIR/hivemind"
 echo

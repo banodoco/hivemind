@@ -37,7 +37,8 @@ findable entry for the next person.
 ```bash
 git clone https://github.com/banodoco/hivemind /tmp/hivemind-skill-tmp \
   && mkdir -p ~/.claude/skills \
-  && cp -r /tmp/hivemind-skill-tmp/hivemind ~/.claude/skills/ \
+  && rm -rf ~/.claude/skills/hivemind \
+  && cp -r /tmp/hivemind-skill-tmp/skill ~/.claude/skills/hivemind \
   && rm -rf /tmp/hivemind-skill-tmp \
   && echo "Installed. Restart Claude Code, then try: /hivemind"
 ```
@@ -47,18 +48,36 @@ Or run `bash install.sh` from a clone of this repo.
 ### 2. Astrid pack (executor-based)
 
 ```bash
-astrid pack install /path/to/hivemind
+python3 -m astrid packs install https://github.com/banodoco/hivemind.git
 ```
 
 The pack exposes six executors: `hivemind.search`, `hivemind.get_item`,
 `hivemind.contribute`, `hivemind.ingest_article`, `hivemind.ingest_workflow`,
 `hivemind.ingest_youtube`. See `AGENTS.md` for the agent guide.
+(Requires Astrid with external Python-executor pack support, 2026-06-04+.)
 
 ### 3. Codex / any agent (instruction-file copy)
 
-Copy `hivemind/SKILL.md` into your `AGENTS.md` (or equivalent instruction
+Copy `skill/SKILL.md` into your `AGENTS.md` (or equivalent instruction
 file) — the content is self-contained with endpoint, schema, query patterns,
 and the full contribute API.
+
+## Repository layout
+
+One repo, three products — the Astrid pack is contractually pinned to the
+repo root (`astrid packs install <git-url>` requires `pack.yaml` in a
+directory whose name equals the pack id, and the clone is named `hivemind`):
+
+| entry | belongs to | what it is |
+|---|---|---|
+| `skill/SKILL.md` | all agents | **The canonical playbook** — installed as the Claude skill, discovered by Astrid, copy-paste for anything else |
+| `pack.yaml`, `executors/`, `AGENTS.md`, `__init__.py` | Astrid pack | Manifest, six stdlib-only executors, agent guide, package marker for `hivemind.executors.*` imports |
+| `schema/`, `supabase/` | backend | The corpus DDL and the `contribute` edge function (the only write path) |
+| `scripts/` | ops | Contributor-key issuance |
+| `tests/` | dev | 297 Python unit tests (mocked HTTP) + deno tests under `supabase/` |
+| `install.sh`, `assets/` | repo | Claude-skill installer, mascot |
+| `DESIGN.md` | docs | Architecture: layers, flywheel, deferred decisions |
+| `.astridignore` | Astrid pack | Keeps backend/assets/tests out of installed pack copies |
 
 ---
 
