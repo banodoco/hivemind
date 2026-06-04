@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.contribute",
+  "name": "Contribute",
+  "kind": "external",
+  "version": "2.0",
+  "short_description": "Submit a resource or distillation to the Hivemind corpus via the contribute edge function.",
+  "description": "Builds the locked request envelope (action + data) and POSTs to the contribute edge function with X-Contributor-Key auth. Supports --dry-run to print the request body without sending. Maps 400/401/409 responses to readable messages.",
+  "keywords": [
+    "hivemind",
+    "contribute",
+    "submit",
+    "resource",
+    "distillation",
+    "edge-function"
+  ],
+  "inputs": [
+    {
+      "name": "type",
+      "type": "string",
+      "required": true,
+      "description": "What to contribute: resource | distillation."
+    },
+    {
+      "name": "kind",
+      "type": "string",
+      "required": false,
+      "description": "kind"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "title"
+    },
+    {
+      "name": "body_file",
+      "type": "string",
+      "required": false,
+      "description": "body file"
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "required": false,
+      "description": "source"
+    },
+    {
+      "name": "url",
+      "type": "string",
+      "required": false,
+      "description": "url"
+    },
+    {
+      "name": "author",
+      "type": "string",
+      "required": false,
+      "description": "author"
+    },
+    {
+      "name": "question",
+      "type": "string",
+      "required": false,
+      "description": "question"
+    },
+    {
+      "name": "answer",
+      "type": "string",
+      "required": false,
+      "description": "answer"
+    },
+    {
+      "name": "confidence",
+      "type": "string",
+      "required": false,
+      "description": "confidence"
+    },
+    {
+      "name": "cites",
+      "type": "string",
+      "required": false,
+      "description": "Comma-separated cites, e.g. message:88123,resource:17."
+    },
+    {
+      "name": "supersedes",
+      "type": "number",
+      "required": false,
+      "description": "supersedes"
+    },
+    {
+      "name": "conditions",
+      "type": "string",
+      "required": false,
+      "description": "conditions"
+    },
+    {
+      "name": "from_file",
+      "type": "string",
+      "required": false,
+      "description": "Read the full payload from a JSON file."
+    },
+    {
+      "name": "dry_run",
+      "type": "boolean",
+      "required": false,
+      "description": "Print the request envelope without sending."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "file",
+      "path_template": "{out}/result.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.contribute.run",
+      "--type",
+      "{type}",
+      "--out",
+      "{out}/result.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "env_passthrough": [
+      "HIVEMIND_API_URL",
+      "HIVEMIND_CONTRIBUTOR_KEY"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.contribute.run"
+  }
+}

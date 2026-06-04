@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.ingest_workflow",
+  "name": "Ingest Workflow",
+  "kind": "external",
+  "version": "2.0",
+  "short_description": "Parse a ComfyUI workflow JSON and submit as a resource with model metadata.",
+  "description": "Parses a ComfyUI workflow JSON (from --path or --url), extracts metadata.models (checkpoint/lora/vae names from node widget values), metadata.custom_nodes (non-core class_type values), metadata.node_count, and generates a searchable body description. The full workflow JSON is stored in payload. Submits as kind=workflow via the contribute path. --dry-run supported.",
+  "keywords": [
+    "hivemind",
+    "ingest",
+    "workflow",
+    "comfyui",
+    "json",
+    "models"
+  ],
+  "inputs": [
+    {
+      "name": "path",
+      "type": "string",
+      "required": false,
+      "description": "Local path to a ComfyUI workflow JSON (mutually exclusive with url)."
+    },
+    {
+      "name": "url",
+      "type": "string",
+      "required": false,
+      "description": "URL of a ComfyUI workflow JSON (mutually exclusive with path)."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "title"
+    },
+    {
+      "name": "kind",
+      "type": "string",
+      "required": false,
+      "description": "kind"
+    },
+    {
+      "name": "dry_run",
+      "type": "boolean",
+      "required": false,
+      "description": "Print the envelope without submitting."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "file",
+      "path_template": "{out}/result.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.ingest_workflow.run",
+      "--out",
+      "{out}/result.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "env_passthrough": [
+      "HIVEMIND_API_URL",
+      "HIVEMIND_CONTRIBUTOR_KEY"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.ingest_workflow.run"
+  }
+}

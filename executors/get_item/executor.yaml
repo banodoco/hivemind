@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.get_item",
+  "name": "Get Item",
+  "kind": "external",
+  "version": "2.0",
+  "short_description": "Fetch a single full row from the Hivemind corpus by kind and id.",
+  "description": "Retrieves an untruncated row from unified_feed by item_kind and item_id. For distillations, also fetches its distillation_cites. For messages and resources, also fetches distillations that cite the item.",
+  "keywords": [
+    "hivemind",
+    "get",
+    "fetch",
+    "corpus",
+    "distillation",
+    "cite"
+  ],
+  "inputs": [
+    {
+      "name": "kind",
+      "type": "string",
+      "required": true,
+      "description": "Item kind: message | resource | distillation."
+    },
+    {
+      "name": "id",
+      "type": "number",
+      "required": true,
+      "description": "Item id."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "item",
+      "type": "file",
+      "path_template": "{out}/item.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.get_item.run",
+      "--kind",
+      "{kind}",
+      "--id",
+      "{id}",
+      "--out",
+      "{out}/item.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "env_passthrough": [
+      "HIVEMIND_API_URL",
+      "HIVEMIND_ANON_KEY"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.get_item.run"
+  }
+}

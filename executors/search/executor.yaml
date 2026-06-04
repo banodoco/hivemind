@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.search",
+  "name": "Search",
+  "kind": "external",
+  "version": "2.0",
+  "short_description": "Search the Hivemind unified corpus with distillations-first merging.",
+  "description": "Queries the unified_feed PostgREST view with ilike matching on title and body. Distillation-kind rows are fetched first and merged ahead of other kinds. Each body is truncated to 700 characters with a truncated flag. When no distillation rows match, a nudge is appended encouraging the user to submit one.",
+  "keywords": [
+    "hivemind",
+    "search",
+    "corpus",
+    "unified_feed",
+    "postgrest",
+    "distillation"
+  ],
+  "inputs": [
+    {
+      "name": "query",
+      "type": "string",
+      "required": true,
+      "description": "Search query (ilike-matched on title and body)."
+    },
+    {
+      "name": "kinds",
+      "type": "string",
+      "required": false,
+      "description": "Comma-separated kind filter (message,article,workflow,transcript,distillation,...)."
+    },
+    {
+      "name": "sources",
+      "type": "string",
+      "required": false,
+      "description": "Comma-separated source filter."
+    },
+    {
+      "name": "since",
+      "type": "string",
+      "required": false,
+      "description": "ISO timestamp lower bound for created_at."
+    },
+    {
+      "name": "limit",
+      "type": "number",
+      "required": false,
+      "description": "Max results (default 20)."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "results",
+      "type": "file",
+      "path_template": "{out}/results.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.search.run",
+      "--query",
+      "{query}",
+      "--out",
+      "{out}/results.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "env_passthrough": [
+      "HIVEMIND_API_URL",
+      "HIVEMIND_ANON_KEY"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.search.run"
+  }
+}

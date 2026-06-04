@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.ingest_youtube",
+  "name": "Ingest YouTube",
+  "kind": "external",
+  "version": "2.0",
+  "short_description": "Extract YouTube captions via yt-dlp and submit as a transcript resource.",
+  "description": "Shells out to yt-dlp --skip-download --write-subs --write-auto-subs --sub-format vtt to extract captions into a temp directory, parses VTT to clean text (deduping rolling auto-caption repeats), fetches metadata (title, channel, duration, video id) via yt-dlp -j, and submits as kind=transcript, source=youtube, external_id=<video id>. Exits non-zero with a clear message if no captions exist. No Whisper, no audio download. --dry-run supported.",
+  "keywords": [
+    "hivemind",
+    "ingest",
+    "youtube",
+    "transcript",
+    "captions",
+    "yt-dlp",
+    "vtt"
+  ],
+  "inputs": [
+    {
+      "name": "url",
+      "type": "string",
+      "required": true,
+      "description": "YouTube video URL (captions-only ingestion)."
+    },
+    {
+      "name": "dry_run",
+      "type": "boolean",
+      "required": false,
+      "description": "Print the envelope without submitting."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "file",
+      "path_template": "{out}/result.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.ingest_youtube.run",
+      "--url",
+      "{url}",
+      "--out",
+      "{out}/result.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "binaries": [
+      "yt-dlp"
+    ],
+    "env_passthrough": [
+      "HIVEMIND_API_URL",
+      "HIVEMIND_CONTRIBUTOR_KEY"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.ingest_youtube.run"
+  }
+}

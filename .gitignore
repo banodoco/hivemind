@@ -1,1 +1,7 @@
+__pycache__/
+.claude/
+.megaplan/plans/
+.megaplan/debt.json
+.megaplan/schemas/
+.megaplan/verification/
 .DS_Store

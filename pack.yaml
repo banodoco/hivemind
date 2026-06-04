@@ -1,0 +1,59 @@
+schema_version: 1
+id: hivemind
+name: Hivemind
+version: 2.0.0
+origin: external
+install_tier: optional
+pack_type: capability
+domain: knowledge
+stability: experimental
+support: community
+visibility: visible
+permissions:
+  - id: network
+    reason: Executors call the Hivemind Supabase REST API and the contribute edge function.
+  - id: subprocess
+    reason: YouTube ingest shells out to yt-dlp for caption extraction.
+  - id: environment
+    reason: Reads HIVEMIND_API_URL, HIVEMIND_ANON_KEY, and HIVEMIND_CONTRIBUTOR_KEY from the environment.
+description: >
+  Hivemind v2 — unified corpus protocol.  Read the knowledge corpus through
+  a searchable unified feed and contribute resources/distillations through
+  a locked edge-function write path.  Six self-contained, stdlib-only
+  executors: search, get_item, contribute, ingest_article, ingest_workflow,
+  ingest_youtube.
+keywords:
+  - hivemind
+  - knowledge
+  - corpus
+  - search
+  - distillation
+  - supabase
+  - postgrest
+  - contribute
+  - ingest
+capabilities:
+  - search_corpus
+  - get_item
+  - contribute_resource
+  - contribute_distillation
+  - ingest_article
+  - ingest_workflow
+  - ingest_youtube
+agent:
+  purpose: >
+    Use when you need to search a shared knowledge corpus, retrieve full
+    items, or submit new resources and cited distillations to the Hivemind.
+  do_not_use_for: >
+    Not for direct database writes — all writes go through the contribute
+    edge function with a contributor key.  Not for audio transcription
+    (use Astrid editorial.transcribe and then hivemind.contribute).
+  normal_entrypoints:
+    - hivemind.search
+    - hivemind.get_item
+    - hivemind.contribute
+    - hivemind.ingest_article
+    - hivemind.ingest_workflow
+    - hivemind.ingest_youtube
+content:
+  executors: executors

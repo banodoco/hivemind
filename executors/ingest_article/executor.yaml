@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.ingest_article",
+  "name": "Ingest Article",
+  "kind": "external",
+  "version": "2.0",
+  "short_description": "Fetch a web article, extract readable text, and submit as a resource.",
+  "description": "Fetches a URL with urllib, extracts readable text with a stdlib html.parser-based extractor (strips script/style/nav, collapses whitespace, picks up title from <title> or og:title), builds the add_resource envelope, and submits via the same code path as hivemind.contribute. --dry-run supported.",
+  "keywords": [
+    "hivemind",
+    "ingest",
+    "article",
+    "web",
+    "extract",
+    "html"
+  ],
+  "inputs": [
+    {
+      "name": "url",
+      "type": "string",
+      "required": true,
+      "description": "Article URL to fetch and ingest."
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "title"
+    },
+    {
+      "name": "kind",
+      "type": "string",
+      "required": false,
+      "description": "kind"
+    },
+    {
+      "name": "dry_run",
+      "type": "boolean",
+      "required": false,
+      "description": "Print the envelope without submitting."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "file",
+      "path_template": "{out}/result.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.ingest_article.run",
+      "--url",
+      "{url}",
+      "--out",
+      "{out}/result.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "env_passthrough": [
+      "HIVEMIND_API_URL",
+      "HIVEMIND_CONTRIBUTOR_KEY"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.ingest_article.run"
+  }
+}
