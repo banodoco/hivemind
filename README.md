@@ -51,9 +51,10 @@ Or run `bash install.sh` from a clone of this repo.
 python3 -m astrid packs install https://github.com/banodoco/hivemind.git
 ```
 
-The pack exposes six executors: `hivemind.search`, `hivemind.get_item`,
-`hivemind.contribute`, `hivemind.ingest_article`, `hivemind.ingest_workflow`,
-`hivemind.ingest_youtube`. See `AGENTS.md` for the agent guide.
+The pack exposes seven executors: `hivemind.search`, `hivemind.get_item`,
+`hivemind.refresh_media`, `hivemind.contribute`, `hivemind.ingest_article`,
+`hivemind.ingest_workflow`, `hivemind.ingest_youtube`. See `AGENTS.md` for the
+agent guide.
 (Requires Astrid with external Python-executor pack support, 2026-06-04+.)
 
 ### 3. Codex / any agent (instruction-file copy)
@@ -71,10 +72,10 @@ directory whose name equals the pack id, and the clone is named `hivemind`):
 | entry | belongs to | what it is |
 |---|---|---|
 | `skill/SKILL.md` | all agents | **The canonical playbook** — installed as the Claude skill, discovered by Astrid, copy-paste for anything else |
-| `pack.yaml`, `executors/`, `AGENTS.md`, `__init__.py` | Astrid pack | Manifest, six stdlib-only executors, agent guide, package marker for `hivemind.executors.*` imports |
+| `pack.yaml`, `executors/`, `AGENTS.md`, `__init__.py` | Astrid pack | Manifest, seven stdlib-only executors, agent guide, package marker for `hivemind.executors.*` imports |
 | `schema/`, `supabase/` | backend | The corpus DDL and the `contribute` edge function (the only write path) |
 | `scripts/` | ops | Contributor-key issuance |
-| `tests/` | dev | 297 Python unit tests (mocked HTTP) + deno tests under `supabase/` |
+| `tests/` | dev | 309 Python unit tests (mocked HTTP) + deno tests under `supabase/` |
 | `install.sh`, `assets/` | repo | Claude-skill installer, mascot |
 | `DESIGN.md` | docs | Architecture: layers, flywheel, deferred decisions |
 | `.astridignore` | Astrid pack | Keeps backend/assets/tests out of installed pack copies |
@@ -161,6 +162,7 @@ curl -s -X POST "$SUPABASE_URL/functions/v1/contribute" \
 |---|---|---|
 | `search` | `python3 executors/search/run.py --query "..."` | ilike search on unified_feed, distillations-first |
 | `get_item` | `python3 executors/get_item/run.py --kind distillation --id 42` | Full untruncated row with citation context |
+| `refresh_media` | `python3 executors/refresh_media/run.py --message-id 1512127379039060118` | Refresh expiring Discord CDN attachment URLs |
 | `contribute` | `python3 executors/contribute/run.py --type resource ...` | Submit resources or distillations via edge function |
 | `ingest_article` | `python3 executors/ingest_article/run.py --url https://...` | Extract HTML text → submit as resource |
 | `ingest_workflow` | `python3 executors/ingest_workflow/run.py --path workflow.json` | Parse ComfyUI JSON → extract models → submit |

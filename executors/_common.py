@@ -33,6 +33,7 @@ from typing import Any
 _DEFAULT_API_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1"
 _DEFAULT_ANON_KEY = "sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx"
 _DEFAULT_CONTRIBUTE_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/contribute"
+_DEFAULT_REFRESH_MEDIA_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/refresh-media-urls"
 _BODY_TRUNCATION_LIMIT = 700
 
 # ---------------------------------------------------------------------------
@@ -58,6 +59,11 @@ def resolve_contributor_key() -> str | None:
 def resolve_contribute_url() -> str:
     """Return the contribute edge-function URL."""
     return os.environ.get("HIVEMIND_CONTRIBUTE_URL", _DEFAULT_CONTRIBUTE_URL).rstrip("/")
+
+
+def resolve_refresh_media_url() -> str:
+    """Return the Discord media refresh edge-function URL."""
+    return os.environ.get("HIVEMIND_REFRESH_MEDIA_URL", _DEFAULT_REFRESH_MEDIA_URL).rstrip("/")
 
 
 # ---------------------------------------------------------------------------
@@ -161,6 +167,27 @@ def edge_post(
         "Accept": "application/json",
     }
     return _http_post(url, headers, json.dumps(payload).encode("utf-8"))
+
+
+def public_edge_post(
+    payload: dict[str, Any],
+    *,
+    url: str,
+    anon_key: str | None = None,
+) -> dict[str, Any]:
+    """POST to a public Supabase edge function using the anon key.
+
+    This is for read/refresh surfaces such as ``refresh-media-urls`` that
+    authenticate with the publishable key rather than ``X-Contributor-Key``.
+    """
+    key = anon_key or resolve_anon_key()
+    headers = {
+        "Authorization": f"Bearer {key}",
+        "apikey": key,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    return _http_post(url.rstrip("/"), headers, json.dumps(payload).encode("utf-8"))
 
 
 # ---------------------------------------------------------------------------

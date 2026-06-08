@@ -11,17 +11,17 @@ support: community
 visibility: visible
 permissions:
   - id: network
-    reason: Executors call the Hivemind Supabase REST API and the contribute edge function.
+    reason: Executors call the Hivemind Supabase REST API, refresh-media edge function, and contribute edge function.
   - id: subprocess
     reason: YouTube ingest shells out to yt-dlp for caption extraction.
   - id: environment
     reason: Reads HIVEMIND_API_URL, HIVEMIND_ANON_KEY, and HIVEMIND_CONTRIBUTOR_KEY from the environment.
 description: >
   Hivemind v2 — unified corpus protocol.  Read the knowledge corpus through
-  a searchable unified feed and contribute resources/distillations through
-  a locked edge-function write path.  Six self-contained, stdlib-only
-  executors: search, get_item, contribute, ingest_article, ingest_workflow,
-  ingest_youtube.
+  a searchable unified feed, refresh Discord attachment URLs, and contribute
+  resources/distillations through a locked edge-function write path.  Seven
+  self-contained, stdlib-only executors: search, get_item, refresh_media,
+  contribute, ingest_article, ingest_workflow, ingest_youtube.
 keywords:
   - hivemind
   - knowledge
@@ -31,6 +31,7 @@ keywords:
   - supabase
   - postgrest
   - contribute
+  - refresh-media
   - ingest
 capabilities:
   - search_corpus
@@ -43,7 +44,8 @@ capabilities:
 agent:
   purpose: >
     Use when you need to search a shared knowledge corpus, retrieve full
-    items, or submit new resources and cited distillations to the Hivemind.
+    items, refresh Discord media URLs, or submit new resources and cited
+    distillations to the Hivemind.
   do_not_use_for: >
     Not for direct database writes — all writes go through the contribute
     edge function with a contributor key.  Not for audio transcription
@@ -51,6 +53,7 @@ agent:
   normal_entrypoints:
     - hivemind.search
     - hivemind.get_item
+    - hivemind.refresh_media
     - hivemind.contribute
     - hivemind.ingest_article
     - hivemind.ingest_workflow

@@ -34,6 +34,8 @@ permanently searchable.
    - `hivemind.search` — `--input query=… [kinds, sources, since, limit]`;
      distillations-first merge, truncated bodies, miss-nudge
    - `hivemind.get_item` — `--input kind=… id=…`; full body + cites both ways
+   - `hivemind.refresh_media` — `--input message_id=…`; refresh expiring
+     Discord CDN attachment URLs for a raw Discord message
    - `hivemind.contribute` — `--input type=resource|distillation …`; `dry_run=true` supported
    - `hivemind.ingest_article` / `hivemind.ingest_workflow` / `hivemind.ingest_youtube`
      — fetch + render + submit (YouTube is captions-only; no Whisper)
@@ -281,6 +283,47 @@ summaries. Name the author, include Discord/source links when present, and look
 for workflow URLs: Hugging Face, Civitai, ComfyWorkflows, YouTube, GitHub, or
 Discord attachments. Cross-check Wan claims with
 [wanx-troopers.github.io](https://wanx-troopers.github.io/) when relevant.
+
+## Refresh Discord media URLs
+
+Discord CDN attachment URLs expire. When `message_feed` gives you a Discord
+message id/permalink but no usable media URL, refresh the message's attachments
+through the public edge function.
+
+Astrid executor:
+
+```bash
+python3 executors/refresh_media/run.py --message-id 1512127379039060118
+```
+
+Raw curl:
+
+```bash
+curl -s -X POST 'https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/refresh-media-urls' \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"message_id": "1512127379039060118"}'
+```
+
+The `message_id` must be a JSON string, not a number. Discord snowflakes exceed
+JavaScript's safe integer range, so unquoted JSON numbers can be silently
+rounded.
+
+Successful response:
+
+```json
+{
+  "success": true,
+  "message_id": "1512127379039060118",
+  "attachments": [
+    {
+      "filename": "example.mp4",
+      "url": "https://cdn.discordapp.com/attachments/..."
+    }
+  ],
+  "urls_updated": 1
+}
+```
 
 ## Caveats
 

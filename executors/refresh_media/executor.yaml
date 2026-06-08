@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "hivemind.refresh_media",
+  "name": "Refresh Media",
+  "kind": "external",
+  "version": "1.0",
+  "short_description": "Refresh expiring Discord CDN attachment URLs for a message.",
+  "description": "Calls the refresh-media-urls Supabase edge function with a quoted Discord message_id string, returning fresh attachment URLs and metadata. Useful when message_feed has a Discord permalink but no media URL, or old CDN links have expired.",
+  "keywords": [
+    "hivemind",
+    "discord",
+    "media",
+    "attachments",
+    "cdn",
+    "refresh"
+  ],
+  "inputs": [
+    {
+      "name": "message_id",
+      "type": "string",
+      "required": true,
+      "description": "Discord message snowflake. Must be passed as a string to preserve precision."
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "file",
+      "path_template": "{out}/result.json"
+    }
+  ],
+  "command": {
+    "argv": [
+      "{python_exec}",
+      "-m",
+      "hivemind.executors.refresh_media.run",
+      "--message-id",
+      "{message_id}",
+      "--out",
+      "{out}/result.json"
+    ]
+  },
+  "cache": {
+    "mode": "none"
+  },
+  "isolation": {
+    "mode": "subprocess",
+    "network": true,
+    "env_passthrough": [
+      "HIVEMIND_ANON_KEY",
+      "HIVEMIND_REFRESH_MEDIA_URL"
+    ]
+  },
+  "metadata": {
+    "runtime_entrypoint": "main",
+    "runtime_file": "run.py",
+    "runtime_module": "hivemind.executors.refresh_media.run"
+  }
+}
