@@ -84,6 +84,25 @@ export const DUPLICATE_SIMILARITY_THRESHOLD = 0.6;
 export const VALID_CONFIDENCE_VALUES: readonly Confidence[] = ["high", "medium", "low"] as const;
 export const VALID_CITE_ITEM_KINDS: readonly CiteItemKind[] = ["message", "resource", "distillation"] as const;
 export const VALID_ACTIONS: readonly ActionKind[] = ["add_resource", "submit_distillation"] as const;
+export const WORKFLOW_SEMANTICS_VERSION = 1;
+export const WORKFLOW_SEMANTICS_REQUIRED_SOURCES: readonly string[] = ["vibecomfy", "vibecomfy-external"] as const;
+export const WORKFLOW_SEMANTICS_MEDIA_TYPES: readonly string[] = ["image", "video", "audio", "3d", "multi", "unknown"] as const;
+export const WORKFLOW_SEMANTICS_TASK_TYPES: readonly string[] = [
+  "text_to_image",
+  "image_to_image",
+  "image_to_video",
+  "text_to_video",
+  "video_to_video",
+  "audio_to_video",
+  "controlnet",
+  "compositing",
+  "inpainting",
+  "upscale",
+  "other",
+  "unknown",
+] as const;
+export const WORKFLOW_SEMANTICS_CONFIDENCE_VALUES: readonly string[] = ["high", "medium", "low"] as const;
+export const WORKFLOW_SEMANTICS_DIRECTION_CONFIDENCE_VALUES: readonly string[] = ["deterministic", "inferred", "llm", "unknown"] as const;
 
 // ---- Request validation ----
 
@@ -149,6 +168,130 @@ export function validateAddResourceData(data: Record<string, unknown>): Validati
     return { error: "validation", detail: "data.payload must be a JSON object when provided" };
   }
 
+  const semanticsError = validateRequiredWorkflowSemantics(data);
+  if (semanticsError) {
+    return semanticsError;
+  }
+
+  return null;
+}
+
+export function requiresWorkflowSemantics(data: Record<string, unknown>): boolean {
+  return data.kind === "workflow"
+    && typeof data.source === "string"
+    && (WORKFLOW_SEMANTICS_REQUIRED_SOURCES as readonly string[]).includes(data.source);
+}
+
+function hasWorkflowSemanticsBypass(metadata: Record<string, unknown>): boolean {
+  const bypass = metadata.workflow_semantics_bypass;
+  return bypass === "legacy" || bypass === "backfill" || metadata.workflow_semantics_legacy_bypass === true;
+}
+
+function validateRequiredWorkflowSemantics(data: Record<string, unknown>): ValidationError | null {
+  if (!requiresWorkflowSemantics(data)) {
+    return null;
+  }
+  const metadata = data.metadata;
+  if (metadata === undefined || metadata === null || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return { error: "validation", detail: "workflow resources from source 'vibecomfy' or 'vibecomfy-external' require metadata.workflow_semantics" };
+  }
+  const meta = metadata as Record<string, unknown>;
+  if (hasWorkflowSemanticsBypass(meta)) {
+    return null;
+  }
+  if (meta.workflow_semantics_version !== WORKFLOW_SEMANTICS_VERSION) {
+    return { error: "validation", detail: "metadata.workflow_semantics_version must be 1 for VibeComfy workflow resources" };
+  }
+  const semantics = meta.workflow_semantics;
+  if (semantics === null || typeof semantics !== "object" || Array.isArray(semantics)) {
+    return { error: "validation", detail: "metadata.workflow_semantics must be a JSON object for VibeComfy workflow resources" };
+  }
+  return validateWorkflowSemanticsObject(semantics as Record<string, unknown>);
+}
+
+export function validateWorkflowSemanticsObject(semantics: Record<string, unknown>): ValidationError | null {
+  if (typeof semantics.media_type !== "string" || !(WORKFLOW_SEMANTICS_MEDIA_TYPES as readonly string[]).includes(semantics.media_type)) {
+    return { error: "validation", detail: `metadata.workflow_semantics.media_type must be one of: ${WORKFLOW_SEMANTICS_MEDIA_TYPES.join(", ")}` };
+  }
+  if (typeof semantics.task_type !== "string" || !(WORKFLOW_SEMANTICS_TASK_TYPES as readonly string[]).includes(semantics.task_type)) {
+    return { error: "validation", detail: `metadata.workflow_semantics.task_type must be one of: ${WORKFLOW_SEMANTICS_TASK_TYPES.join(", ")}` };
+  }
+  for (const key of ["model_families", "node_types", "custom_nodes", "models", "searchable_aliases"]) {
+    const err = validateStringArray(semantics[key], `metadata.workflow_semantics.${key}`);
+    if (err) return err;
+  }
+  if (semantics.node_class_multiset === null || typeof semantics.node_class_multiset !== "object" || Array.isArray(semantics.node_class_multiset)) {
+    return { error: "validation", detail: "metadata.workflow_semantics.node_class_multiset must be a JSON object" };
+  }
+  for (const [key, value] of Object.entries(semantics.node_class_multiset as Record<string, unknown>)) {
+    if (!key || typeof value !== "number" || !Number.isInteger(value) || value < 1) {
+      return { error: "validation", detail: "metadata.workflow_semantics.node_class_multiset values must be positive integers" };
+    }
+  }
+  const adapterError = validateAdapterDirections(semantics.adapter_directions);
+  if (adapterError) return adapterError;
+  const evidenceError = validateSemanticsEvidence(semantics.evidence);
+  if (evidenceError) return evidenceError;
+  const gateError = validatePromotionGates(semantics.promotion_gates);
+  if (gateError) return gateError;
+  return null;
+}
+
+function validateStringArray(value: unknown, path: string): ValidationError | null {
+  if (!Array.isArray(value)) {
+    return { error: "validation", detail: `${path} must be an array of strings` };
+  }
+  if (!value.every((item) => typeof item === "string")) {
+    return { error: "validation", detail: `${path} must be an array of strings` };
+  }
+  return null;
+}
+
+function validateAdapterDirections(value: unknown): ValidationError | null {
+  if (!Array.isArray(value)) {
+    return { error: "validation", detail: "metadata.workflow_semantics.adapter_directions must be an array" };
+  }
+  for (let i = 0; i < value.length; i++) {
+    const item = value[i];
+    if (item === null || typeof item !== "object" || Array.isArray(item)) {
+      return { error: "validation", detail: `metadata.workflow_semantics.adapter_directions[${i}] must be an object` };
+    }
+    const direction = item as Record<string, unknown>;
+    const fromError = validateStringArray(direction.from, `metadata.workflow_semantics.adapter_directions[${i}].from`);
+    if (fromError) return fromError;
+    if (typeof direction.to !== "string" || direction.to.length === 0) {
+      return { error: "validation", detail: `metadata.workflow_semantics.adapter_directions[${i}].to must be a non-empty string` };
+    }
+    if (typeof direction.confidence !== "string" || !(WORKFLOW_SEMANTICS_DIRECTION_CONFIDENCE_VALUES as readonly string[]).includes(direction.confidence)) {
+      return { error: "validation", detail: `metadata.workflow_semantics.adapter_directions[${i}].confidence must be one of: ${WORKFLOW_SEMANTICS_DIRECTION_CONFIDENCE_VALUES.join(", ")}` };
+    }
+  }
+  return null;
+}
+
+function validateSemanticsEvidence(value: unknown): ValidationError | null {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return { error: "validation", detail: "metadata.workflow_semantics.evidence must be a JSON object" };
+  }
+  const evidence = value as Record<string, unknown>;
+  const derivedError = validateStringArray(evidence.derived_from, "metadata.workflow_semantics.evidence.derived_from");
+  if (derivedError) return derivedError;
+  if (typeof evidence.confidence !== "string" || !(WORKFLOW_SEMANTICS_CONFIDENCE_VALUES as readonly string[]).includes(evidence.confidence)) {
+    return { error: "validation", detail: `metadata.workflow_semantics.evidence.confidence must be one of: ${WORKFLOW_SEMANTICS_CONFIDENCE_VALUES.join(", ")}` };
+  }
+  return null;
+}
+
+function validatePromotionGates(value: unknown): ValidationError | null {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return { error: "validation", detail: "metadata.workflow_semantics.promotion_gates must be a JSON object" };
+  }
+  const gates = value as Record<string, unknown>;
+  for (const key of ["has_workflow_json", "has_compiled_api", "has_python_source", "parseable_workflow"]) {
+    if (typeof gates[key] !== "boolean") {
+      return { error: "validation", detail: `metadata.workflow_semantics.promotion_gates.${key} must be a boolean` };
+    }
+  }
   return null;
 }
 

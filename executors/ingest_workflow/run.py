@@ -19,6 +19,7 @@ from typing import Any
 
 # -- dual-import guard (T5 pattern) -------------------------------------------
 try:
+    from ..workflow_semantics import enrich_resource_data
     from .._common import (
         build_add_resource_envelope,
         dry_run_output,
@@ -32,7 +33,10 @@ except ImportError:
 
     _HERE = _os.path.dirname(_os.path.abspath(__file__))
     _EXECUTORS = _os.path.dirname(_HERE)
+    _ROOT = _os.path.dirname(_EXECUTORS)
+    sys.path.insert(0, _ROOT)
     sys.path.insert(0, _EXECUTORS)
+    from workflow_semantics import enrich_resource_data  # type: ignore[import-not-found]
     from _common import (  # type: ignore[import-not-found]
         build_add_resource_envelope,
         dry_run_output,
@@ -335,6 +339,8 @@ def build_envelope(
         data["url"] = url
     if external_id:
         data["external_id"] = external_id
+    if kind == "workflow":
+        data = enrich_resource_data(data)
     return build_add_resource_envelope(data)
 
 
