@@ -424,31 +424,33 @@ Successful response:
 }
 ```
 
-### Refresh rate limits (measured + platform)
+### Refresh rate limits (enforced + platform)
 
-Observed behavior (2026-08-05): ~0.4–1.0s per message; a burst of 3 rapid
-refreshes succeeded with no throttling; already-fresh URLs return
-`urls_updated: 0` (the function skips re-signing — it only calls Discord when a
-URL is near expiry). The real constraints:
+**The function now enforces throttling + a 24h freshness cache (2026-08-05):**
+- **24h cached delivery** — if a message's attachment URLs were successfully
+  refreshed within the last 24h *and* the URL's Discord `ex` expiry is still
+  >1h out, the function returns the SAME URLs with `cached: true` and does NOT
+  call Discord (a re-refresh costs nothing, no Discord load).
+- **Per-IP:** max **10 real refreshes/min** per caller → HTTP **429** with
+  `Retry-After`. (Cached deliveries don't count.)
+- **Global:** max **60 real refreshes/min** across the project → HTTP **429**.
+- Fail-closed: if the throttle gate itself errors, the function returns **503**
+  rather than running unthrottled.
 
-- **Discord API** — each actual re-sign is a Discord call. Global bot limit
-  **50 req/sec** (3000/min); per-channel GET-messages is far tighter, roughly
-  **5 req / 5s per channel** (~1/sec/channel). A 429 carries `Retry-After`.
+Observed (2026-08-05, pre-throttle): ~0.4–1.0s per real refresh. Platform
+constraints that still apply:
+- **Discord API** — each real refresh is a Discord call. Global bot limit
+  **50 req/sec** (3000/min); per-channel GET-messages far tighter, roughly
+  **5 req / 5s per channel**. A Discord 429 carries `Retry-After`.
 - **Supabase Edge Functions** — monthly invocation quota: **500K/mo (Free)**,
   **2M/mo (Pro)**, billed per invocation even when `urls_updated: 0`. A
   full-corpus refresh (~188k attachment messages) is ~37% of Free / 9% of Pro.
-  Max execution ~150s (Free) / 400s (Pro).
 
-**Sensible limits for this use case:**
-- **On-demand (an agent refreshing a few attachments per answer):** no hard cap
-  needed; keep it to **≤ ~10 refreshes/min** to avoid accidental loops and stay
-  well under Discord's per-channel bucket.
-- **Bulk/backfill refresh:** sequential only (each call ≈1s self-spaces the
-  batch), and **do not parallelize multiple messages from the same channel** —
-  space them ≥1s apart per channel (Discord per-channel ~5/5s). Across channels,
-  stay under 50 req/sec. Prefer refreshing only near-expiry URLs (the function
-  already no-ops on fresh ones) to keep Discord calls minimal; the Supabase
-  invocation quota still counts every call, so budget the monthly number first.
+**Practical guidance:** on-demand refreshes are unaffected (≤10/min from one
+caller, and most hits are `cached`). For a bulk/backfill pass, respect the
+enforced caps (sequential, spread across channels, and rely on the 24h cache to
+skip already-fresh messages) and budget the Supabase monthly invocation quota
+first.
 
 ## Caveats
 
