@@ -111,11 +111,35 @@ Common columns across all kinds:
 | `author` | text | display name (null for distillations — resolved via get-item) |
 | `context` | text | message → channel_name, distillation → conditions, resource → null |
 | `url` | text | Discord link or resource URL (null for distillations) |
-| `metadata` | jsonb | kind-specific: messages → `{channel_id, reactions}`, distillations → `{status, confidence}` |
+| `metadata` | jsonb | kind-specific: distillations → `{status, confidence}`; messages → full Discord envelope (see below) |
 | `created_at` | timestamptz | ISO 8601 |
 
 Distillations have a lifecycle: `pending` → `approved` (curator action).
 Prefer approved distillations, then pending, then raw items.
+
+### Message metadata (schema/035 exposure)
+
+Message rows carry the full Discord envelope in `metadata` (in addition to the
+original `channel_id` + `reactions`):
+
+| key | type | notes |
+|---|---|---|
+| `channel_id` | int | channel the message is in |
+| `guild_id` | int | server id |
+| `reactions` | json | reaction list (frequently null — do not rank by it) |
+| `author_id` | int | author's `members.member_id` |
+| `avatar_url` | text | author's avatar, when known |
+| `reference_id` | int | the message this one replies to (Discord reply/cite), if any |
+| `thread_id` | int | thread/forum id the message belongs to, if any |
+| `message_type` | text | Discord message type (e.g. `DEFAULT`) |
+| `edited_at` | timestamptz | last edit time, when edited |
+| `is_pinned` | bool | pinned/curated |
+| `reaction_count` | int | total reactions (more reliable than `reactions`) |
+| `embeds` | jsonb | Discord embed objects (link previews — title/description/source URL of shared content) |
+| `channel_type` | text | channel kind (`text`, `forum`, …) |
+
+Deleted messages (`is_deleted = true`) are filtered out of `unified_feed` and
+search results entirely — they never appear.
 
 ### Search query pattern
 

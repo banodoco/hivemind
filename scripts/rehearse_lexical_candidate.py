@@ -76,7 +76,20 @@ create table if not exists public.discord_messages (
   is_deleted   boolean not null default false,
   thread_id    bigint,
   message_type text,
-  flags        int
+  flags        int,
+  -- full live column shape (mirrors phase0-schema-eligibility-map.md) so the
+  -- message-metadata exposure (schema/035) can join these columns in rehearsal.
+  attachments jsonb default '[]',
+  embeds      jsonb default '[]',
+  reaction_count int default 0,
+  reactors    jsonb default '[]',
+  reference_id bigint,
+  edited_at   timestamptz,
+  is_pinned   boolean default false,
+  indexed_at  timestamptz default now(),
+  synced_at   timestamptz default now(),
+  edit_history jsonb default '[]',
+  deleted_at  timestamptz
 );
 create index if not exists _dm_author_idx on public.discord_messages (author_id);
 create index if not exists _dm_channel_idx on public.discord_messages (channel_id);
@@ -94,7 +107,8 @@ create table if not exists public.members (
   bot         boolean not null default false,
   system      boolean not null default false,
   allow_content_sharing boolean not null default true,
-  include_in_updates    boolean not null default true
+  include_in_updates    boolean not null default true,
+  avatar_url  text
 );
 
 create table if not exists public.discord_channels (
