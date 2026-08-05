@@ -205,6 +205,7 @@ on, both directions.
 
 ```
 GET /rest/v1/message_filters?is_pinned=eq.true&limit=20          # pinned messages
+GET /rest/v1/message_filters?channel_name=eq.minimax_h3_resources # messages in a channel (zero-hop)
 GET /rest/v1/message_filters?thread_id=eq.X                      # forum/thread posts
 GET /rest/v1/message_filters?reference_id=eq.X                   # replies to X (btree)
 GET /rest/v1/message_filters?attachments=cs.[{"content_type":"video/mp4"}]   # has attachment of type (GIN)
@@ -212,12 +213,16 @@ GET /rest/v1/message_filters?attachments=cs.[{"filename":"x.png"}]           # e
 ```
 
 Columns: `message_id, channel_id, guild_id, author_id, thread_id, reference_id,
-is_pinned, reaction_count, attachments, embeds, content, created_at` (deleted
-messages already filtered). All filters are index-backed (verified: is_pinned
-~0.2s, reference_id ~0.1s, attachments containment ~0.1–0.6s). For the full
-enriched row, `get_item` the `message_id` from `unified_feed`. Attachments
-containment uses PostgREST's `cs` operator (jsonb `@>`); `content_type` is only
-present on ~4% of attachments, so prefer `filename` for type detection.
+is_pinned, reaction_count, attachments, embeds, content, created_at,
+channel_name` (deleted messages already filtered). All filters are index-backed
+(verified: is_pinned ~0.1s, channel_name ~0.16s, reference_id ~0.1s, attachments
+containment ~0.1–0.6s). **`channel_name` is not unique** — multiple channels can
+share a name, so `channel_name=eq.X` matches messages from ALL channels with
+that name; use `channel_id` when you need exactly one. For the full enriched
+row, `get_item` the `message_id` from `unified_feed`. Attachments containment
+uses PostgREST's `cs` operator (jsonb `@>`); `content_type` is only present on
+~5% of attachments (video) / ~3% (image), so prefer `filename` for type
+detection (filtering by `content_type` only finds attachments the archive typed).
 
 ### Search query pattern
 
