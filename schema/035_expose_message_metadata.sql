@@ -89,6 +89,12 @@ create or replace view public.message_feed as
     left join discord_channels c on c.channel_id = m.channel_id
    where m.is_deleted = false;
 
+-- Make the RLS-on-discord_messages fallback explicit: even if the external
+-- archive later replaces message_feed with an UNFILTERED definition, running
+-- it as security_invoker means anon reads still hit the discord_messages RLS
+-- policy (which hides deleted rows at the source).
+alter view public.message_feed set (security_invoker = true);
+
 create or replace view unified_feed
 with (security_invoker = true) as
   select
@@ -135,7 +141,7 @@ with (security_invoker = true) as
       from members me
      where me.member_id = d.author_id
   ) mm on true
-  where coalesce(d.is_deleted, false) = false
+  where d.is_deleted = false
 union all
   select
     kind,

@@ -103,6 +103,13 @@ control.
 
 ### Presentation view: `message_feed` (a VIEW, RLS off)
 
+> **Status (2026-08-05): schema/035 supersedes the description below.** The
+> message-metadata exposure migration redefines `message_feed` in-repo with
+> `WHERE m.is_deleted = false`, adds an RLS filter on `discord_messages` for
+> public reads, enriches `unified_feed`'s message `metadata` (13 keys, Discord
+> ids stringified), and mirrors the shape in the lexical RPC. Treat this map as
+> the pre-035 baseline.
+
 `message_feed` is a **view**, not a table: `discord_messages m` left joins
 `members a` (author display name) and `discord_channels c` (channel name), plus a
 correlated subquery over `discord_reactions` (`removed_at IS NULL`) for the

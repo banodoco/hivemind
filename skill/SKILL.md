@@ -152,7 +152,10 @@ GET /unified_feed?select=*&or=(title.ilike.*QUERY*,body.ilike.*QUERY*)&limit=20
 ```
 
 For message-only searches (raw Discord), use the original `message_feed` table
-with the channel map below.
+with the channel map below. `message_feed` now filters out deleted messages
+(`is_deleted = true`) — like every other public surface. For the enriched
+envelope (embeds, reference_id, reaction_count, avatar, …), use `unified_feed`
+instead (see "Message metadata" above).
 
 ### Get single item
 
@@ -187,8 +190,15 @@ Each row in the original `message_feed`:
 | `channel_name` | text    | scope your search by channel (see list below)              |
 | `channel_id`   | bigint  | rarely needed                                              |
 | `guild_id`     | bigint  | always Banodoco                                            |
-| `reactions`    | jsonb   | usually `null` — don't rely on it for ranking              |
+| `reactions`    | json    | usually `null` — don't rely on it for ranking              |
 | `created_at`   | timestamptz | ISO 8601                                              |
+
+> Deleted messages are already filtered out of `message_feed` (schema/035).
+> This table is the raw 8-column surface; for the enriched envelope — embeds,
+> reply (`reference_id`), reaction counts, and author/channel details — read
+> `unified_feed`'s `metadata` instead. (Attachments are NOT in metadata; use
+> the `refresh_media` executor / `refresh-media-urls` edge function for CDN
+> attachment URLs.)
 
 ## Channel map
 

@@ -100,6 +100,13 @@ comment on table content_embeddings is
     'representation identity. HNSW (task 2.16) and semantic candidate SQL (task 2.15) '
     'come later; this table stores the vectors and identity/cleanup indexes only.';
 
+-- Supabase default privileges auto-grant new public-schema tables to
+-- anon/authenticated. content_embeddings stores message chunk_text (incl.
+-- deleted messages until the async cleanup drains), so it must NOT be publicly
+-- readable. service_role (worker/backfill/search) is untouched. Schema/035's
+-- guarded revoke covers DBs where this table already existed before 035.
+revoke all on table content_embeddings from anon, authenticated;
+
 -- ---------------------------------------------------------------------------
 -- Dimension-mixing guard (data layer). The vector(384) column already rejects a
 -- wrong-length vector physically; this trigger additionally forbids filing a
