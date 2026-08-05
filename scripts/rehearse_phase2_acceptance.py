@@ -376,8 +376,11 @@ def rehearse(evidence_path: pathlib.Path = EVIDENCE_PATH) -> dict:
         # --- changed fixture: old marker ceases, new marker ranks.
         chg = next(x for x in fx if x["name"] == "changed")
         # edit source to NEW marker, re-mediate (refresh manifest), re-embed.
+        # (dict hoisted out of the f-string: backslashes in f-string expressions
+        #  are a SyntaxError on Python < 3.12.)
+        new_marker = {"python_source": "import torch\nMARKER_NEW = 1\n"}
         run_replica(cluster, f"update external_resources set payload="
-                     f"{lp.q_jsonb({'python_source': 'import torch\nMARKER_NEW = 1\n'})} where id={chg['id']};")
+                     f"{lp.q_jsonb(new_marker)} where id={chg['id']};")
         seed_fixture(cluster, {**chg, "payload": {"python_source": "import torch\nMARKER_NEW = 1\n"}})
         seed_jobs_for_fixtures(cluster, [chg["id"]])
         worker_drain(cluster, "w-change")
@@ -393,8 +396,9 @@ def rehearse(evidence_path: pathlib.Path = EVIDENCE_PATH) -> dict:
         # Fresh pool of 6 workflows for concurrency.
         pool = [7001 + i for i in range(6)]
         for rid in pool:
+            marker = {"python_source": f"import torch\nMARKER_POOL_{rid} = 1\n"}
             run_replica(cluster, "insert into external_resources(id,kind,source,title,body,payload) values "
-                         f"({rid},'workflow','x','pool {rid}','d',{lp.q_jsonb({'python_source': f'import torch\nMARKER_POOL_{rid} = 1\n'})});")
+                         f"({rid},'workflow','x','pool {rid}','d',{lp.q_jsonb(marker)});")
             run(cluster, "insert into lexical_resource_python_state(resource_id,kind,cohort,public_state,available) values "
                          f"({rid},'workflow','payload_python','safe',true) on conflict (resource_id) do nothing;")
             entries = ch.build_representation_manifest({"kind": "workflow", "title": f"pool {rid}", "body": "d",
@@ -456,8 +460,9 @@ def rehearse(evidence_path: pathlib.Path = EVIDENCE_PATH) -> dict:
         rows = jrows(cluster, "select * from hivemind_embedding_payload('resource','7002','workflow_python',512,50)")
         exp_hash = rows[0]["representation_hash"] if rows else None
         # change source AFTER payload (manifest NOT refreshed) -> finalize must detect mismatch.
+        changed_marker = {"python_source": "import torch\nMARKER_CHANGED_UNDER_US = 1\n"}
         run_replica(cluster, f"update external_resources set payload="
-                     f"{lp.q_jsonb({'python_source': 'import torch\nMARKER_CHANGED_UNDER_US = 1\n'})} where id=7002;")
+                     f"{lp.q_jsonb(changed_marker)} where id=7002;")
         res = jone(cluster, "select outcome from hivemind_finalize_embedding_job("
                    f"{sc_jid},'wsrc',{lp.q_jsonb([])},{lp.q(exp_hash)},'safe',true)")
         ev["source_change"] = {"outcome": (res or {}).get("outcome")}
