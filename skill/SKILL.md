@@ -137,7 +137,7 @@ original `channel_id` + `reactions`):
 | `reaction_count` | int | total reactions (more reliable than `reactions`) |
 | `embeds` | jsonb | Discord embed objects (link previews — title/description/source URL of shared content) |
 | `attachments` | jsonb | Discord attachment objects — **the resource-detection signal** (non-empty = message contains a file/media). Each has `filename` (always — infer type from extension) + `url`; `content_type` (MIME) only where the archive captured it (~4%) |
-| `channel_type` | text | channel kind (`text`, `forum`, `news`, `thread`, …) — null for ~0.5% of messages whose channel the archive didn't type |
+| `channel_type` | text | channel kind (`text`, `forum`, `news`, `thread`, …) — null for only 1 message (the ambiguous `events` channel, awaiting confirmation) |
 
 > **Scope + semantics (verified against live, 2026-08-05):**
 > - The message envelope keys above (`channel_type`, `reactions`, `attachments`,
@@ -147,8 +147,9 @@ original `channel_id` + `reactions`):
 > - `reactions` shows **active** reactions only (`removed_at IS NULL`, ~7% of
 >   messages). `reaction_count` is the **historical total** (includes removed
 >   reactions, ~16% of messages) — use `reaction_count` as the popularity signal.
-> - `channel_type` is populated for ~99.5% of messages; the remaining ~0.5% are
->   channels missing from the archive's channel table.
+> - `channel_type` is populated on every channel except `events` (1 message,
+>   ambiguous name collision) — the 2026-08-05 backfill typed the previously
+>   unclassified channels (incl. `minimax_h3_resources` → forum).
 
 Deleted messages (`is_deleted = true`) are filtered out of `unified_feed`,
 `message_feed`, search results, and direct `discord_messages` reads (RLS)
