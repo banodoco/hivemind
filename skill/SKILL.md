@@ -424,6 +424,32 @@ Successful response:
 }
 ```
 
+### Refresh rate limits (measured + platform)
+
+Observed behavior (2026-08-05): ~0.4–1.0s per message; a burst of 3 rapid
+refreshes succeeded with no throttling; already-fresh URLs return
+`urls_updated: 0` (the function skips re-signing — it only calls Discord when a
+URL is near expiry). The real constraints:
+
+- **Discord API** — each actual re-sign is a Discord call. Global bot limit
+  **50 req/sec** (3000/min); per-channel GET-messages is far tighter, roughly
+  **5 req / 5s per channel** (~1/sec/channel). A 429 carries `Retry-After`.
+- **Supabase Edge Functions** — monthly invocation quota: **500K/mo (Free)**,
+  **2M/mo (Pro)**, billed per invocation even when `urls_updated: 0`. A
+  full-corpus refresh (~188k attachment messages) is ~37% of Free / 9% of Pro.
+  Max execution ~150s (Free) / 400s (Pro).
+
+**Sensible limits for this use case:**
+- **On-demand (an agent refreshing a few attachments per answer):** no hard cap
+  needed; keep it to **≤ ~10 refreshes/min** to avoid accidental loops and stay
+  well under Discord's per-channel bucket.
+- **Bulk/backfill refresh:** sequential only (each call ≈1s self-spaces the
+  batch), and **do not parallelize multiple messages from the same channel** —
+  space them ≥1s apart per channel (Discord per-channel ~5/5s). Across channels,
+  stay under 50 req/sec. Prefer refreshing only near-expiry URLs (the function
+  already no-ops on fresh ones) to keep Discord calls minimal; the Supabase
+  invocation quota still counts every call, so budget the monthly number first.
+
 ## Caveats
 
 - `fts` is not reliable; no-hit FTS probes timed out. Use scoped `ilike`.
