@@ -189,12 +189,16 @@ on, both directions.
 > **Filtering caveat (corpus scale).** PostgREST **jsonb-path filters on
 > `metadata` time out** — `unified_feed` is a 1.2M-message view with no index on
 > the derived `metadata`, so `metadata->reference_id=eq.X` / `metadata->attachments`
-> / `metadata->>is_pinned=eq.true` scans and hits the 2s statement timeout
-> (verified: HTTP 500 `57014` on `wan_chatter`; `jsonb_typeof(metadata)` is
-> `object` on every row — it is NOT a malformed-data bug). Do NOT rely on
-> server-side metadata filters. Instead: (a) read the fields from result rows /
-> `get_item` (indexed, fast); (b) walk chains via `get_item` by id; or (c) filter
-> the SOURCE table directly — `discord_messages.reference_id` is btree-indexed,
+> / `metadata->>is_pinned=eq.true` scans and hits the **anon role's 3s
+> statement_timeout**. **How to recognize it:** HTTP 500 with body
+> `{"code":"57014","message":"canceling statement due to statement timeout"}` —
+> the `code: 57014` is a statement-timeout, **NOT a data error** (verified:
+> `jsonb_typeof(metadata)` is `object` on every row; the same query returns rows
+> given >3s). It fails on big channels even at `limit=5` because a LIMIT can't
+> skip the scan when matches are scarce. Do NOT rely on server-side metadata
+> filters. Instead: (a) read the fields from result rows / `get_item` (indexed,
+> fast); (b) walk chains via `get_item` by id; or (c) filter the SOURCE table
+> directly — `discord_messages.reference_id` is btree-indexed,
 > `discord_messages.is_pinned=eq.true` (a real column) returns in ~0.2s, and
 > `discord_messages.attachments` is jsonb. `discord_messages` is anon-readable
 > (deleted rows filtered by RLS).
