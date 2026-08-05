@@ -76,6 +76,14 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
             R.bootstrap(cls.cluster)  # 001 + 003..009
             # Apply the exposure override on top (the unit under test).
             cls.cluster.psql_file(R.SCHEMA_DIR / "035_expose_message_metadata.sql")
+            # Mirror live: discord_messages has RLS enabled + public read grant.
+            # (postgres is superuser and bypasses RLS, so existing tests are
+            # unaffected; only the SET ROLE anon test below sees the policy.)
+            cls.cluster.psql(
+                "grant usage on schema public to anon, authenticated;"
+                " alter table public.discord_messages enable row level security;"
+                " grant select on public.discord_messages to anon, authenticated;"
+            )
             R.seed(cls.cluster, n_messages=2000)
             _seed_enriched(cls.cluster)
         except Exception:
@@ -118,6 +126,36 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
         deleted_msg = str(1_000_000_000_000_000_000)
         self.assertNotIn(deleted_msg, ids)
 
+    def test_message_feed_excludes_deleted(self) -> None:
+        """message_feed (the documented raw-message public surface) is redefined
+        in 035 with the is_deleted filter — direct reads must hide deleted rows."""
+        deleted_msg = str(1_000_000_000_000_000_000)
+        leaked = _one_int(self.cluster,
+            "select count(*) from public.message_feed "
+            f"where message_id = {deleted_msg};")
+        self.assertEqual(leaked, 0, "deleted message leaked through message_feed")
+
+    def test_rls_hides_deleted_from_public(self) -> None:
+        """Direct discord_messages reads by a public role must not see deleted
+        messages (RLS policy created by 035). postgres is superuser (bypasses
+        RLS) and still sees them — proving the policy, not the data, filters."""
+        deleted_msg = 1_000_000_000_000_000_000
+        # Superuser sees the deleted row (RLS bypassed).
+        self.assertGreater(
+            _one_int(self.cluster,
+                "select count(*) from public.discord_messages "
+                f"where is_deleted = true and message_id = {deleted_msg};"),
+            0, "fixture should have a deleted message")
+        # anon (subject to RLS) must not.
+        rc, out = self.cluster.psql(
+            "set role anon; "
+            f"select count(*) from public.discord_messages "
+            f"where is_deleted = true and message_id = {deleted_msg}; "
+            "reset role;")
+        self.assertEqual(rc, 0, f"anon query failed: {out}")
+        self.assertEqual(int(out.strip().splitlines()[-1]), 0,
+                         "deleted message visible to anon despite RLS policy")
+
     # ------------------------------------------------------------------
     # Enriched metadata on unified_feed
     # ------------------------------------------------------------------
@@ -135,16 +173,18 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
                     "message_type", "edited_at", "is_pinned", "reaction_count",
                     "embeds", "channel_type", "avatar_url"):
             self.assertIn(key, meta, f"metadata missing new key {key}")
-        # Values round-trip from the source columns.
-        self.assertEqual(meta["author_id"], 1)
-        self.assertEqual(meta["reference_id"], REFERENCED_ID)
-        self.assertEqual(meta["thread_id"], 123)
+        # Values round-trip from the source columns. Discord ids are
+        # STRINGIFIED at the JSON boundary (snowflakes exceed 2^53, so JS
+        # number parsing would silently round them).
+        self.assertEqual(meta["author_id"], "1")
+        self.assertEqual(meta["reference_id"], str(REFERENCED_ID))
+        self.assertEqual(meta["thread_id"], "123")
+        self.assertEqual(meta["guild_id"], "9000")
         self.assertEqual(meta["message_type"], "DEFAULT")
         self.assertEqual(meta["reaction_count"], 7)
         self.assertIs(meta["is_pinned"], True)
         self.assertEqual(meta["channel_type"], "forum")
         self.assertEqual(meta["avatar_url"], "https://cdn.example/avatar.png")
-        self.assertEqual(meta["guild_id"], 9000)
         self.assertEqual(meta["embeds"][0]["title"], "Sigma Flux Guide")
 
     def test_unified_feed_metadata_for_plain_message(self) -> None:
@@ -167,7 +207,7 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
         by_id = {r["item_id"]: r for r in resp["results"]}
         self.assertIn(str(ENRICHED_ID), by_id, "enriched message not retrieved by RPC")
         meta = by_id[str(ENRICHED_ID)]["metadata"]
-        self.assertEqual(meta["reference_id"], REFERENCED_ID)
+        self.assertEqual(meta["reference_id"], str(REFERENCED_ID))
         self.assertEqual(meta["reaction_count"], 7)
         self.assertEqual(meta["channel_type"], "forum")
         self.assertEqual(meta["embeds"][0]["title"], "Sigma Flux Guide")
@@ -175,6 +215,26 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
         # Old keys preserved on the RPC path too.
         self.assertIn("channel_id", meta)
         self.assertIn("reactions", meta)
+
+    def test_rpc_metadata_matches_view_row_for_row(self) -> None:
+        """The RPC hydration must mirror unified_feed field-for-field (the
+        view/RPC drift invariant)."""
+        resp = R.call_rpc(self.cluster, "sigmaflux")
+        by_id = {r["item_id"]: r for r in resp["results"]}
+        self.assertIn(str(ENRICHED_ID), by_id)
+        view_meta = _query_json(
+            self.cluster,
+            "select (select metadata::text from public.unified_feed "
+            f"where kind='message' and item_id='{ENRICHED_ID}');",
+        )
+        self.assertEqual(by_id[str(ENRICHED_ID)]["metadata"], view_meta)
+
+    def test_rpc_results_never_null_kind(self) -> None:
+        """A candidate that disappears between rank and hydrate must be DROPPED,
+        not emitted as a phantom row with null kind/item_id (schema/035 guard)."""
+        resp = R.call_rpc(self.cluster, "sampler video")
+        self.assertTrue(all(r.get("kind") is not None and r.get("item_id") is not None
+                            for r in resp["results"]))
 
     # ------------------------------------------------------------------
     # Non-message branches untouched

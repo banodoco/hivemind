@@ -1,41 +1,93 @@
 -- ============================================================
 -- 035_expose_message_metadata.sql
 -- Hivemind — expose the full Discord message envelope on the public
--- search surface, and stop surfacing deleted messages.
+-- search surface, and stop surfacing deleted messages anywhere.
 --
--- Two additive, idempotent overrides (the established schema/034 pattern):
+-- Five additive, idempotent overrides:
 --
---   1. unified_feed (schema/001) — the MESSAGE branch now carries
---      channel_id / reactions / guild_id / author_id / reference_id /
---      thread_id / message_type / edited_at / is_pinned / reaction_count /
---      embeds / channel_type / avatar_url in `metadata`, sourced by lateral
---      joins into discord_messages / discord_channels / members. Messages
---      with is_deleted = true are filtered out of the view entirely.
+--   1. RLS on discord_messages        — public SELECT now filters
+--      is_deleted = true at the SOURCE. Direct PostgREST reads of
+--      discord_messages (a public surface) can no longer return deleted
+--      messages. service_role bypasses RLS, so the write path is untouched.
 --
---   2. hivemind_lexical_search (schema/009) — mirrors the SAME metadata
---      shape + deletion filter so RPC results match the feed row-for-row.
+--   2. message_feed (external view)   — redefined in-repo with the exact
+--      live shape (phase0-schema-eligibility-map.md) plus
+--      ``WHERE m.is_deleted = false``. message_feed is the documented
+--      raw-message public surface; it previously had NO deletion filter.
 --
--- Why this lives here (not in message_feed):
---   * message_feed is an external view (Discord archive; source NOT in this
---     repo) projecting only 8 columns with NO is_deleted filter. The extra
---     fields + the filter therefore ride in these overrides via lateral
---     joins keyed on message_id.
+--   3. unified_feed (schema/001)      — the MESSAGE branch carries the full
+--      envelope in `metadata` (original channel_id/reactions preserved;
+--      new guild_id / author_id / reference_id / thread_id / message_type /
+--      edited_at / is_pinned / reaction_count / embeds / channel_type /
+--      avatar_url) sourced by lateral joins into discord_messages /
+--      discord_channels / members, and filters deleted messages.
+--      Discord snowflakes are STRINGIFIED (JS-safe > 2^53).
 --
--- Deletion coverage: every other read path already filters is_deleted
--- (candidate SQL 008/010/012/013, semantic 032/033, embedding write path
--- 025/029/034). This closes the last two surfaces that leaked deleted
--- messages: unified_feed (get_item / search) and the lexical RPC hydration.
+--   4. hivemind_lexical_search (009)  — mirrors the same metadata shape +
+--      deletion filter so RPC results match the feed row-for-row, and drops
+--      phantom rows if a candidate disappears between rank and hydrate.
 --
--- Backwards compatibility: metadata additions are additive-only —
--- channel_id + reactions keep their exact positions, new keys append.
--- Message representation_hash is content-only (executors/canonical_
--- representations.py + schema/034 mirror), so no embedding/hash is
--- invalidated, and no consumer asserts the exact {channel_id, reactions}
--- shape (verified in the phase0 read-path map).
+--   5. content_embeddings guard       — when the embedding migrations deploy,
+--      revoke anon/authenticated access so message chunk_text (incl. deleted
+--      messages pre-cleanup) is not publicly readable. No-op while absent.
 --
--- Rehearsal harness updated to match: scripts/rehearse_lexical_candidate.py
--- BASE_DDL now carries the full discord_messages / members column shape.
+-- Deletion coverage: candidate SQL (008/010/012/013), semantic (032/033),
+-- and the embedding write path (025/029/034) already filter is_deleted.
+-- This closes every remaining public surface: discord_messages (RLS),
+-- message_feed (view), unified_feed (view), and the lexical RPC.
+--
+-- Backwards compatibility: metadata additions are additive; channel_id +
+-- reactions keep their positions. representation_hash is content-only, so no
+-- embedding/hash is invalidated, and no consumer asserts the exact old shape.
+--
+-- Rehearsal harness (scripts/rehearse_lexical_candidate.py) BASE_DDL now
+-- mirrors the full live discord_messages / members / discord_reactions shape.
 -- ============================================================
+
+
+-- Hide deleted messages from public reads at the source (discord_messages is
+-- directly readable via PostgREST; message_feed reads through it). service_role
+-- bypasses RLS, so the write path is unaffected. Idempotent drop+create.
+drop policy if exists "Allow public read access to messages" on public.discord_messages;
+do $$
+begin
+  if not exists (
+    select 1 from pg_policy pol
+    join pg_class c on c.oid = pol.polrelid
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relname = 'discord_messages'
+      and pol.polname = 'hivemind public read non-deleted messages'
+  ) then
+    create policy "hivemind public read non-deleted messages" on public.discord_messages
+      for select to public using (coalesce(is_deleted, false) = false);
+  end if;
+end $$;
+
+-- content_embeddings stores message chunk_text (incl. deleted messages until
+-- the async cleanup runs). Supabase default privileges grant new public-schema
+-- tables to anon/authenticated, so when the embedding migrations (020-034)
+-- deploy, close that surface preemptively. service_role keeps its grant for the
+-- worker/backfill/search path. Guarded: no-op on DBs where the table is absent.
+do $$
+begin
+  if to_regclass('public.content_embeddings') is not null then
+    revoke all on table public.content_embeddings from anon, authenticated;
+  end if;
+end $$;
+
+create or replace view public.message_feed as
+  select m.message_id, m.content, m.created_at,
+         coalesce(a.global_name, a.username) as author_name,
+         c.channel_name, m.channel_id, m.guild_id,
+         (select json_agg(json_build_object('emoji', r.emoji,
+                   'reactor', coalesce(rm.global_name, rm.username)))
+            from discord_reactions r
+            left join members rm on rm.member_id = r.user_id
+           where r.message_id = m.message_id and r.removed_at is null) as reactions
+    from discord_messages m
+    left join members a        on a.member_id  = m.author_id
+    left join discord_channels c on c.channel_id = m.channel_id
+   where m.is_deleted = false;
 
 create or replace view unified_feed
 with (security_invoker = true) as
@@ -50,20 +102,20 @@ with (security_invoker = true) as
     'https://discord.com/channels/' || m.guild_id || '/' || m.channel_id || '/' || m.message_id
                                     as url,
     jsonb_build_object(
-      'channel_id',     m.channel_id,
-      'reactions',      m.reactions,
-      'guild_id',       m.guild_id,
-      'author_id',      d.author_id,
-      'reference_id',   d.reference_id,
-      'thread_id',      d.thread_id,
-      'message_type',   d.message_type,
-      'edited_at',      d.edited_at,
-      'is_pinned',      d.is_pinned,
-      'reaction_count', d.reaction_count,
-      'embeds',         d.embeds,
-      'channel_type',   cc.channel_type,
-      'avatar_url',     mm.avatar_url
-    )                                   as metadata,
+               'channel_id',     m.channel_id,
+               'reactions',      m.reactions,
+               'guild_id',       m.guild_id::text,
+               'author_id',      d.author_id::text,
+               'reference_id',   d.reference_id::text,
+               'thread_id',      d.thread_id::text,
+               'message_type',   d.message_type,
+               'edited_at',      d.edited_at,
+               'is_pinned',      d.is_pinned,
+               'reaction_count', d.reaction_count,
+               'embeds',         d.embeds,
+               'channel_type',   cc.channel_type,
+               'avatar_url',     mm.avatar_url
+             )                                   as metadata,
     m.created_at
   from message_feed m
   left join lateral (
@@ -277,8 +329,9 @@ begin
     from top t
     left join lateral (
       -- MESSAGE branch (mirrors unified_feed exactly; schema/001 as overridden
-      -- by schema/035). New metadata keys ride alongside the original
-      -- channel_id/reactions; deleted messages are re-filtered here.
+      -- by schema/035). Discord ids are stringified at the JSON boundary
+      -- (snowflakes exceed 2^53 — JS number rounding). Deleted messages are
+      -- re-filtered here so a race can't hydrate a just-deleted message.
       (select 'message'::text         as kind,
              'banodoco-discord'::text as source,
              m.message_id::text       as item_id,
@@ -291,10 +344,10 @@ begin
              jsonb_build_object(
                'channel_id',     m.channel_id,
                'reactions',      m.reactions,
-               'guild_id',       m.guild_id,
-               'author_id',      d.author_id,
-               'reference_id',   d.reference_id,
-               'thread_id',      d.thread_id,
+               'guild_id',       m.guild_id::text,
+               'author_id',      d.author_id::text,
+               'reference_id',   d.reference_id::text,
+               'thread_id',      d.thread_id::text,
                'message_type',   d.message_type,
                'edited_at',      d.edited_at,
                'is_pinned',      d.is_pinned,
@@ -383,7 +436,8 @@ begin
                hydrated.created_at desc nulls last,
                hydrated.entity_type asc, hydrated.item_id asc), '[]'::jsonb)
     into v_results
-  from hydrated;
+  from hydrated
+ where hydrated.kind is not null;
 
   return jsonb_build_object(
     'results', v_results,

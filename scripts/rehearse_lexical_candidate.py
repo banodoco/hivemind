@@ -118,14 +118,28 @@ create table if not exists public.discord_channels (
   channel_type text
 );
 
+create table if not exists public.discord_reactions (
+  message_id bigint not null,
+  user_id    bigint not null,
+  emoji      text not null,
+  removed_at timestamptz,
+  primary key (message_id, user_id, emoji)
+);
+
 -- message_feed: the presentation view unified_feed joins to (phase0 map). The
--- lexical RPC hydrates message identities from here. Simplified reactions
--- (null) — reactions are not a ranking input and not needed for search parity.
+-- lexical RPC hydrates message identities from here. Mirrors the live shape
+-- (reactions json, correlated subquery over discord_reactions) so schema/035's
+-- CREATE OR REPLACE VIEW (which adds only the is_deleted filter) is a clean
+-- type-preserving redefinition.
 create or replace view public.message_feed as
   select m.message_id, m.content, m.created_at,
          coalesce(a.global_name, a.username) as author_name,
          c.channel_name, m.channel_id, m.guild_id,
-         null::jsonb as reactions
+         (select json_agg(json_build_object('emoji', r.emoji,
+                   'reactor', coalesce(rm.global_name, rm.username)))
+            from public.discord_reactions r
+            left join public.members rm on rm.member_id = r.user_id
+           where r.message_id = m.message_id and r.removed_at is null) as reactions
     from public.discord_messages m
     left join public.members a        on a.member_id  = m.author_id
     left join public.discord_channels c on c.channel_id = m.channel_id;

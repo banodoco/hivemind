@@ -124,13 +124,13 @@ original `channel_id` + `reactions`):
 
 | key | type | notes |
 |---|---|---|
-| `channel_id` | int | channel the message is in |
-| `guild_id` | int | server id |
+| `channel_id` | number | channel the message is in (legacy numeric; pre-dates the stringification rule) |
+| `guild_id` | string | server id — Discord ids are **strings** here (snowflakes exceed 2⁵³, JS would round them as numbers) |
 | `reactions` | json | reaction list (frequently null — do not rank by it) |
-| `author_id` | int | author's `members.member_id` |
+| `author_id` | string | author's `members.member_id` (string, snowflake-safe) |
 | `avatar_url` | text | author's avatar, when known |
-| `reference_id` | int | the message this one replies to (Discord reply/cite), if any |
-| `thread_id` | int | thread/forum id the message belongs to, if any |
+| `reference_id` | string | the message this one replies to (Discord reply/cite), if any |
+| `thread_id` | string | thread/forum id the message belongs to, if any |
 | `message_type` | text | Discord message type (e.g. `DEFAULT`) |
 | `edited_at` | timestamptz | last edit time, when edited |
 | `is_pinned` | bool | pinned/curated |
@@ -138,8 +138,9 @@ original `channel_id` + `reactions`):
 | `embeds` | jsonb | Discord embed objects (link previews — title/description/source URL of shared content) |
 | `channel_type` | text | channel kind (`text`, `forum`, …) |
 
-Deleted messages (`is_deleted = true`) are filtered out of `unified_feed` and
-search results entirely — they never appear.
+Deleted messages (`is_deleted = true`) are filtered out of `unified_feed`,
+`message_feed`, search results, and direct `discord_messages` reads (RLS)
+entirely — they never appear.
 
 ### Search query pattern
 
