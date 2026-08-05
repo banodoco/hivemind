@@ -187,21 +187,36 @@ reconstruct a chain, walk it message-by-message: read the reply's
 on, both directions.
 
 > **Filtering caveat (corpus scale).** PostgREST **jsonb-path filters on
-> `metadata` time out** — `unified_feed` is a 1.2M-message view with no index on
-> the derived `metadata`, so `metadata->reference_id=eq.X` / `metadata->attachments`
-> / `metadata->>is_pinned=eq.true` scans and hits the **anon role's 3s
-> statement_timeout**. **How to recognize it:** HTTP 500 with body
-> `{"code":"57014","message":"canceling statement due to statement timeout"}` —
-> the `code: 57014` is a statement-timeout, **NOT a data error** (verified:
-> `jsonb_typeof(metadata)` is `object` on every row; the same query returns rows
-> given >3s). It fails on big channels even at `limit=5` because a LIMIT can't
-> skip the scan when matches are scarce. Do NOT rely on server-side metadata
-> filters. Instead: (a) read the fields from result rows / `get_item` (indexed,
-> fast); (b) walk chains via `get_item` by id; or (c) filter the SOURCE table
-> directly — `discord_messages.reference_id` is btree-indexed,
-> `discord_messages.is_pinned=eq.true` (a real column) returns in ~0.2s, and
-> `discord_messages.attachments` is jsonb. `discord_messages` is anon-readable
-> (deleted rows filtered by RLS).
+> `unified_feed.metadata` time out** — `unified_feed` is a 1.2M-message view with
+> no index on the derived `metadata`, so `metadata->reference_id=eq.X` /
+> `metadata->attachments` / `metadata->>is_pinned=eq.true` scans and hits the
+> **anon role's 3s statement_timeout**. **How to recognize it:** HTTP 500 with
+> body `{"code":"57014","message":"canceling statement due to statement
+> timeout"}` — `code: 57014` is a statement-timeout, **NOT a data error**
+> (verified: `jsonb_typeof(metadata)` is `object` on every row). It fails on big
+> channels even at `limit=5` because a LIMIT can't skip the scan when matches
+> are scarce. **Do NOT filter on `unified_feed.metadata`.** Use the fast
+> `message_filters` surface instead (below).
+
+### Fast filtering — `message_filters` (schema/036)
+
+`schema/036` adds a simple, index-backed view for server-side filtering:
+
+```
+GET /rest/v1/message_filters?is_pinned=eq.true&limit=20          # pinned messages
+GET /rest/v1/message_filters?thread_id=eq.X                      # forum/thread posts
+GET /rest/v1/message_filters?reference_id=eq.X                   # replies to X (btree)
+GET /rest/v1/message_filters?attachments=cs.[{"content_type":"video/mp4"}]   # has attachment of type (GIN)
+GET /rest/v1/message_filters?attachments=cs.[{"filename":"x.png"}]           # exact file
+```
+
+Columns: `message_id, channel_id, guild_id, author_id, thread_id, reference_id,
+is_pinned, reaction_count, attachments, embeds, content, created_at` (deleted
+messages already filtered). All filters are index-backed (verified: is_pinned
+~0.2s, reference_id ~0.1s, attachments containment ~0.1–0.6s). For the full
+enriched row, `get_item` the `message_id` from `unified_feed`. Attachments
+containment uses PostgREST's `cs` operator (jsonb `@>`); `content_type` is only
+present on ~4% of attachments, so prefer `filename` for type detection.
 
 ### Search query pattern
 
