@@ -136,7 +136,7 @@ original `channel_id` + `reactions`):
 | `is_pinned` | bool | pinned/curated |
 | `reaction_count` | int | total reactions (more reliable than `reactions`) |
 | `embeds` | jsonb | Discord embed objects (link previews — title/description/source URL of shared content) |
-| `attachments` | jsonb | Discord attachment objects — **the resource-detection signal**. Each: `filename`, `content_type` (MIME type, e.g. `image/png`, `video/mp4`, `application/json`), `url`, `size`, `width`/`height` |
+| `attachments` | jsonb | Discord attachment objects — **the resource-detection signal** (non-empty = message contains a file/media). Each has `filename` (always — infer type from extension) + `url`; `content_type` (MIME) only where the archive captured it (~4%) |
 | `channel_type` | text | channel kind (`text`, `forum`, …) |
 
 Deleted messages (`is_deleted = true`) are filtered out of `unified_feed`,
@@ -153,18 +153,19 @@ server-side filtering.
 Every message's `metadata.attachments` is the Discord attachment array. A
 message that actually contains/shows something (an image, a video, a workflow
 `.json`, a PDF) has a **non-empty** array; prose-only messages have `[]` or no
-`attachments` key. Each element carries the TYPE:
+`attachments` key. ~188k messages in the corpus carry attachments — the
+"resource-bearing" signal is reliable. Each element looks like:
 
 ```json
-{ "filename": "sigmaflux-workflow.json", "content_type": "application/json",
-  "url": "https://cdn.discordapp.com/attachments/...", "size": 2048 }
+{ "filename": "image.png", "url": "https://cdn.discordapp.com/attachments/..." }
 ```
 
-`content_type` is the MIME type — target `image/*`, `video/mp4`, `application/pdf`,
-ComfyUI workflow JSON, etc. So: read `metadata.attachments` from results to
-detect resource-bearing messages, and use the `refresh_media` executor /
-`refresh-media-urls` edge function to get fresh CDN URLs for the attachment
-(`filename` + `url`) by message id.
+`filename` is **always** present — infer the type from its extension (`image/*`,
+`video/*`, `.json`, `.pdf`, …). `content_type` (MIME) is additionally present on
+a minority of stored attachments (the archive captures it only ~4% of the
+time), so treat it as a bonus when it appears, not a guarantee. Use the
+`refresh_media` executor / `refresh-media-urls` edge function to get fresh CDN
+URLs for the attachment by message id.
 
 **2. `reference_id` → build chains.**
 `reference_id` is the snowflake (a string) of the message this one **replies to**
