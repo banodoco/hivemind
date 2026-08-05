@@ -1,0 +1,214 @@
+{
+  "task": "2.15-semantic-candidate-rehearsal",
+  "cluster_isolated": true,
+  "active_contract_id": 6368594834396668537,
+  "resolved_active": "6368594834396668537",
+  "migrations_applied": [
+    "003_lexical_resource_documents.sql",
+    "020_enable_pgvector.sql",
+    "021_embedding_contracts.sql",
+    "022_content_embeddings.sql",
+    "023_embedding_contract_switch.sql",
+    "024_identity_and_canonical_representations.sql",
+    "025_embedding_jobs.sql",
+    "026_embedding_job_rpc.sql",
+    "027_embedding_worker_surface.sql",
+    "028_embedding_worker_cron.sql",
+    "029_embedding_cleanup.sql",
+    "032_semantic_candidate_sql.sql"
+  ],
+  "checks": {
+    "draft_contract_vector_excluded": true,
+    "superseded_contract_vector_excluded": true,
+    "only_active_contract_ranks": true,
+    "no_entity_duplicates": true,
+    "multi_chunk_returns_once": true,
+    "closest_chunk_across_reps": true,
+    "snippet_matches_winning_chunk": true,
+    "tie_picks_prose_chunk0": true,
+    "tie_resolves_identically_repeated": true,
+    "ranks_dense": true,
+    "ordering_is_total_order": true,
+    "deleted_message_excluded": true,
+    "rejected_distillation_excluded": true,
+    "superseded_distillation_excluded": true,
+    "missing_resource_excluded": true,
+    "generic_resource_matches_all_resources": true,
+    "concrete_workflow_matches_only_workflows": true,
+    "concrete_article_matches_only_articles": true,
+    "message_kind_filter": true,
+    "exact_item_ids_snowflake": true,
+    "snowflake_json_string_roundtrip": true,
+    "exact_item_ids_simple": true,
+    "bare_item_ids_fail_closed": true,
+    "bare_item_ids_no_unrelated_entity": true,
+    "ambiguous_item_ids_fail_closed": true,
+    "ambiguous_item_ids_no_unrelated_entity": true,
+    "limit_bounded": true,
+    "limit_deterministic": true,
+    "limit_capped_at_500": true,
+    "quarantined_workflow_ranks_only_via_prose": true,
+    "unavailable_workflow_does_not_rank": true,
+    "safe_workflow_python_still_wins": true,
+    "unsafe_python_snippet_never_leaked": true,
+    "canonical_accessor_5001_safe": true,
+    "canonical_accessor_5004_not_safe": true,
+    "canonical_accessor_5005_not_safe": true,
+    "is_stable": true,
+    "is_security_definer": true,
+    "search_path_pinned": true,
+    "revoked_from_public": true,
+    "granted_to_service_role": true,
+    "not_granted_to_anon": true,
+    "not_granted_to_authenticated": true,
+    "lowpriv_cannot_call": true,
+    "anon_cannot_call": true,
+    "authenticated_cannot_call": true,
+    "service_role_can_call": true
+  },
+  "evidence": {
+    "no_filter_order": [
+      {
+        "rank": 1,
+        "entity": "message",
+        "item_id": "100",
+        "kind": "message",
+        "representation": "prose",
+        "chunk_index": 0,
+        "distance": 0.2,
+        "snippet_len": 13,
+        "snippet_tag": "MSG100"
+      },
+      {
+        "rank": 2,
+        "entity": "resource",
+        "item_id": "5001",
+        "kind": "workflow",
+        "representation": "workflow_python",
+        "chunk_index": 0,
+        "distance": 0.2,
+        "snippet_len": 10,
+        "snippet_tag": "WF5001"
+      },
+      {
+        "rank": 3,
+        "entity": "resource",
+        "item_id": "5002",
+        "kind": "workflow",
+        "representation": "prose",
+        "chunk_index": 0,
+        "distance": 0.2,
+        "snippet_len": 13,
+        "snippet_tag": "WF5002"
+      },
+      {
+        "rank": 4,
+        "entity": "distillation",
+        "item_id": "700",
+        "kind": "distillation",
+        "representation": "prose",
+        "chunk_index": 0,
+        "distance": 0.4,
+        "snippet_len": 14,
+        "snippet_tag": "DIST700"
+      },
+      {
+        "rank": 5,
+        "entity": "message",
+        "item_id": "9007199254740993",
+        "kind": "message",
+        "representation": "prose",
+        "chunk_index": 0,
+        "distance": 0.4,
+        "snippet_len": 14,
+        "snippet_tag": "MSGSNOW"
+      },
+      {
+        "rank": 6,
+        "entity": "resource",
+        "item_id": "5003",
+        "kind": "article",
+        "representation": "prose",
+        "chunk_index": 0,
+        "distance": 0.4,
+        "snippet_len": 14,
+        "snippet_tag": "ART5003"
+      },
+      {
+        "rank": 7,
+        "entity": "resource",
+        "item_id": "5004",
+        "kind": "workflow",
+        "representation": "prose",
+        "chunk_index": 0,
+        "distance": 0.4,
+        "snippet_len": 13,
+        "snippet_tag": "WF5004"
+      }
+    ],
+    "filters": {
+      "generic_resource": [
+        "resource:5001",
+        "resource:5002",
+        "resource:5003",
+        "resource:5004"
+      ],
+      "concrete_workflow": [
+        "resource:5001",
+        "resource:5002",
+        "resource:5004"
+      ],
+      "concrete_article": [
+        "resource:5003"
+      ],
+      "message_kind": [
+        "message:100",
+        "message:9007199254740993"
+      ],
+      "snowflake_item_id": [
+        "9007199254740993"
+      ]
+    },
+    "excluded_closest_vectors": {
+      "draft_contract_300": true,
+      "superseded_contract_400": true,
+      "deleted_message_200": true,
+      "rejected_distillation_701": true,
+      "superseded_distillation_702": true,
+      "missing_resource_5999": true
+    },
+    "unsafe_workflow_python_gate": {
+      "quarantined_5004_present": true,
+      "quarantined_5004_winning_representation": "prose",
+      "quarantined_5004_winning_chunk_index": 0,
+      "unavailable_5005_present": false,
+      "safe_5001_winning_representation": "workflow_python",
+      "stale_unsafe_snippet_leaked": false,
+      "canonical_accessor_5001_safe": true,
+      "canonical_accessor_5004_safe": false,
+      "canonical_accessor_5005_safe": false
+    },
+    "item_ids_fail_closed": {
+      "bare_item_ids_returned_count": 0,
+      "ambiguous_item_ids_returned_count": 0,
+      "bare_leaked_unrelated_entity_5001": false,
+      "ambiguous_leaked_unrelated_entity": false
+    },
+    "security": {
+      "grantees": [
+        "postgres",
+        "service_role"
+      ],
+      "catalog": {
+        "volatile": "s",
+        "security_definer": "t",
+        "config": "{\"search_path=public, pg_temp\"}"
+      }
+    }
+  },
+  "verdict": {
+    "all_pass": true,
+    "n_pass": 47,
+    "n_total": 47
+  }
+}

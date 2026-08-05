@@ -1,0 +1,70 @@
+{
+  "offline": {
+    "problems": [],
+    "summary": {
+      "n_cases": 112,
+      "n_judged": 104,
+      "n_no_hit": 8,
+      "categories_present": [
+        "best_is_distillation",
+        "best_is_message",
+        "best_is_resource",
+        "channel_scoped",
+        "code_fragment",
+        "cross_source",
+        "exact_name",
+        "long_resource_chunk",
+        "multi_term",
+        "named_author",
+        "no_hit",
+        "paraphrase",
+        "pending_status",
+        "selective_filter",
+        "settings",
+        "single_workflow",
+        "snowflake",
+        "spelling_variant",
+        "time_scoped",
+        "timeout_prone",
+        "workflow_code",
+        "workflow_only",
+        "workflow_python_evidence"
+      ],
+      "categories_missing": [],
+      "grade_counts": {
+        "0": 0,
+        "1": 2,
+        "2": 35,
+        "3": 104
+      },
+      "query_text_reuse": {
+        "Mochi": 2,
+        "BerniniConditioning": 3,
+        "BlockifyMask": 2,
+        "Flux2Scheduler": 2,
+        "upscale": 3,
+        "controlnet": 2,
+        "taeltx": 2,
+        "ColorMatch": 3
+      },
+      "snapshot": {
+        "n_items": 58,
+        "n_judged_anchored": 52,
+        "n_judged": 52
+      },
+      "evidence": {
+        "n_evidence_ids": 2849,
+        "n_snapshot_unanchored": 0,
+        "captured_at_utc": "2026-07-28T19:15:11Z",
+        "endpoint_ref": "ujlwuvkrxlvoswwkerdf"
+      }
+    }
+  },
+  "live": {
+    "n_identities": 52,
+    "n_ok": 52,
+    "missing": [],
+    "errors": [],
+    "endpoint_ref": "ujlwuvkrxlvoswwkerdf"
+  }
+}

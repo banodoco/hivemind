@@ -1,0 +1,2349 @@
+{
+  "version": "golden/2026-07-28/v1",
+  "meta": {
+    "version": "golden/2026-07-28/v1",
+    "evidence_version": "evidence/2026-07-28",
+    "captured_at_utc": "2026-07-28T19:15:11Z",
+    "endpoint_ref": "ujlwuvkrxlvoswwkerdf",
+    "n_cases": 112,
+    "rubric": {
+      "3": "primary — single best / canonical / direct exact match",
+      "2": "strong — clearly on-topic & correct, not the single best (co-equal or supporting)",
+      "1": "marginal — topically related / tangential; useful context, weak match",
+      "0": "not_relevant — explicit distractor (not used in expected; relevant set = grade>=1)"
+    },
+    "principle": "Grades reflect what an item actually contains relative to query intent, NOT where the legacy ILIKE system happens to rank it. Identities validated live; snowflakes are strings (selected programmatically, never hand-typed); workflow Python evidence is existence-only (no code bodies stored)."
+  },
+  "cases": [
+    {
+      "id": "G001",
+      "query": "FLUX.1",
+      "categories": [
+        "exact_name",
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 3,
+          "note": "alias 'flux.1'; .gguf model — direct dotted-name hit"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1764",
+          "grade": 2,
+          "note": "flux.1 alias; FLUX image gen"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1757",
+          "grade": 1,
+          "note": "Flux-family, not FLUX.1 specifically"
+        }
+      ]
+    },
+    {
+      "id": "G002",
+      "query": "Wan 2.2",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 3,
+          "note": "title 'Wan 2.2 Video Animation…' — spaced+dotted form"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 2,
+          "note": "Wan2.2 I2V; same family, no-space form"
+        }
+      ]
+    },
+    {
+      "id": "G003",
+      "query": "Wan2.2",
+      "categories": [
+        "exact_name",
+        "spelling_variant"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 3,
+          "note": "title 'Wan2.2 Image-to-Video…' — no-space form"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 2,
+          "note": "Wan 2.2 spaced variant"
+        }
+      ]
+    },
+    {
+      "id": "G004",
+      "query": "Flux 2",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "1757",
+          "grade": 3,
+          "note": "title 'Flux 2 Image Generation with LoRA Enhancement'"
+        }
+      ]
+    },
+    {
+      "id": "G005",
+      "query": "LTX-Video",
+      "categories": [
+        "exact_name",
+        "spelling_variant"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "grade": 3,
+          "note": "alias 'ltx-video' — hyphenated form"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "grade": 2,
+          "note": "ltx-video alias"
+        }
+      ]
+    },
+    {
+      "id": "G006",
+      "query": "lightx2v_I2V_14B",
+      "categories": [
+        "exact_name",
+        "code_fragment"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 3,
+          "note": "model filename lightx2v_I2V_14B…_bf16.safetensors in body"
+        }
+      ]
+    },
+    {
+      "id": "G007",
+      "query": "Bernini",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "83",
+          "grade": 3,
+          "note": "title '…with Bernini Conditioning'"
+        }
+      ]
+    },
+    {
+      "id": "G008",
+      "query": "Qwen Image",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "grade": 3,
+          "note": "alias 'qwen image'"
+        }
+      ]
+    },
+    {
+      "id": "G009",
+      "query": "VACE",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "grade": 3,
+          "note": "VACE in title/body; WanVideo I2V"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2539",
+          "grade": 2,
+          "note": "wan2.1_vace model filename"
+        }
+      ]
+    },
+    {
+      "id": "G010",
+      "query": "CogVideoX",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "64",
+          "grade": 3,
+          "note": "CogVideoX present in body (VEnhancer)"
+        }
+      ]
+    },
+    {
+      "id": "G011",
+      "query": "Mochi",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "260",
+          "grade": 3,
+          "note": "title 'Mochi Video Generation with Video Input'"
+        }
+      ]
+    },
+    {
+      "id": "G012",
+      "query": "Stable Diffusion",
+      "categories": [
+        "exact_name",
+        "spelling_variant"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "36",
+          "grade": 3,
+          "note": "alias 'stable diffusion 3'"
+        }
+      ]
+    },
+    {
+      "id": "G013",
+      "query": "SDXL",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "grade": 3,
+          "note": "alias 'sdxl'; SVD with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "240",
+          "grade": 2,
+          "note": "sdxl alias; UltraCascade"
+        }
+      ]
+    },
+    {
+      "id": "G014",
+      "query": "Hunyuan",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 3,
+          "note": "EmptyHunyuanLatentVideo node in body"
+        }
+      ]
+    },
+    {
+      "id": "G015",
+      "query": "Cascade",
+      "categories": [
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "240",
+          "grade": 3,
+          "note": "title 'UltraCascade Multi-Model…'"
+        }
+      ]
+    },
+    {
+      "id": "G016",
+      "query": ".gguf",
+      "categories": [
+        "exact_name",
+        "code_fragment"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 3,
+          "note": "Wan2.2-Animate-14B-Q6_K.gguf model"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 2,
+          "note": "pixelwave_flux1_dev_Q8_0_03.gguf"
+        }
+      ]
+    },
+    {
+      "id": "G017",
+      "query": "Seedance 2",
+      "categories": [
+        "exact_name",
+        "best_is_distillation",
+        "cross_source"
+      ],
+      "limit": 20,
+      "notes": "exact name absent from workflow titles but present as a distillation topic — name lookup across kinds",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "3",
+          "grade": 3,
+          "note": "distillation on Seedance 2 reference control; no workflow title carries it"
+        }
+      ]
+    },
+    {
+      "id": "G018",
+      "query": "WanVideoSampler",
+      "categories": [
+        "workflow_code",
+        "exact_name",
+        "timeout_prone"
+      ],
+      "limit": 20,
+      "notes": "legacy baseline TIMED OUT on 'WanVideoSampler' (30s)",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "grade": 3,
+          "note": "WanVideoSampler node (WanVideo I2V)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "9",
+          "grade": 2,
+          "note": "also contains WanVideoSampler"
+        }
+      ]
+    },
+    {
+      "id": "G019",
+      "query": "KSampler",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "grade": 3,
+          "note": "KSampler node (SVD SDXL Turbo)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "36",
+          "grade": 2,
+          "note": "KSampler (HiDream)"
+        }
+      ]
+    },
+    {
+      "id": "G020",
+      "query": "VAEDecode",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "64",
+          "grade": 3,
+          "note": "VAEDecode node (VEnhancer)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "grade": 2,
+          "note": "VAEDecode present"
+        }
+      ]
+    },
+    {
+      "id": "G021",
+      "query": "BerniniConditioning",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "83",
+          "grade": 3,
+          "note": "BerniniConditioning node (body ilike confirmed)"
+        }
+      ]
+    },
+    {
+      "id": "G022",
+      "query": "BlockifyMask",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 3,
+          "note": "BlockifyMask node"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2542",
+          "grade": 2,
+          "note": "BlockifyMask (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G023",
+      "query": "MochiDecodeSpatialTiling",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "260",
+          "grade": 3,
+          "note": "Mochi-specific node class"
+        }
+      ]
+    },
+    {
+      "id": "G024",
+      "query": "DetailDaemonSamplerNode",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "grade": 3,
+          "note": "DetailDaemonSamplerNode node"
+        }
+      ]
+    },
+    {
+      "id": "G025",
+      "query": "AudioSeparation",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "1167",
+          "grade": 3,
+          "note": "AudioSeparation node (Wan2.1 Multi-Talk)"
+        }
+      ]
+    },
+    {
+      "id": "G026",
+      "query": "DepthAnythingV2Preprocessor",
+      "categories": [
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2539",
+          "grade": 3,
+          "note": "node present (py cohort; id-scoped ilike confirmed)"
+        }
+      ]
+    },
+    {
+      "id": "G027",
+      "query": "IPAdapterFaceIDKolors",
+      "categories": [
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2757",
+          "grade": 3,
+          "note": "unique node class; only this workflow (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G028",
+      "query": "ClownGuide_Beta",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "240",
+          "grade": 3,
+          "note": "ClownGuide_Beta node (UltraCascade)"
+        }
+      ]
+    },
+    {
+      "id": "G029",
+      "query": "LoadWanVideoT5TextEncoder",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "grade": 3,
+          "note": "LoadWanVideoT5TextEncoder node"
+        }
+      ]
+    },
+    {
+      "id": "G030",
+      "query": "EmptyHunyuanLatentVideo",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 3,
+          "note": "EmptyHunyuanLatentVideo node"
+        }
+      ]
+    },
+    {
+      "id": "G031",
+      "query": "Flux2Scheduler",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "1757",
+          "grade": 3,
+          "note": "Flux2Scheduler node (Flux 2)"
+        }
+      ]
+    },
+    {
+      "id": "G032",
+      "query": "ltx-2-19b-ic-lora-detailer",
+      "categories": [
+        "workflow_code",
+        "code_fragment"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "grade": 3,
+          "note": "model filename in body"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2540",
+          "grade": 2,
+          "note": "same detailer model (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G033",
+      "query": "wan2.2_animate_14B",
+      "categories": [
+        "workflow_code",
+        "code_fragment"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2542",
+          "grade": 3,
+          "note": "wan2.2_animate_14B_bf16 model (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G034",
+      "query": "CreateVideo",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "grade": 3,
+          "note": "CreateVideo node"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "grade": 2,
+          "note": "CreateVideo node"
+        }
+      ]
+    },
+    {
+      "id": "G035",
+      "query": "which workflow wires the ColorMatch node",
+      "categories": [
+        "workflow_python_evidence",
+        "workflow_code",
+        "paraphrase"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2537",
+          "grade": 3,
+          "note": "ColorMatch node only here (py cohort; id-scoped ilike confirmed)"
+        }
+      ]
+    },
+    {
+      "id": "G036",
+      "query": "find the ipadapter weight types workflow",
+      "categories": [
+        "workflow_python_evidence",
+        "workflow_code",
+        "paraphrase"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2758",
+          "grade": 3,
+          "note": "title/source is ipadapter_weight_types.json (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G037",
+      "query": "regional ipadapter mask conditioning",
+      "categories": [
+        "workflow_python_evidence",
+        "multi_term",
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2750",
+          "grade": 3,
+          "note": "IP-Adapter Regional Conditioning with Masks (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G038",
+      "query": "controlnet inpainting flux",
+      "categories": [
+        "multi_term",
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 3,
+          "note": "Flux Inpainting + ControlNet"
+        }
+      ]
+    },
+    {
+      "id": "G039",
+      "query": "video upscaling lora",
+      "categories": [
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "grade": 3,
+          "note": "LTXV Upscaling + LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 2,
+          "note": "Pose Control + Upscaling"
+        }
+      ]
+    },
+    {
+      "id": "G040",
+      "query": "pose control animation",
+      "categories": [
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 3,
+          "note": "Pose Control + Upscaling"
+        }
+      ]
+    },
+    {
+      "id": "G041",
+      "query": "audio separation multi talk",
+      "categories": [
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "1167",
+          "grade": 3,
+          "note": "Wan2.1 Multi-Talk + Audio Separation"
+        }
+      ]
+    },
+    {
+      "id": "G042",
+      "query": "face id kolors",
+      "categories": [
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2757",
+          "grade": 3,
+          "note": "FaceID + Kolors + ChatGLM3"
+        }
+      ]
+    },
+    {
+      "id": "G043",
+      "query": "image comparison enhancement",
+      "categories": [
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "grade": 3,
+          "note": "Image Comparison + Enhancement (Florence2)"
+        }
+      ]
+    },
+    {
+      "id": "G044",
+      "query": "noise scheduling lora",
+      "categories": [
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 3,
+          "note": "LoRAs + Noise Scheduling"
+        }
+      ]
+    },
+    {
+      "id": "G045",
+      "query": "svd sdxl turbo",
+      "categories": [
+        "multi_term",
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "grade": 3,
+          "note": "SVD Image-to-Video with SDXL Turbo"
+        }
+      ]
+    },
+    {
+      "id": "G046",
+      "query": "make the motion less jittery",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "5",
+          "grade": 3,
+          "note": "LightX2V motion trade-off distillation"
+        }
+      ]
+    },
+    {
+      "id": "G047",
+      "query": "tighten control using a reference video",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "3",
+          "grade": 3,
+          "note": "Seedance 2 reference-driven control"
+        }
+      ]
+    },
+    {
+      "id": "G048",
+      "query": "localize edits to just one region",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "7",
+          "grade": 3,
+          "note": "localized VACE inpainting masks/control frames"
+        }
+      ]
+    },
+    {
+      "id": "G049",
+      "query": "keep colors consistent between the input and output character",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "4",
+          "grade": 3,
+          "note": "Wan Animate color matching / relighting"
+        }
+      ]
+    },
+    {
+      "id": "G050",
+      "query": "is there a faster sampler patch",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "6",
+          "grade": 3,
+          "note": "LTX2 Attention Tuner Patch — speed optimization"
+        }
+      ]
+    },
+    {
+      "id": "G051",
+      "query": "compare two image editors",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "8",
+          "grade": 3,
+          "note": "Qwen Image Edit vs Flux 2 Klein"
+        }
+      ]
+    },
+    {
+      "id": "G052",
+      "query": "what searchable info should a workflow keep",
+      "categories": [
+        "paraphrase",
+        "cross_source",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "12",
+          "grade": 3,
+          "note": "VibeComfy workflow searchable semantics"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2750",
+          "grade": 1,
+          "note": "cited resource example"
+        }
+      ]
+    },
+    {
+      "id": "G053",
+      "query": "budget VRAM for training a control lora",
+      "categories": [
+        "paraphrase",
+        "settings",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "9",
+          "grade": 3,
+          "note": "video control LoRA training scale/VRAM"
+        }
+      ]
+    },
+    {
+      "id": "G054",
+      "query": "Bernini OOM fix",
+      "categories": [
+        "settings",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "10",
+          "grade": 3,
+          "note": "Bernini OOM caused by ClownShark"
+        }
+      ]
+    },
+    {
+      "id": "G055",
+      "query": "ClownShark crash comfyui",
+      "categories": [
+        "settings",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "10",
+          "grade": 3,
+          "note": "ClownShark OOM distillation"
+        }
+      ]
+    },
+    {
+      "id": "G056",
+      "query": "INT8 quantization makes lora weak",
+      "categories": [
+        "settings",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "11",
+          "grade": 3,
+          "note": "Wan INT8 quantization vs LightX2V LoRA strength"
+        }
+      ]
+    },
+    {
+      "id": "G057",
+      "query": "looping sampler MSR",
+      "categories": [
+        "settings",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531487459404419102",
+          "grade": 3,
+          "note": "Looping Sampler MSR message (BNDC)"
+        }
+      ]
+    },
+    {
+      "id": "G058",
+      "query": "custom audio workflows",
+      "categories": [
+        "settings",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531711322037682237",
+          "grade": 3,
+          "note": "custom-audio-workflows message"
+        }
+      ]
+    },
+    {
+      "id": "G059",
+      "query": "upscale",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "authors": [
+          "QuintForms"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531607167076012122",
+          "grade": 3,
+          "note": "QuintForms upscale-step message"
+        }
+      ]
+    },
+    {
+      "id": "G060",
+      "query": "flux.2 dev lora",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "authors": [
+          "buggz"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531724110558920724",
+          "grade": 3,
+          "note": "buggz int8-convrot fp8 flux.2 dev message"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531723906308771967",
+          "grade": 2,
+          "note": "buggz 'not seeing many flux.2 dev loras'"
+        }
+      ]
+    },
+    {
+      "id": "G061",
+      "query": "vace t2v weights",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "authors": [
+          "spacepxl"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531284476775370863",
+          "grade": 3,
+          "note": "spacepxl 'vace keeps the t2v weights'"
+        }
+      ]
+    },
+    {
+      "id": "G062",
+      "query": "live update summary",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "authors": [
+          "BNDC"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531714016236409054",
+          "grade": 3,
+          "note": "BNDC 'Why the community cares' summary"
+        }
+      ]
+    },
+    {
+      "id": "G063",
+      "query": "controlnet",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "channels": [
+          "wan_chatter"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531344153131352206",
+          "grade": 3,
+          "note": "hicho 'u dont have to use controlnet'"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531284476775370863",
+          "grade": 2,
+          "note": "spacepxl vace/controlnet"
+        }
+      ]
+    },
+    {
+      "id": "G064",
+      "query": "sampler",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "channels": [
+          "ltx_chatter"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531693288141230103",
+          "grade": 3,
+          "note": "ucren 'distill scheduler sampler'"
+        }
+      ]
+    },
+    {
+      "id": "G065",
+      "query": "vae",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "channels": [
+          "ltx_chatter"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531732489159184569",
+          "grade": 3,
+          "note": "Mandalorian 'LTX Video VAE'"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531722733917048912",
+          "grade": 2,
+          "note": "hicho checkpoint/vae message"
+        }
+      ]
+    },
+    {
+      "id": "G066",
+      "query": "upscale",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "channels": [
+          "krea-2-image"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531607167076012122",
+          "grade": 3,
+          "note": "QuintForms upscale step (krea-2-image)"
+        }
+      ]
+    },
+    {
+      "id": "G067",
+      "query": "lora",
+      "categories": [
+        "time_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "since": "2026-07-28"
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531732226474246244",
+          "grade": 3,
+          "note": "2026-07-28 lora message"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531724110558920724",
+          "grade": 2,
+          "note": "2026-07-28 flux.2 dev lora"
+        }
+      ]
+    },
+    {
+      "id": "G068",
+      "query": "controlnet",
+      "categories": [
+        "time_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "since": "2026-07-25"
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531344153131352206",
+          "grade": 3,
+          "note": "2026-07-27 controlnet message"
+        }
+      ]
+    },
+    {
+      "id": "G069",
+      "query": "mask",
+      "categories": [
+        "time_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "since": "2026-07-28"
+      },
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531728869349003414",
+          "grade": 3,
+          "note": "2026-07-28 mask message"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531714005544996966",
+          "grade": 2,
+          "note": "2026-07-28 MaskVidExperiments"
+        }
+      ]
+    },
+    {
+      "id": "G070",
+      "query": "upscale ai generated video",
+      "categories": [
+        "cross_source",
+        "best_is_distillation",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "1",
+          "grade": 3,
+          "note": "distillation: what people use to upscale AI video"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531449356857639053",
+          "grade": 2,
+          "note": "real upscale/CivitAI-guide message"
+        }
+      ]
+    },
+    {
+      "id": "G071",
+      "query": "lightx2v motion trade off",
+      "categories": [
+        "cross_source",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "5",
+          "grade": 3,
+          "note": "LightX2V motion trade-off distillation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "grade": 2,
+          "note": "workflow carrying the lightx2v model"
+        }
+      ]
+    },
+    {
+      "id": "G072",
+      "query": "vace inpainting masks",
+      "categories": [
+        "cross_source",
+        "best_is_distillation"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "7",
+          "grade": 3,
+          "note": "VACE inpainting masks/control frames"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "grade": 2,
+          "note": "WanVideo VACE I2V workflow"
+        }
+      ]
+    },
+    {
+      "id": "G073",
+      "query": "bernini conditioning video",
+      "categories": [
+        "cross_source",
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "83",
+          "grade": 3,
+          "note": "Wan2.1 Bernini Conditioning workflow"
+        },
+        {
+          "kind": "distillation",
+          "item_id": "10",
+          "grade": 2,
+          "note": "Bernini OOM distillation"
+        }
+      ]
+    },
+    {
+      "id": "G074",
+      "query": "upscale step preserve detail",
+      "categories": [
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531607167076012122",
+          "grade": 3,
+          "note": "'I switched to an upscale step to preserve…'"
+        }
+      ]
+    },
+    {
+      "id": "G075",
+      "query": "not seeing many flux.2 dev loras",
+      "categories": [
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531723906308771967",
+          "grade": 3,
+          "note": "buggz verbatim topic message"
+        }
+      ]
+    },
+    {
+      "id": "G076",
+      "query": "audio vae only super and nano",
+      "categories": [
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531719890136993862",
+          "grade": 3,
+          "note": "yi 'Only super and nano contain the audio va…'"
+        }
+      ]
+    },
+    {
+      "id": "G077",
+      "query": "flux inpainting compositing",
+      "categories": [
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 3,
+          "note": "Flux Inpainting + Compositing"
+        }
+      ]
+    },
+    {
+      "id": "G078",
+      "query": "mochi video input",
+      "categories": [
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "260",
+          "grade": 3,
+          "note": "Mochi Video Generation with Video Input"
+        }
+      ]
+    },
+    {
+      "id": "G079",
+      "query": "faceid kolors chatglm",
+      "categories": [
+        "best_is_resource"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2757",
+          "grade": 3,
+          "note": "FaceID + Kolors + ChatGLM3"
+        }
+      ]
+    },
+    {
+      "id": "G080",
+      "query": "taeltx",
+      "categories": [
+        "long_resource_chunk",
+        "workflow_code",
+        "code_fragment"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2540",
+          "grade": 3,
+          "note": "taeltx model deep in a py-cohort body (>=95K chars)"
+        }
+      ]
+    },
+    {
+      "id": "G081",
+      "query": "wan2.2_animate_14B_bf16",
+      "categories": [
+        "long_resource_chunk",
+        "workflow_code",
+        "code_fragment"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2542",
+          "grade": 3,
+          "note": "model literal deep in a py-cohort body"
+        }
+      ]
+    },
+    {
+      "id": "G082",
+      "query": "wan2.1_vace_14B",
+      "categories": [
+        "long_resource_chunk",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2537",
+          "grade": 3,
+          "note": "wan2.1_vace model in a large py-cohort body"
+        }
+      ]
+    },
+    {
+      "id": "G083",
+      "query": "Florence2",
+      "categories": [
+        "workflow_only",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2538",
+          "grade": 3,
+          "note": "Florence2 (py cohort)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "grade": 2,
+          "note": "Florence2 image comparison"
+        }
+      ]
+    },
+    {
+      "id": "G084",
+      "query": "ColorMatch",
+      "categories": [
+        "workflow_only",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2537",
+          "grade": 3,
+          "note": "ColorMatch node (py cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G085",
+      "query": "IPAdapter",
+      "categories": [
+        "workflow_only",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2750",
+          "grade": 3,
+          "note": "IP-Adapter Regional (py)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2757",
+          "grade": 2,
+          "note": "FaceID Kolors (py)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2758",
+          "grade": 2,
+          "note": "ipadapter_weight_types (py)"
+        }
+      ]
+    },
+    {
+      "id": "G086",
+      "query": "LTX",
+      "categories": [
+        "workflow_only",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "grade": 3,
+          "note": "LTXV workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "grade": 2,
+          "note": "LTX Video Audio"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2540",
+          "grade": 2,
+          "note": "VHS LTX (py)"
+        }
+      ]
+    },
+    {
+      "id": "G087",
+      "query": "Mochi",
+      "categories": [
+        "workflow_only",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "260",
+          "grade": 3,
+          "note": "Mochi workflow"
+        }
+      ]
+    },
+    {
+      "id": "G088",
+      "query": "ColorMatch",
+      "categories": [
+        "single_workflow",
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "2537"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2537",
+          "grade": 3,
+          "note": "the only scoped workflow; id-scoped ilike confirmed"
+        }
+      ]
+    },
+    {
+      "id": "G089",
+      "query": "BerniniConditioning",
+      "categories": [
+        "single_workflow",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "83"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "83",
+          "grade": 3,
+          "note": "scoped to 83; node confirmed present"
+        }
+      ]
+    },
+    {
+      "id": "G090",
+      "query": "BlockifyMask",
+      "categories": [
+        "single_workflow",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "169"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "grade": 3,
+          "note": "scoped to 169"
+        }
+      ]
+    },
+    {
+      "id": "G091",
+      "query": "ipadapter_weight_types",
+      "categories": [
+        "single_workflow",
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "2758"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2758",
+          "grade": 3,
+          "note": "scoped to 2758; matches its source name"
+        }
+      ]
+    },
+    {
+      "id": "G092",
+      "query": "Flux2Scheduler",
+      "categories": [
+        "single_workflow",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "1757"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "1757",
+          "grade": 3,
+          "note": "scoped to 1757"
+        }
+      ]
+    },
+    {
+      "id": "G093",
+      "query": "taeltx",
+      "categories": [
+        "single_workflow",
+        "long_resource_chunk",
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "2540"
+        ]
+      },
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2540",
+          "grade": 3,
+          "note": "scoped to 2540; deep py match"
+        }
+      ]
+    },
+    {
+      "id": "G094",
+      "query": "ltxv",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "grade": 3,
+          "note": "alias 'ltxv'"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "grade": 2,
+          "note": "ltxv alias"
+        }
+      ]
+    },
+    {
+      "id": "G095",
+      "query": "wanvideo",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "grade": 3,
+          "note": "alias 'wanvideo'"
+        }
+      ]
+    },
+    {
+      "id": "G096",
+      "query": "sd_xl",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "grade": 3,
+          "note": "alias 'sd_xl'"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "240",
+          "grade": 2,
+          "note": "sd_xl alias"
+        }
+      ]
+    },
+    {
+      "id": "G097",
+      "query": "control net",
+      "categories": [
+        "spelling_variant"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 3,
+          "note": "alias 'control net' (two-word form)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "grade": 2,
+          "note": "'control net' alias"
+        }
+      ]
+    },
+    {
+      "id": "G098",
+      "query": "flux1",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 3,
+          "note": "alias 'flux1'"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1764",
+          "grade": 2,
+          "note": "flux1 alias"
+        }
+      ]
+    },
+    {
+      "id": "G099",
+      "query": "CFGGuider",
+      "categories": [
+        "workflow_code"
+      ],
+      "limit": 20,
+      "notes": "py-cohort row: payload.python_source is authoritative and the same bytes also appear in body (both cohort) — exercises AD-4 precedence / no-double-indexing",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2538",
+          "grade": 3,
+          "note": "py-cohort (payload.python_source authoritative; both cohort)"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "grade": 2,
+          "note": "CFGGuider present"
+        }
+      ]
+    },
+    {
+      "id": "G100",
+      "query": "DownloadAndLoadFlorence2Model",
+      "categories": [
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "limit": 20,
+      "notes": "same both-cohort precedence check",
+      "expected": [
+        {
+          "kind": "workflow",
+          "item_id": "2538",
+          "grade": 3,
+          "note": "node in py-cohort body (both cohort)"
+        }
+      ]
+    },
+    {
+      "id": "G101",
+      "query": "model",
+      "categories": [
+        "timeout_prone",
+        "best_is_message",
+        "snowflake"
+      ],
+      "limit": 20,
+      "notes": "legacy baseline TIMED OUT on 'model' (30s, others pass) — broad common-term query",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531714016236409054",
+          "grade": 3,
+          "note": "BNDC model-related summary"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531449356857639053",
+          "grade": 2,
+          "note": "model guide message"
+        }
+      ]
+    },
+    {
+      "id": "G102",
+      "query": "controlnet settings",
+      "categories": [
+        "timeout_prone",
+        "multi_term"
+      ],
+      "limit": 20,
+      "notes": "legacy baseline returned HTTP 500 on 'controlnet settings' (others pass) — contiguous-substring multi-term weakness",
+      "expected": [
+        {
+          "kind": "message",
+          "item_id": "1531344153131352206",
+          "grade": 3,
+          "note": "controlnet message"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "grade": 2,
+          "note": "ControlNet workflow"
+        }
+      ]
+    },
+    {
+      "id": "G103",
+      "query": "best distillation for upscaling video",
+      "categories": [
+        "best_is_distillation",
+        "pending_status"
+      ],
+      "limit": 20,
+      "notes": "distillation id=1 status=pending confidence=low; the AD-6 approved-distillation boost has zero approved rows at capture time",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "1",
+          "grade": 3,
+          "note": "pending (approved=0 today): upscale AI video"
+        }
+      ]
+    },
+    {
+      "id": "G104",
+      "query": "attention tuner patch speed",
+      "categories": [
+        "best_is_distillation",
+        "pending_status",
+        "settings"
+      ],
+      "limit": 20,
+      "notes": "",
+      "expected": [
+        {
+          "kind": "distillation",
+          "item_id": "6",
+          "grade": 3,
+          "note": "pending confidence=medium: LTX2 Attention Tuner Patch"
+        }
+      ]
+    },
+    {
+      "id": "G105",
+      "query": "zzqxnotarealmodel-99999",
+      "categories": [
+        "no_hit"
+      ],
+      "limit": 20,
+      "notes": "genuine nonsense term",
+      "expect_no_hit": true
+    },
+    {
+      "id": "G106",
+      "query": "qwertyuiopasdfgh-nonexistent-term",
+      "categories": [
+        "no_hit"
+      ],
+      "limit": 20,
+      "notes": "adversarial nonsense",
+      "expect_no_hit": true
+    },
+    {
+      "id": "G107",
+      "query": "DEFINITELY_NOT_A_REAL_NODE_CLASS_XYZ",
+      "categories": [
+        "no_hit",
+        "workflow_only"
+      ],
+      "limit": 20,
+      "notes": "no workflow body contains this symbol",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "expect_no_hit": true
+    },
+    {
+      "id": "G108",
+      "query": "BerniniConditioning",
+      "categories": [
+        "no_hit",
+        "single_workflow"
+      ],
+      "limit": 20,
+      "notes": "symbol exists globally (W83) but NOT in scoped W5",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "5"
+        ]
+      },
+      "expect_no_hit": true
+    },
+    {
+      "id": "G109",
+      "query": "ColorMatch",
+      "categories": [
+        "no_hit",
+        "single_workflow"
+      ],
+      "limit": 20,
+      "notes": "ColorMatch exists in W2537 but NOT in scoped W83",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "83"
+        ]
+      },
+      "expect_no_hit": true
+    },
+    {
+      "id": "G110",
+      "query": "upscale",
+      "categories": [
+        "no_hit",
+        "time_scoped"
+      ],
+      "limit": 20,
+      "notes": "future date; nothing eligible",
+      "filters": {
+        "since": "2030-01-01"
+      },
+      "expect_no_hit": true
+    },
+    {
+      "id": "G111",
+      "query": "DROP TABLE unified_feed",
+      "categories": [
+        "no_hit"
+      ],
+      "limit": 20,
+      "notes": "injection-shaped; treated as inert text",
+      "expect_no_hit": true
+    },
+    {
+      "id": "G112",
+      "query": "🛑🦄 imaginary-emoji-workflow-🦄🛑",
+      "categories": [
+        "no_hit"
+      ],
+      "limit": 20,
+      "notes": "unicode emoji nonsense",
+      "expect_no_hit": true
+    }
+  ]
+}

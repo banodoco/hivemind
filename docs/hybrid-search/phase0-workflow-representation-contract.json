@@ -1,0 +1,270 @@
+{
+  "schema": "hivemind/workflow-representation-contract",
+  "title": "Hivemind workflow representation, security, embedding, chunking, evaluation, and rollback contract",
+  "task": "0.8",
+  "plan": "docs/architecture/hivemind-hybrid-search-plan.md",
+  "status": "frozen",
+  "decision_record": "docs/hybrid-search/phase0-workflow-representation-contract.md",
+  "reference_implementation": "executors/workflow_representation.py",
+  "validator": "scripts/validate_workflow_contract.py",
+  "frozen_at_utc": "2026-07-28T00:00:00Z",
+  "evidence_date": "2026-07-28",
+  "evidence_timestamps": {
+    "inventory_completed": "2026-07-28T18:50:48Z",
+    "golden_evidence_captured": "2026-07-28T19:15:00Z",
+    "baseline_captured": "2026-07-28T19:01:24Z"
+  },
+  "endpoint_ref": "ujlwuvkrxlvoswwkerdf",
+
+  "versions": {
+    "canonicalization": 1,
+    "delimiter_grammar": 1,
+    "secret_scan": 1,
+    "chunking": 2,
+    "semantics_projection": 1
+  },
+
+  "delimiters": {
+    "recognized": [
+      "Python ready-template source:",
+      "Python scratchpad source:"
+    ],
+    "grammar": "A block starts at a line whose rstrip() equals a recognized literal; the Python text runs until the next recognized delimiter line, the 'Workflow semantics (rule-based):' marker, or end of body. The delimiter line is not part of the returned Python. No markdown fence is emitted by VibeComfy.",
+    "vibecomfy_sources": {
+      "Python ready-template source:": "vibecomfy/scripts/upload_ready_templates_to_hivemind.py:242",
+      "Python scratchpad source:": "vibecomfy/scripts/upload_external_workflows_to_hivemind.py:744"
+    },
+    "terminating_marker": "Workflow semantics (rule-based):",
+    "emitter_headers": {
+      "# vibecomfy: generated scratchpad": "scratchpad",
+      "# vibecomfy: generated external workflow archive": "external_archive",
+      "# vibecomfy: generated": "ready_template"
+    }
+  },
+
+  "cohorts": {
+    "source_cohorts": ["payload_python", "body_python", "recoverable", "unavailable"],
+    "public_states": ["safe", "quarantined"],
+    "duplication_flag": "both",
+    "counts_2026_07_28": {
+      "total_workflows": 2757,
+      "payload_python_including_both": 222,
+      "body_python_only": 0,
+      "both_duplicate": 222,
+      "neither_recoverable_or_unavailable": 2535,
+      "any_python": 222,
+      "no_python": 2535,
+      "recoverable": "deferred_to_remediation_task_2.12",
+      "unavailable": "deferred_to_remediation_task_2.12",
+      "quarantined": "deferred_until_safe_policy_scan;_0.3_high_entropy_base64_222_rejected_as_false_positive"
+    },
+    "matching_method": "Deterministic over all 2757 kind=workflow rows fetched via PostgREST (counts exact). payload_python = non-empty payload.python_source. body_python = recognized delimited block present. both = payload bytes also form the body block. neither = neither location. recoverable/unavailable require running the VibeComfy exporter (local artifact access) and are not observable from the DB; split deferred.",
+    "uncertainty": "The recoverable/unavailable split of the 2535 'neither' rows is unknown. Bounded sample (schema map, first 200 workflows) showed 199/200 carry corpus_path, suggesting recoverable is likely the majority but UNCONFIRMED. The quarantined count under the safe (trap-free) policy is unknown; the only task-0.3 reason code (high_entropy_base64) is rejected as a false-positive trap, so the real count is expected near zero but must be measured at remediation. Two data-quality anomalies (source='s', source='comfyui') are out of scope for cohort math.",
+    "state_transitions": {
+      "recoverable_to_payload_python": "Remediation materializes payload.python_source from the VibeComfy exporter (idempotent, high-water monotonic).",
+      "body_python_to_payload_python": "Remediation promotes the body block into payload.",
+      "unavailable_to_other": "A later authoritative source artifact (new ingestion / operator repair) moves the row; identity external_resources.id is unchanged.",
+      "both_to_dedup": "Remediation re-renders body with the Python block present exactly once; canonical prose strips the duplicate block.",
+      "safe_to_quarantined": "Only via re-scan on content change; quarantine never auto-clears without operator review and secret rotation.",
+      "quarantined_to_safe": "Operator review + rotation + re-scan only."
+    }
+  },
+
+  "precedence": {
+    "order": [
+      "1. Non-empty payload.python_source is authoritative (cohort payload_python; body_duplicate flagged if the same bytes form a body block).",
+      "2. Else a recognized body-delimited block is authoritative (cohort body_python).",
+      "3. Else deterministic VibeComfy recovery (cohort recoverable; no LLM, no execution).",
+      "4. Else cohort unavailable with an explicit reason; prose remains searchable."
+    ],
+    "canonical_python_representation": "workflow_python = the authoritative bytes from the precedence above; never a second copy recovered from prose.",
+    "authoritative_for": ["workflow_python embedding", "full-code lexical document", "get_item representation=python"]
+  },
+
+  "no_duplication": {
+    "rule": "When payload.python_source bytes also occur as the delimited body block, remove that block from the canonical prose representation before hashing, embedding, and lexical-document construction. Never embed or index both copies.",
+    "canonical_prose": "title + body_with_python_blocks_removed + projected workflow_semantics",
+    "canonical_python": "authoritative Python bytes only (one copy)",
+    "hashing": "representation_hash over the full canonical representation; chunk_hash per chunk; the two are independent hash columns.",
+    "gate": "count of (workflow, representation bytes) embedded or indexed more than once == 0"
+  },
+
+  "identity_version_hash": {
+    "embedding_identity": ["contract_id", "entity_type=resource", "item_id=external_resources.id::text", "representation_type in {prose, workflow_python}", "chunk_index"],
+    "immutable_identity": "entity_type + item_id (representation_type and chunk_index are representation identity, not row identity)",
+    "version_fields": ["canonicalization_version", "chunking_version", "secret_scan_version"],
+    "hash_algorithm": "sha256 of UTF-8 frozen-normalized text",
+    "normalization": "Unicode NFC; CRLF/CR -> LF; per-line trailing whitespace stripped; stripped to a stable form with a single trailing newline convention. Identical inputs yield identical hashes.",
+    "refresh_triggers": [
+      "payload.python_source change",
+      "body delimited-block bytes change",
+      "title/description/tags/workflow_semantics change",
+      "canonicalization_version bump",
+      "chunking_version bump",
+      "secret_scan_version bump",
+      "safe<->quarantined transition"
+    ],
+    "hash_skip": "re-canonicalize recomputes the hash; if unchanged, skip re-embed/re-index (idempotent).",
+    "structured_projection": {
+      "source": "executors/workflow_semantics.py",
+      "version": 1,
+      "projected_fields": ["media_type", "task_type", "model_families", "adapter_directions", "node_types", "node_class_multiset", "custom_nodes", "models", "searchable_aliases"],
+      "embedded_into": "workflow prose canonical text (not arbitrary payload/workflow_json/compiled_api)"
+    }
+  },
+
+  "safe_retrieval": {
+    "matched_snippet": "bounded (<=240 chars) window around the matched span; secret-redacted via the same scanner (defense in depth); never the matched secret value.",
+    "get_item_representation_python": "returns whitelisted full payload.python_source (or recovered authoritative) + representation version/hash; rejects if not kind=workflow; fails closed if quarantined; never returns arbitrary payload, corpus_path, workflow_json, or compiled_api wholesale.",
+    "quarantine_exclusion": ["lexical indexing", "embeddings", "snippets", "get_item"]
+  },
+
+  "secret_scanner": {
+    "policy": "Deterministic, fail-closed. A hit quarantines the representation from public lexical/embedding/snippet/full-code retrieval and records only non-secret reason codes. New ingestion fails closed; historical hits enter the documented remove/rotate incident path.",
+    "reason_codes": ["private_key_block", "provider_token_prefix", "credential_assignment", "credential_url", "aws_env_var"],
+    "trap_fix": "high_entropy_base64 is explicitly NOT a reason code. The task-0.3 inventory flagged all 222 Python-bearing workflows with high_entropy_base64 because VibeComfy-generated source legitimately embeds large base64/JSON literals. A bare high-entropy run with no credential context is benign. Matches require structure: a key block, a known provider prefix of credential length, a credential-keyword assignment with a high-entropy RHS, a user:pass@ URL, or an AWS env var.",
+    "tiers": {
+      "private_key_block": "PEM/SSH/PGP headers (-----BEGIN ... PRIVATE KEY-----)",
+      "provider_token_prefix": "openai sk-/sk-proj-, github ghp_/gho_/ghu_/ghs_/ghr_, slack xox[abprs]-, aws AKIA/ASIA, google AIza, stripe sk_live_/rk_live_, supabase sb_secret_ (publishable sb_publishable_ is public and excluded), hivemind contributor hm_<64hex>, structured JWT eyJ...eyJ...sig",
+      "credential_assignment": "credential-keyword LHS (api_key/apikey/secret/password/passwd/token/access_token/refresh_token/private_key/client_secret/authorization) assigned a quoted high-entropy string of length>=16",
+      "credential_url": "scheme://user:password@host with a non-placeholder password of length>=6",
+      "aws_env_var": "AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY assignment with a plausible value"
+    },
+    "logging_rule": "Never log, echo, serialize, hash-to-client, or include the matched value in metadata, reports, snippets, or reason objects. Record only {reason_code, bounded position, scanner_version}.",
+    "validation_gates": {
+      "false_positive_on_generated_code": 0,
+      "true_positive_each_planted_secret": "100% with correct reason code",
+      "matched_value_leakage": 0
+    }
+  },
+
+  "recovery": {
+    "exporters": "Reuse VibeComfy's existing emit_ready_template_python / emit_scratchpad_python / _fallback_python_archive_source via port_convert_workflow / load_workflow_any. No second generator in Hivemind; no LLM inference; no execution of stored Python.",
+    "no_overwrite": "Never overwrite a non-empty payload.python_source. Recovery only fills empty payload from a body delimiter, or regenerates from workflow_json/compiled_api/corpus_path/provenance when both payload and body lack Python.",
+    "corpus_path": "Resolved only in an authorized operator job with an explicit VibeComfy root; Edge/search requests never read local paths.",
+    "unavailable_reasons": ["no_source_artifact", "corpus_path_unresolvable", "conversion_error", "exporter_unavailable", "secret_quarantine_blocks_public"],
+    "durable_state": ["run_id", "cursor (external_resources.id ordered asc = high-water boundary)", "per-cohort counters", "per-public-state counters", "retryable per-row failures", "final reconciliation report"],
+    "requirements": ["idempotent (hash-skip)", "monotonic by high-water (never restore older over newer authoritative source)", "interruptible and resumable", "never execute stored Python", "never infer Python from prose with an LLM", "refresh lexical state only after the source-row patch commits"]
+  },
+
+  "embedding_pilot": {
+    "note": "Frozen pilot candidates only. The production winner is chosen at task 2.14 by evaluation; this contract does NOT preselect it.",
+    "candidates": [
+      {"provider": "openai", "model": "text-embedding-3-small", "dimension": 384, "via": "dimensions=384 shortening", "role": "capacity-preferred (0.7: full corpus 4.59 GB PASS)"},
+      {"provider": "openai", "model": "text-embedding-3-small", "dimension": 1536, "via": "native", "role": "quality fallback (0.7: full corpus 16.4 GB FAIL; viable only at pilot/cohort scope)"}
+    ],
+    "quality_alternative_noted": {"provider": "openai", "model": "text-embedding-3-large", "dimension": 3072},
+    "representation_types": ["prose", "workflow_python"],
+    "contract_identity": "contract_id = provider + model + dimension + canonicalization_version + chunking_version; one active contract per dimension",
+    "dimension_migration": "Separate fixed-dimension table + HNSW index; atomic active-contract switch only after replacement coverage passes; never mix dimensions in one table.",
+    "vector_validation": "finite, no NaN/Inf, exact dimension D, L2-normalized at write and at query; wrong-dimension -> fail closed (skip+count+retry); cosine via <=>",
+    "query_normalization": "same text normalization as corpus canonicalization; embed once per request; timeout ~400ms; best-effort per-instance cache; failure -> lexical degradation + semantic_degraded",
+    "secret_boundary": "provider key only in Hivemind Edge secret store (OPENAI_API_KEY, task 2.1 setup) for query embeddings; operator-run backfill reads the approved provider credential from an authorized local/managed environment; never in pack/repo/client; deterministic fake embedder for unit/contract tests",
+    "deferred_to_2_14": ["production dimension", "final chunk configuration"]
+  },
+
+  "chunking": {
+    "estimate": "chars/4 token heuristic (frozen planner estimate; real tokenizer in task 2.6)",
+    "configs": {
+      "prose_512": {"mode": "prose", "target_tokens": 512, "overlap_tokens": 50, "method": "paragraph-aware"},
+      "prose_1024": {"mode": "prose", "target_tokens": 1024, "overlap_tokens": 100, "method": "paragraph-aware"},
+      "python_512": {"mode": "python", "target_tokens": 512, "overlap_tokens": 50, "method": "AST top-level alignment"},
+      "python_2048": {"mode": "python", "target_tokens": 2048, "overlap_tokens": 100, "method": "AST top-level alignment"}
+    },
+    "overlap_offsets": "record chunk_index, content chunk_hash, method, and stable source offsets; deterministic -> repeated runs identical",
+    "parser_fallback": "On ast.parse failure or a single literal node exceeding the budget (generated archives), fall back to a bounded line/token window with overlap; never require execution.",
+    "best_chunk_collapse": "Collapse to one best chunk per (entity_type, item_id) across representation types before RRF.",
+    "no_silent_truncation": "Never silently truncate searchable or embeddable Python; split into bounded chunks. Measured worst case payload.python_source max 1,415,262 chars (~354K tokens) -> ~76 chunks at 512 tokens.",
+    "bounded_lexical_code_document": "Full canonical Python participates in lexical retrieval (imports, symbols, node classes, model filenames, kwargs, fragments) via a bounded code-document arm; over-limit documents are split per (resource_id, representation_type, chunk_index) and collapsed to the resource identity before global ranking; never silent-truncate."
+  },
+
+  "measured_workflow_sizes_2026_07_28": {
+    "source": "docs/hybrid-search/phase0-inventory.json",
+    "prose_body_chars_n2757": {"p50": 1613, "p95": 13898, "p99": 345703, "min": 613, "max": 1417640, "mean": 12769},
+    "payload_python_chars_n222": {"p50": 95216, "p95": 448574, "p99": 719694, "min": 3268, "max": 1415262, "mean": 138983},
+    "body_extracted_python_chars_n222": {"p50": 96027, "p95": 450192, "p99": 720821, "min": 3480, "max": 1416828, "mean": 139843}
+  },
+
+  "golden_set": {
+    "version": "golden/2026-07-28/v1",
+    "n_cases": 112,
+    "judged": 104,
+    "no_hit": 8,
+    "categories_present": 23,
+    "path": "eval/retrieval/golden/golden-v1.json",
+    "category_counts": {
+      "workflow_code": 32, "exact_name": 25, "snowflake": 18, "best_is_distillation": 17,
+      "best_is_message": 17, "selective_filter": 11, "paraphrase": 10, "multi_term": 10,
+      "best_is_resource": 8, "spelling_variant": 8, "workflow_python_evidence": 8,
+      "single_workflow": 8, "no_hit": 8, "settings": 7, "code_fragment": 6,
+      "cross_source": 6, "workflow_only": 6, "named_author": 4, "channel_scoped": 4,
+      "time_scoped": 4, "long_resource_chunk": 4, "timeout_prone": 3, "pending_status": 2
+    },
+    "freeze_rule": "No post-hoc threshold changes after Phase 1/2/3 runs; re-judging only via a versioned v2 sibling."
+  },
+
+  "gates": {
+    "post_hoc_locked": true,
+    "quality": [
+      {"id": "Q1", "metric": "hybrid_recall_at_10", "comparator": ">=", "threshold": "ILIKE_recall_at_10 + 0.15", "scope": "112-case golden set"},
+      {"id": "Q2", "metric": "hybrid_mrr", "comparator": ">=", "threshold": "ILIKE_mrr + 0.10", "scope": "112-case golden set"},
+      {"id": "Q3", "metric": "exact_identifier_recall_at_10", "comparator": ">=", "threshold": "0.95 AND >= best_lexical_recall_at_10 - 0.02", "scope": "exact_name subset (25)"},
+      {"id": "Q4", "metric": "overall_hybrid_recall_at_10", "comparator": ">=", "threshold": "max(lexical, semantic) recall_at_10 - 0.01"},
+      {"id": "Q5", "metric": "duplicate_item_rate_after_collapse", "comparator": "==", "threshold": "0"},
+      {"id": "Q6", "metric": "result_count", "comparator": "<=", "threshold": "requested global limit"},
+      {"id": "Q7", "metric": "forced_embedding_failure_returns_lexical", "comparator": "==", "threshold": "1.0 (100%)", "and_every_response_degraded": true},
+      {"id": "Q8", "metric": "warm_p95_latency", "comparator": "<=", "threshold": "1.0 s", "scope": "production-like staging"},
+      {"id": "Q9", "metric": "warm_p50_latency", "comparator": "<=", "threshold": "500 ms"},
+      {"id": "Q10", "metric": "e2e_p95_including_edge_cold_start", "comparator": "<=", "threshold": "2.0 s"},
+      {"id": "Q11", "metric": "lexical_or_degraded_p95_latency", "comparator": "<=", "threshold": "750 ms"},
+      {"id": "Q12", "metric": "non_validation_search_error_rate", "comparator": "<", "threshold": "0.005", "scope": "load test"},
+      {"id": "Q13", "metric": "unplanned_semantic_degradation_rate", "comparator": "<", "threshold": "0.02", "scope": "provider healthy"},
+      {"id": "Q14", "metric": "workflow_code_exact_match_recall_at_10", "comparator": ">=", "threshold": "0.95", "scope": "workflow_code subset (32)"},
+      {"id": "Q15", "metric": "single_workflow_query_returns_only_item_id", "comparator": "==", "threshold": "1.0", "scope": "single_workflow subset (8)"},
+      {"id": "Q16", "metric": "duplicate_workflow_python_indexed_from_body_and_payload", "comparator": "==", "threshold": "0"}
+    ],
+    "security": [
+      {"id": "S1", "metric": "quarantined_python_ranks_or_snippets_or_embeds_or_get_item", "comparator": "==", "threshold": "0 (never)", "scope": "security regression fixture"},
+      {"id": "S2", "metric": "matched_secret_values_in_logs_or_metadata", "comparator": "==", "threshold": "0"},
+      {"id": "S3", "metric": "scanner_false_positive_on_generated_code_fixture", "comparator": "==", "threshold": "0"},
+      {"id": "S4", "metric": "scanner_true_positive_each_planted_secret", "comparator": "==", "threshold": "1.0 with correct reason code"}
+    ],
+    "coverage": [
+      {"id": "C1", "metric": "active_contract_coverage_distillations_and_resources", "comparator": "==", "threshold": "1.0"},
+      {"id": "C2", "metric": "active_contract_coverage_enabled_message_cohort", "comparator": ">=", "threshold": "0.95"},
+      {"id": "C3", "metric": "recoverable_workflows_with_materialized_versioned_hashed_python", "comparator": "==", "threshold": "1.0"},
+      {"id": "C4", "metric": "unavailable_rows_without_explicit_non_secret_reason", "comparator": "==", "threshold": "0"},
+      {"id": "C5", "metric": "stale_or_mismatched_representation_hashes", "comparator": "<", "threshold": "0.001"},
+      {"id": "C6", "metric": "ineligible_indexed_items", "comparator": "==", "threshold": "0 (release blocker)"}
+    ],
+    "capacity_cost": [
+      {"id": "P1", "metric": "pilot_embedding_api_spend", "comparator": "<=", "threshold": "$25"},
+      {"id": "P2", "metric": "projected_vector_table_plus_hnsw_storage_full_corpus", "comparator": "<=", "threshold": "12 GB", "verdict_384": "PASS 4.59 GB", "verdict_1536": "FAIL 16.4 GB"},
+      {"id": "P3", "metric": "projected_search_infra_monthly_recurring", "comparator": "<=", "threshold": "$50/month", "verdict_384_full": "CONDITIONAL (latency-gated to 2.16/3.10)"}
+    ]
+  },
+
+  "rollback": {
+    "invariants": ["schema additive only", "source rows never modified or deleted on rollback", "failed/stale jobs remain inspectable and retryable", "durable cursors preserved"],
+    "stages": {
+      "lexical": "Roll back via client mode=legacy (two-pass ILIKE). The lexical RPC/tsvector columns/indexes are additive; drop or rebuild indexes in an approved maintenance window. STOP if exact_identifier Recall@10 < 0.95, workflow-code exact-match < 0.95, or non-validation error >= 0.5%.",
+      "embedding_pilot": "Keep vectors; disable semantic retrieval (no deletion) if quality regresses or a capacity/cost gate is crossed; resume from the durable cursor and content hashes. STOP at any capacity gate ($25 / 12 GB / $50mo), coverage below gate, or stale-hash >= 0.1%.",
+      "workflow_remediation": "Separately resumable from its own cursor; never restore an older representation over a newer authoritative source; high-water monotonic; on rollback leave payload untouched and mark the remediation run superseded. STOP if any non-empty payload is overwritten or any unavailable/quarantined row lacks a reason.",
+      "hnsw": "Drop or rebuild the index in an approved maintenance window; retain embedding rows for diagnosis; never delete source. STOP on capacity pressure or destabilizing ingestion/search.",
+      "edge": "Per-request degradation to lexical; provider/service-role secrets stay server-side; roll back to lexical/legacy via flag. STOP immediately on any credential leak, or on error/latency gate failure.",
+      "canary": "Retain lexical and legacy overrides; one-configuration-change rollback. STOP on any release-blocking metric.",
+      "production_backfill": "Cohort-gated with pause/resume; source data never modified. STOP at any cohort gate or storage/cost gate."
+    }
+  },
+
+  "deferred": [
+    {"item": "FTS config simple vs english", "task": "1.1"},
+    {"item": "production embedding dimension and final chunk configuration", "task": "2.14"},
+    {"item": "HNSW tuning and the 384-d $50/mo latency tier", "task": "2.16/3.10"},
+    {"item": "recoverable vs unavailable exact split + real quarantined count", "task": "2.12"},
+    {"item": "soft-delete is_deleted=false filter (message cohort)", "task": "1.7/1.8/1.9"},
+    {"item": "author opt-out and bot/system message policy", "task": "Phase 1"},
+    {"item": "snowflake string boundary in cites and get_item --id", "task": "2.4/Phase 4"},
+    {"item": "full-project DB size measurement before index build", "task": "5.2"}
+  ]
+}

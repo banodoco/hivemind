@@ -1,0 +1,343 @@
+{
+  "task": "2.16-selected-contract-hnsw-benchmark",
+  "cluster_isolated": true,
+  "run_class": "local_volume_only",
+  "representative_semantic_evidence": false,
+  "selected_contract_id": 1360541028304258884,
+  "selected_contract_preimage_sha256": "12e19cdb566b87445ab2d3563e6cb948f58801f78f8395878fc9e0c2457d5462",
+  "index_name": "content_embeddings_hnsw_c1360541028304258884",
+  "preflight": {
+    "ok": true,
+    "dependency_ok": true,
+    "representative_ok": false,
+    "checks": {
+      "d1_decision_json_present": true,
+      "d1_provider_model": true,
+      "d1_dimension_384": true,
+      "d1_canon_chunk_versions": true,
+      "d1_prose_512_50": true,
+      "d1_python_512_50": true,
+      "d1_chunk_config_identity": true,
+      "d1_eval_contract_id": true,
+      "d1_winner_selected_true": true,
+      "d1_winner_active_false": true,
+      "d1_winner_production_activated_false": true,
+      "d1_nonwinners_inactive_eval_only": true,
+      "d1_hashes_bound": true,
+      "d1_strict_replay_zero_provider": true,
+      "d1_strict_replay_zero_network": true,
+      "d1_strict_replay_winner_reproduced": true,
+      "d1_selected_bigint_derived": true,
+      "d1_selected_bigint_not_dimension_only": true,
+      "d2_entities": true,
+      "d2_chunks": true,
+      "d2_prose": true,
+      "d2_workflow_python": true,
+      "d2_unique_texts": true,
+      "d2_dup_collapsed": true,
+      "d2_golden_counts": true,
+      "d2_cache_record_count": true,
+      "d2_cache_384_private": true,
+      "d3_representative_pg_vectors": false,
+      "d3_real_selected_contract_cache_only_snapshot": false,
+      "d4_schema_032_present": true,
+      "d4_schema_033_present": true,
+      "d4_signature": true,
+      "d5_representative_staging": false
+    },
+    "detail": {
+      "d1_selection": {
+        "selected_production_dimension": 384,
+        "selected_prose_chunk_contract": {
+          "target_tokens": 512,
+          "overlap_tokens": 50
+        },
+        "selected_workflow_python_chunk_contract": {
+          "target_tokens": 512,
+          "overlap_tokens": 50
+        },
+        "selected_evaluation_contract_id": "12e19cdb566b8744",
+        "selected_chunk_config_identity": "chunk_config\u001fv1\u001fprose#512/50\u001fworkflow_python#512/50",
+        "selected_base_contract_id_dimension_only": "6368594834396668537",
+        "production_chunking_version_handoff": {
+          "canonicalization_version": 1,
+          "chunking_version": 2,
+          "chunk_config_version": 1
+        },
+        "production_activated": false,
+        "note": "selection recorded by task 2.14; task 2.17 is a propagation/verification/acceptance-test handoff only — actual activation is a later, separate rollout decision"
+      },
+      "d2_cohort": {
+        "n_entities": 7769,
+        "n_chunks": 23138,
+        "n_unique_embeddable_texts": 22850,
+        "n_duplicate_chunks_collapsed": 288,
+        "chunks_by_representation": {
+          "prose": 7873,
+          "workflow_python": 15265
+        },
+        "max_chunk_index": 692,
+        "multi_chunk_entities": 785
+      },
+      "d3_blocker": "No representative selected-contract PostgreSQL cohort or production-like staging snapshot exists (Phase-0 access audit evidences only the live Banodoco project, which must not be mutated). Only deterministic fake vectors can be loaded locally -> run_class=local_volume_only.",
+      "d5_environment_class": "local_volume_only"
+    },
+    "representative_semantic_evidence": false,
+    "run_class": "local_volume_only",
+    "verdict": "blocked_not_representative",
+    "blocker": "No representative selected-contract PostgreSQL cohort or production-like staging snapshot exists (Phase-0 access audit evidences only the live Banodoco project, which must not be mutated). Only deterministic fake vectors can be loaded locally -> run_class=local_volume_only."
+  },
+  "protocol": {
+    "k": 10,
+    "ef_search_sweep": [
+      40,
+      80,
+      120,
+      200
+    ],
+    "priming_passes": 1,
+    "warm_repetitions_per_query_per_setting": 5,
+    "interleaving": "deterministic_round_robin_round_then_ef_then_query",
+    "latency_metric": "EXPLAIN ANALYZE Execution Time (ms, server-side, timing off)",
+    "exact_mode": "TRUE exact: set hivemind.semantic_exact_mode=on in a fresh session with enable_indexscan=off; enable_bitmapscan=off so the function NULLs the per-arm bound and scores the COMPLETE cohort",
+    "ann_mode": "natural plan; hnsw.ef_search=<sweep>; hnsw.iterative_scan=strict_order",
+    "query_fixtures": "10 corpus resource vectors (deterministic)"
+  },
+  "environment": {
+    "pg_bindir": "/opt/homebrew/opt/postgresql@14/bin",
+    "server_version": "14.15 (Homebrew)",
+    "pgvector_extversion": "0.8.5"
+  },
+  "manifest_hash": "0b4bb2fd64c7d63993227e5dba40579d64f0b9cabecb8329c07c476628969ac7",
+  "manifest_frozen_before_measurement": true,
+  "volume": {
+    "vectors_loaded": 23138,
+    "prose_loaded": 7873,
+    "workflow_python_loaded": 15265,
+    "unique_texts_loaded": 22850
+  },
+  "manifest_drift_refused": true,
+  "manifest": {
+    "task": "2.16-selected-contract-hnsw-pilot",
+    "selected_contract": {
+      "provider": "openai",
+      "model": "text-embedding-3-small",
+      "dimension": 384,
+      "canonicalization_version": 1,
+      "chunking_version": 2,
+      "chunk_config_identity": "chunk_config\u001fv1\u001fprose#512/50\u001fworkflow_python#512/50",
+      "selected_contract_preimage_sha256": "12e19cdb566b87445ab2d3563e6cb948f58801f78f8395878fc9e0c2457d5462",
+      "eval_contract_id_hex": "12e19cdb566b8744",
+      "selected_contract_id_bigint": 1360541028304258884,
+      "historical_dimension_only_id_bigint": 6368594834396668537
+    },
+    "task_2_14_hashes": {
+      "candidate_grid_hash": "1aa27a54e9f3edd340dfbab7b2847c302a5ebf13909f4202175b873f5e701074",
+      "decision_policy_hash": "7d2c3dcb51ae99727fbea8e9520718523243bf036b3d9d59a2e2c0dfe21094ad",
+      "eval3_cohort_manifest_hash": "0ae1c3f4deef42322d10deb53af1d97d6aec75e90424a9a4da3bf735e94a9b34",
+      "accounting_sha256": "89282953fc88a47bc4fa40cd0f6d011b5194f3623169c2ee8fff69a35007b919",
+      "decision_deterministic_core_sha256": "05caa124d4b47d5863439e33bcf301842a838b52ba391cb58cb211faffb9d360",
+      "golden_sha256": "d29eb3e1867c5721d662faacda3d684444efd25b9cb8194737c8b8fde135a9be",
+      "replay_bundle_canonical_sha256": "b0894a98b536f0c9a6b3b8fe7a1d40f2deb3708692169ba209657400fc08cf9c",
+      "replay_bundle_file_sha256": "09dbce078cd896775f48168efb504c42c66bdb08572baeb5873c3073e75799cd",
+      "cache_384_sha256": "70a9fc7454c3374f89464f86022952b62862badd10f9c79becb0ebc95926a2b5"
+    },
+    "frozen_volume": {
+      "vectors": 23138,
+      "prose_chunks": 7873,
+      "workflow_python_chunks": 15265,
+      "entities_cohort": 7769,
+      "unique_embeddable_texts_cohort": 22850,
+      "duplicate_chunks_collapsed_cohort": 288,
+      "old_capacity_model_estimate_labeled": 41196
+    },
+    "index_contract": {
+      "name": "content_embeddings_hnsw_c1360541028304258884",
+      "access_method": "hnsw",
+      "opclass": "vector_cosine_ops",
+      "m": 16,
+      "ef_construction": 64,
+      "predicate": "contract_id = 1360541028304258884",
+      "table": "public.content_embeddings"
+    },
+    "hnsw_query_gucs": {
+      "ef_search_sweep": [
+        40,
+        80,
+        120,
+        200
+      ],
+      "default_ef_search": 40,
+      "iterative_scan": "strict_order",
+      "max_scan_tuples": "unspecified_default",
+      "scan_mem_multiplier": "unspecified_default"
+    },
+    "measurement": {
+      "k": 10,
+      "priming_passes": 1,
+      "warm_repetitions_per_query_per_setting": 5,
+      "interleaving": "deterministic_round_robin_by_query_then_setting",
+      "exact_mode": "TRUE exact: set hivemind.semantic_exact_mode=on in a FRESH session with enable_indexscan=off; enable_bitmapscan=off so the function NULLs the per-arm bound and scores the COMPLETE applicable cohort (not a LIMIT-truncated baseline). One shared SQL surface (the function); no second hand-edited ranking.",
+      "ann_mode": "natural plan; hnsw.ef_search=<sweep>; hnsw.iterative_scan=strict_order"
+    },
+    "gates": {
+      "storage_full_corpus_gb": 12,
+      "monthly_search_infrastructure_usd": 50,
+      "mean_exact_vs_ann_recall_at_10": 0.95,
+      "duplicate_entity_rate_after_collapse": 0,
+      "ineligible_indexed_items": 0,
+      "stale_or_mismatched_hashes_fraction_lt": 0.001
+    },
+    "selection_rule": "lowest pre-registered ef_search passing every applicable quality, latency, security, coverage, and capacity gate; ties -> lower ef_search, then lower warm p95; if none passes, verdict stop. selected_ef_search is NULL here because representative quality cannot be proved from synthetic data.",
+    "environment": {
+      "run_class": "local_volume_only",
+      "pg_bindir": "/opt/homebrew/opt/postgresql@14/bin",
+      "server_version": "14.15 (Homebrew)",
+      "pgvector_extversion": "0.8.5",
+      "vector_dims": null
+    }
+  },
+  "build": {
+    "build_returncode": 0,
+    "wall_s": 1.04,
+    "lock_timeout": "5s",
+    "statement_timeout": "300s",
+    "maintenance_work_mem": "512MB",
+    "invalid_same_name_preexisted": false,
+    "prebuild_capacity": {
+      "database_bytes": 99812131,
+      "table_total_bytes": 50569216,
+      "selected_contract_vectors": 23138,
+      "projected_index_gb": 1.976,
+      "storage_gate_gb": 12,
+      "free_disk_gb": 2.112,
+      "total_disk_gb": 245.107,
+      "safe_free_disk_margin_gb": 2.0,
+      "hosted_quota_gb": "UNAVAILABLE (local isolated cluster)",
+      "maintenance_work_mem_effective": "64MB",
+      "maintenance_work_mem_justification": "maintenance_work_mem=512MB (build-session override); effective_cluster_default=64MB; local_ram_gb=17.18; conservative for an m=16 HNSW build at the local rehearsal volume (23138 vectors); never raised above measured safe headroom.",
+      "query_gucs": {
+        "hnsw.ef_search": {
+          "effective": null,
+          "available": false
+        },
+        "hnsw.iterative_scan": {
+          "effective": null,
+          "available": false
+        },
+        "hnsw.max_scan_tuples": {
+          "effective": null,
+          "available": false
+        },
+        "hnsw.scan_mem_multiplier": {
+          "effective": null,
+          "available": false
+        }
+      },
+      "abort": false,
+      "abort_reason": null
+    },
+    "progress_samples_count": 2,
+    "progress_last": "building index: loading tuples:5785/5785",
+    "build_stderr_redacted": ""
+  },
+  "catalog": {
+    "exists": true,
+    "indisvalid": "t",
+    "indisready": "t",
+    "predicate": "(contract_id = '1360541028304258884'::bigint)",
+    "opclass": "vector_cosine_ops",
+    "reloptions": "m=16,ef_construction=64",
+    "size_pretty": "42 MB"
+  },
+  "storage": {
+    "database_bytes": 143508259,
+    "hnsw_index_bytes": 43696128,
+    "hnsw_index_size_pretty": "42 MB"
+  },
+  "exact_baseline": {
+    "latency_ms_mean": 461.915,
+    "latency_ms_p50": 452.491,
+    "latency_ms_p95": 507.198,
+    "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
+  },
+  "per_ef": {
+    "40": {
+      "warm_n": 50,
+      "latency_ms_mean": 89.366,
+      "latency_ms_p50": 89.225,
+      "latency_ms_p95": 90.358,
+      "latency_ms_max": 93.334,
+      "exact_vs_ann_recall_at_10_mean": 1.0,
+      "exact_vs_ann_recall_at_10_min": 1.0,
+      "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
+    },
+    "80": {
+      "warm_n": 50,
+      "latency_ms_mean": 90.16,
+      "latency_ms_p50": 89.601,
+      "latency_ms_p95": 93.501,
+      "latency_ms_max": 95.115,
+      "exact_vs_ann_recall_at_10_mean": 1.0,
+      "exact_vs_ann_recall_at_10_min": 1.0,
+      "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
+    },
+    "120": {
+      "warm_n": 50,
+      "latency_ms_mean": 92.069,
+      "latency_ms_p50": 91.544,
+      "latency_ms_p95": 96.788,
+      "latency_ms_max": 103.792,
+      "exact_vs_ann_recall_at_10_mean": 1.0,
+      "exact_vs_ann_recall_at_10_min": 1.0,
+      "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
+    },
+    "200": {
+      "warm_n": 50,
+      "latency_ms_mean": 91.943,
+      "latency_ms_p50": 90.739,
+      "latency_ms_p95": 98.38,
+      "latency_ms_max": 100.614,
+      "exact_vs_ann_recall_at_10_mean": 1.0,
+      "exact_vs_ann_recall_at_10_min": 1.0,
+      "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
+    }
+  },
+  "hnsw_use": {
+    "full_function_idx_scan_before": 280,
+    "full_function_idx_scan_after": 286,
+    "full_function_idx_scan_delta": 6,
+    "full_function_idx_scan_delta_positive": true,
+    "full_function_uses_hnsw": true,
+    "full_function_broad_calls": 6,
+    "full_function_note": "Strictly positive idx_scan delta from multiple BROAD calls to the ACTUAL function; eligibility baked as a literal row-local text[] per arm keeps HNSW as the driver. Decisive proof.",
+    "inner_knn_idx_scan_before": 286,
+    "inner_knn_idx_scan_after": 289,
+    "inner_knn_idx_scan_delta": 3,
+    "inner_knn_idx_scan_delta_positive": true,
+    "inner_knn_uses_index": true,
+    "inner_knn_role": "diagnostic_only_insufficient"
+  },
+  "invariants": {
+    "result_count_le_limit": true,
+    "no_duplicate_entities": true,
+    "no_null_rank": true
+  },
+  "provider_calls": 0,
+  "network_calls": 0,
+  "source_mutations": 0,
+  "source_mutations_scope": "external/production sources; local fixture inserts disclosed separately",
+  "local_fixture_inserts": {
+    "content_embeddings_selected_contract": 23138,
+    "note": "throwaway isolated local cluster only; no external/production source mutated."
+  },
+  "production_mutated": false,
+  "contract_activated": false,
+  "selected_ef_search": null,
+  "selection_note": "Lowest pre-registered ef_search passing all gates would be selected, but representative semantic quality and hosted latency cannot be proved from synthetic local volume; selected_ef_search stays NULL (verdict stop/blocked).",
+  "verdict": "blocked_not_representative",
+  "blocker": "No representative selected-contract PostgreSQL cohort or production-like staging snapshot exists (Phase-0 access audit evidences only the live Banodoco project, which must not be mutated). Only deterministic fake vectors can be loaded locally -> run_class=local_volume_only.",
+  "representative_evidence_required_to_unblock": "A cache-only load of the exact selected-contract vector cohort into an isolated representative PostgreSQL (or approved production-like staging) database, then re-run scripts/benchmark_hnsw_pilot.py in a representative-preflight/benchmark mode against that snapshot — no provider call, no production mutation. Only then may selected_ef_search be set.",
+  "hygiene_findings": [],
+  "hygiene_clean": true
+}

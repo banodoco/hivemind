@@ -1,0 +1,88 @@
+{
+  "version": "message-identifier/2026-07-28/v1",
+  "frozen": true,
+  "post_hoc_locked": true,
+  "description": "Frozen extraction fixtures for the full-message exact-identifier side index (plan task 1.6). Each fixture is a message-content string with the expected set of (compact, preserve) rows the IMMUTABLE SQL function hivemind_extract_message_identifiers and the Python reference executors.message_identifier_index.extract_message_identifiers MUST agree on byte-for-byte. Grounded in the real 112-case golden identifier vocabulary (FLUX.1, Wan 2.2/Wan2.2, LTX-Video, lightx2v_I2V_14B.safetensors, WanVideoSampler, force_clip_output=False) plus prose, URLs, paths, SQL-like adversarial input, very-long tokens, CJK, and empty/whitespace cases.",
+  "contract": {
+    "identifier_run_chars": "A-Za-z0-9_.=-",
+    "min_term_chars": 3,
+    "max_term_chars": 100,
+    "must_contain_letter": true,
+    "max_terms_per_message": 256,
+    "dedup": "one row per (message_id, compact), first-occurrence preserve"
+  },
+  "fixtures": [
+    {
+      "name": "dotted_versioned",
+      "content": "FLUX.1 and Wan2.2 / wan_2.2, LTX-Video ltx-2-19b-ic-lora-detailer",
+      "expected_compacts": ["and", "flux1", "ltx219bicloradetailer", "ltxvideo", "wan22"]
+    },
+    {
+      "name": "filenames_and_extensions",
+      "content": "model.safetensors .gguf lightx2v_I2V_14B.safetensors pixel.gguf",
+      "expected_compacts": ["gguf", "lightx2vi2v14bsafetensors", "modelsafetensors", "pixelgguf"]
+    },
+    {
+      "name": "python_symbols_and_kwargs",
+      "content": "WanVideoSampler(args) IPAdapterFaceIDKolors force_clip_output=False num_frames=10",
+      "expected_compacts": ["args", "forceclipoutput=false", "ipadapterfaceidkolors", "numframes=10", "wanvideosampler"]
+    },
+    {
+      "name": "url_path_components",
+      "content": "https://huggingface.co/u/flux.1-dev.safetensors at 512px on 2026-07-28",
+      "expected_compacts": ["512px", "flux1devsafetensors", "huggingfaceco", "https"]
+    },
+    {
+      "name": "adversarial_sql_like_inert",
+      "content": "C:\\Users\\flux DROP TABLE unified_feed; -- do not run",
+      "expected_compacts": ["drop", "flux", "not", "run", "table", "unifiedfeed", "users"]
+    },
+    {
+      "name": "ordinary_prose_numbers_dropped",
+      "content": "plain prose: the model is good, 1024 steps, v1.5.5",
+      "expected_compacts": ["good", "model", "plain", "prose", "steps", "the", "v155"]
+    },
+    {
+      "name": "empty",
+      "content": "",
+      "expected_compacts": []
+    },
+    {
+      "name": "whitespace_only",
+      "content": "   \t\n  ",
+      "expected_compacts": []
+    },
+    {
+      "name": "cjk_prose_ascii_identifier_only",
+      "content": "動漫 flux.1 视频 视频2",
+      "expected_compacts": ["flux1"]
+    },
+    {
+      "name": "overlong_run_dropped",
+      "content": "a=b=c=d very_long_token" ,
+      "note": "connectors _ and = are internal, so very_long_token is one run (compact verylongtoken) and a=b=c=d is one run; punctuation-only/short runs drop",
+      "expected_compacts": ["a=b=c=d", "verylongtoken"]
+    },
+    {
+      "name": "pure_punctuation_dropped",
+      "content": "=== ... --- ??? flux",
+      "expected_compacts": ["flux"]
+    },
+    {
+      "name": "spaced_dotted_name_splits",
+      "content": "Wan 2.2",
+      "expected_compacts": ["wan"],
+      "note": "the spaced form 'Wan 2.2' splits into 'wan' (2.2 -> '22' is pure-digit, dropped). The spaced dotted form is bridged by the resource title arm (1.5) + the FTS phrase arm, not the message side index. Documented frozen scoping decision."
+    },
+    {
+      "name": "golden_message_terms",
+      "content": "u dont have to use controlnet for the sampler vae lora upscale",
+      "expected_compacts": ["controlnet", "dont", "for", "have", "lora", "sampler", "the", "upscale", "use", "vae"]
+    },
+    {
+      "name": "long_resource_filename_fragment",
+      "content": "download wan2.2_animate_14B_bf16.safetensors and wan2.1_vace_14B",
+      "expected_compacts": ["and", "download", "wan21vace14b", "wan22animate14bbf16safetensors"]
+    }
+  ]
+}

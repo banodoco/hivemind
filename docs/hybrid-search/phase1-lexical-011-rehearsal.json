@@ -1,0 +1,113 @@
+{
+  "task": "1.12",
+  "date": "2026-07-29",
+  "method": "isolated throwaway PostgreSQL 14+ cluster (initdb --auth=trust, temp data dir, ephemeral port, unix socket); torn down after capture. No Docker, no network, no production mutation.",
+  "migrations_applied": [
+    "001_unified_corpus.sql",
+    "003_lexical_resource_documents.sql",
+    "004_discord_message_fts.sql",
+    "005_identifier_normalization.sql",
+    "006_short_field_trigram.sql",
+    "007_message_identifier_index.sql",
+    "008_lexical_candidate_sql.sql",
+    "009_lexical_search_rpc.sql",
+    "010_lexical_latency_fix.sql",
+    "011_lexical_security_hardening.sql"
+  ],
+  "trust_boundary": {
+    "candidate_fn": "hivemind_lexical_candidates — revoked from public/anon/authenticated",
+    "tables": [
+      "lexical_documents",
+      "lexical_resource_python_state"
+    ],
+    "helper": "hivemind_workflow_python_state — revoked from public/anon/authenticated",
+    "preserved_rpc": "hivemind_lexical_search grant to service_role (009:268) untouched",
+    "note": "anon/authenticated retain NOTHING on these four objects; RLS (no permissive policy) remains as defense-in-depth."
+  },
+  "rollback_note": "REVOKE has no clean inverse. Rollback restores default privileges via explicit GRANT (candidate fn -> public/anon/authenticated; both tables -> anon/authenticated; helper -> public/anon/authenticated). NOT recommended — 011 is the hardened state. See module docstring.",
+  "checks": [
+    {
+      "name": "blocked_candidate_fn:anon",
+      "ok": true,
+      "detail": "SET ROLE anon; candidate fn call must ERROR (permission denied)"
+    },
+    {
+      "name": "blocked_candidate_fn:authenticated",
+      "ok": true,
+      "detail": "SET ROLE authenticated; candidate fn call must ERROR (permission denied)"
+    },
+    {
+      "name": "blocked_read_lexical_documents:anon",
+      "ok": true,
+      "detail": "SET ROLE anon; select count(*) lexical_documents must ERROR"
+    },
+    {
+      "name": "blocked_read_python_state:anon",
+      "ok": true,
+      "detail": "SET ROLE anon; select count(*) lexical_resource_python_state must ERROR"
+    },
+    {
+      "name": "blocked_read_lexical_documents:authenticated",
+      "ok": true,
+      "detail": "SET ROLE authenticated; select count(*) lexical_documents must ERROR"
+    },
+    {
+      "name": "blocked_read_python_state:authenticated",
+      "ok": true,
+      "detail": "SET ROLE authenticated; select count(*) lexical_resource_python_state must ERROR"
+    },
+    {
+      "name": "blocked_write_lexical_documents:anon",
+      "ok": true,
+      "detail": "anon insert into lexical_documents must ERROR"
+    },
+    {
+      "name": "blocked_write_python_state:anon",
+      "ok": true,
+      "detail": "anon insert into lexical_resource_python_state must ERROR"
+    },
+    {
+      "name": "blocked_workflow_python_state_helper:anon",
+      "ok": true,
+      "detail": "anon select workflow_python_state(20) must ERROR"
+    },
+    {
+      "name": "service_role_rpc_callable",
+      "ok": true,
+      "detail": "service_role RPC call rc_ok=True; count=5 results=5"
+    },
+    {
+      "name": "eligibility_rejected_distillation_absent",
+      "ok": true,
+      "detail": "rejected distillation 777 absent from RPC results; dist_ids=['1']"
+    },
+    {
+      "name": "eligibility_softdeleted_message_absent",
+      "ok": true,
+      "detail": "soft-deleted message 1000000000000000000 absent from RPC results"
+    },
+    {
+      "name": "eligibility_quarantined_zero_workflow_docs",
+      "ok": true,
+      "detail": "quarantined resource 31337 workflow_python doc count = 0 (expect 0)"
+    },
+    {
+      "name": "eligibility_quarantined_code_never_ranks",
+      "ok": true,
+      "detail": "candidate fn never emits workflow_python for 31337; reps=['prose']"
+    },
+    {
+      "name": "helper_not_directly_callable_by_service_role",
+      "ok": true,
+      "detail": "direct service_role call to workflow_python_state must be DENIED; it is reached only via the SECURITY DEFINER RPC (proven callable above)"
+    },
+    {
+      "name": "migration_idempotent",
+      "ok": true,
+      "detail": "re-applied 011 without error"
+    }
+  ],
+  "all_pass": true,
+  "n_pass": 16,
+  "n_total": 16
+}

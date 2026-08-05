@@ -1,0 +1,36 @@
+{
+  "privilege_matrix": {
+    "anon": {
+      "mv_select": false,
+      "fn_rpc_exec": false,
+      "fn_candidates_exec": false
+    },
+    "service_role": {
+      "mv_select": true,
+      "fn_rpc_exec": true,
+      "fn_candidates_exec": true
+    },
+    "authenticated": {
+      "mv_select": false,
+      "fn_rpc_exec": false,
+      "fn_candidates_exec": false
+    }
+  },
+  "behavioral_attempts": {
+    "anon_select_mv_denied": true,
+    "anon_call_rpc_denied": true,
+    "authenticated_select_mv_denied": true,
+    "authenticated_call_rpc_denied": true
+  },
+  "verdict": {
+    "anon_cannot_select_mv": true,
+    "authenticated_cannot_select_mv": true,
+    "anon_cannot_call_rpc": true,
+    "authenticated_cannot_call_rpc": true,
+    "anon_cannot_call_candidates": true,
+    "authenticated_cannot_call_candidates": true,
+    "service_role_can_select_mv": true,
+    "service_role_can_call_rpc": true
+  },
+  "all_pass": true
+}

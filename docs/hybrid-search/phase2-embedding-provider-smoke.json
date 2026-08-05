@@ -1,0 +1,23 @@
+{
+  "task": "2.1-embedding-provider-smoke",
+  "gate": "one authorized provider smoke via Hivemind Edge secret (OPENAI_API_KEY)",
+  "provider": "openai",
+  "model": "text-embedding-3-small",
+  "dimension": 384,
+  "dimension_matches_configured": true,
+  "all_finite": true,
+  "l2_norm_within_tolerance": true,
+  "norm_tolerance": 0.0001,
+  "request_success": true,
+  "embedder_has_credential": true,
+  "elapsed_ms": 162.529,
+  "error_state": null,
+  "vector_persisted": false,
+  "input_text_persisted": false,
+  "credential_source": "approved organizational key (source: file)",
+  "secret_boundary": {
+    "edge_secret_name": "OPENAI_API_KEY",
+    "edge_secret_registered": true,
+    "value_exposed": false
+  }
+}

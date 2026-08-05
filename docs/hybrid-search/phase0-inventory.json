@@ -1,0 +1,273 @@
+{
+  "report": "Hivemind corpus inventory (task 0.3)",
+  "generated_at": "2026-07-28T18:47:36.782242+00:00",
+  "plan_date": "2026-07-28",
+  "methodology": {
+    "row_counts": "Counts for external_resources, distillations, and distillation_cites are exact via PostgREST Content-Range header. Discord message count is approximate via pg_class.reltuples (fast). The unified_feed view is too expensive for exact counting (joins message_feed across 1.25M rows with correlated reaction subquery); its row count is derived from underlying table counts.",
+    "text_lengths": "Character lengths of the displayable body/text fields. For external_resources and distillations, all rows are measured. For messages, a stratified sample is used (see message_length_method). Estimated tokens use the rough heuristic chars/4 for English text; actual token counts depend on the tokeniser and may differ.",
+    "workflow_representation": "All kind=workflow rows from external_resources fetched via PostgREST. Cohorts classified according to plan AD-4 precedence: payload_python (non-empty payload.python_source), body_python (Python block via recognised delimiters in body), both (Python in both locations), neither. Duplicate detection checks whether payload python appears verbatim in body. Suspect scanning uses deterministic regex patterns for credential shapes; matched values are never stored or logged."
+  },
+  "row_counts": {
+    "external_resources_total": 2759,
+    "external_resources_by_kind": {
+      "workflow": 2757,
+      "transcript": 1
+    },
+    "distillations": {
+      "total": 11,
+      "approved": 0,
+      "pending": 11,
+      "rejected": 0,
+      "superseded": 0
+    },
+    "distillation_cites_total": 33,
+    "discord_messages_approx": 1248240,
+    "unified_feed_derived_total": 1251010,
+    "_unified_feed_note": "unified_feed total is derived from underlying table counts, not a direct count on the view (which timed out due to join cost). The live view excludes rejected distillations and applies RLS.",
+    "by_entity": {
+      "message": 1248240,
+      "workflow": 2757,
+      "transcript": 1,
+      "distillation": 11
+    }
+  },
+  "text_lengths": {
+    "external_resources_body": {
+      "p50": 1612,
+      "p75": 1853,
+      "p90": 2408,
+      "p95": 13892,
+      "p99": 345672,
+      "min": 1,
+      "max": 1417640,
+      "mean": 12759,
+      "count": 2759
+    },
+    "external_resources_title": {
+      "p50": 49,
+      "p75": 57,
+      "p90": 62,
+      "p95": 66,
+      "p99": 73,
+      "min": 1,
+      "max": 92,
+      "mean": 49,
+      "count": 2759
+    },
+    "external_resources_body_est_tokens": {
+      "p50": 403,
+      "p75": 463,
+      "p90": 601,
+      "p95": 3472,
+      "p99": 86417,
+      "min": 1,
+      "max": 354410,
+      "mean": 3189,
+      "count": 2759
+    },
+    "distillations_question": {
+      "p50": 73,
+      "p75": 77,
+      "p90": 81,
+      "p95": 81,
+      "p99": 81,
+      "min": 49,
+      "max": 81,
+      "mean": 70,
+      "count": 11
+    },
+    "distillations_answer": {
+      "p50": 383,
+      "p75": 469,
+      "p90": 514,
+      "p95": 538,
+      "p99": 557,
+      "min": 208,
+      "max": 562,
+      "mean": 402,
+      "count": 11
+    },
+    "distillations_conditions": {
+      "p50": 134,
+      "p75": 143,
+      "p90": 146,
+      "p95": 146,
+      "p99": 146,
+      "min": 44,
+      "max": 146,
+      "mean": 124,
+      "count": 11
+    },
+    "messages_body_sample": {
+      "p50": 46,
+      "p75": 89,
+      "p90": 154,
+      "p95": 237,
+      "p99": 660,
+      "min": 0,
+      "max": 1953,
+      "mean": 77,
+      "count": 5000
+    },
+    "messages_body_est_tokens_sample": {
+      "p50": 11,
+      "p75": 22,
+      "p90": 38,
+      "p95": 59,
+      "p99": 165,
+      "min": 1,
+      "max": 488,
+      "mean": 19,
+      "count": 5000
+    },
+    "message_length_method": {
+      "method": "offset-stratified sample via PostgREST unified_feed",
+      "sample_size": 5000,
+      "target_sample": 5000,
+      "total_messages": 1248240,
+      "pages_used": 20,
+      "stride": 62412,
+      "uncertainty": "Percentiles estimated from a sample, not the full population. True population percentiles may differ, especially in the tails. Methodology is reproducible: re-running with the same seed/offsets produces identical results."
+    },
+    "long_resource_buckets": {
+      "<1 KB": 152,
+      "1-10 KB": 2450,
+      "10-50 KB": 32,
+      "50-100 KB": 22,
+      "100-500 KB": 95,
+      "500 KB+": 8
+    }
+  },
+  "workflow_representation": {
+    "cohorts": {
+      "total_workflows": 2757,
+      "payload_python": 0,
+      "body_python": 0,
+      "both": 222,
+      "duplicate_body_payload": 222,
+      "neither": 2535,
+      "suspect_count": 222,
+      "suspect_reasons": {
+        "high_entropy_base64": 222
+      },
+      "cohorts": {
+        "payload_python": 222,
+        "body_python_only": 0,
+        "any_python": 222,
+        "no_python": 2535
+      }
+    },
+    "size_stats": {
+      "prose_body": {
+        "p50": 1613,
+        "p75": 1853,
+        "p90": 2411,
+        "p95": 13898,
+        "p99": 345703,
+        "min": 613,
+        "max": 1417640,
+        "mean": 12769,
+        "count": 2757
+      },
+      "payload_python_source": {
+        "p50": 95216,
+        "p75": 207385,
+        "p90": 371215,
+        "p95": 448574,
+        "p99": 719694,
+        "min": 3268,
+        "max": 1415262,
+        "mean": 138983,
+        "count": 222
+      },
+      "body_python_extracted": {
+        "p50": 96027,
+        "p75": 208392,
+        "p90": 371980,
+        "p95": 450192,
+        "p99": 720821,
+        "min": 3480,
+        "max": 1416828,
+        "mean": 139843,
+        "count": 222
+      },
+      "coverage": {
+        "total": 2757,
+        "with_payload_python": 222,
+        "with_body_python": 222
+      }
+    }
+  },
+  "table_sizes": [
+    {
+      "table": "discord_messages",
+      "total_bytes": 1210236928,
+      "table_bytes": 698638336,
+      "index_bytes": 511598592,
+      "total_pretty": "1154 MB",
+      "table_pretty": "666 MB",
+      "index_pretty": "488 MB"
+    },
+    {
+      "table": "external_resources",
+      "total_bytes": 70295552,
+      "table_bytes": 46030848,
+      "index_bytes": 24264704,
+      "total_pretty": "67 MB",
+      "table_pretty": "44 MB",
+      "index_pretty": "23 MB"
+    },
+    {
+      "table": "distillations",
+      "total_bytes": 188416,
+      "table_bytes": 16384,
+      "index_bytes": 172032,
+      "total_pretty": "184 kB",
+      "table_pretty": "16 kB",
+      "index_pretty": "168 kB"
+    },
+    {
+      "table": "vibecomfy_ratings",
+      "total_bytes": 65536,
+      "table_bytes": 16384,
+      "index_bytes": 49152,
+      "total_pretty": "64 kB",
+      "table_pretty": "16 kB",
+      "index_pretty": "48 kB"
+    },
+    {
+      "table": "contributors",
+      "total_bytes": 49152,
+      "table_bytes": 16384,
+      "index_bytes": 32768,
+      "total_pretty": "48 kB",
+      "table_pretty": "16 kB",
+      "index_pretty": "32 kB"
+    },
+    {
+      "table": "distillation_cites",
+      "total_bytes": 32768,
+      "table_bytes": 16384,
+      "index_bytes": 16384,
+      "total_pretty": "32 kB",
+      "table_pretty": "16 kB",
+      "index_pretty": "16 kB"
+    }
+  ],
+  "indexes": {
+    "discord_content_fts": {
+      "index_name": "idx_discord_messages_content_fts",
+      "definition": "CREATE INDEX idx_discord_messages_content_fts ON public.discord_messages USING gin (to_tsvector('english'::regconfig, content))",
+      "size_pretty": "85 MB",
+      "size_bytes": 89382912
+    },
+    "all_gin_trgm": [
+      "external_resources_body_trgm",
+      "external_resources_title_trgm",
+      "distillations_question_trgm",
+      "distillations_answer_trgm"
+    ],
+    "note": "Index list from schema (001_unified_corpus.sql). Live sizes measured above where psql is available."
+  },
+  "completed_at": "2026-07-28T18:50:48.217917+00:00"
+}

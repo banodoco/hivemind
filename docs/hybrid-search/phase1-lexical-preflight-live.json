@@ -1,0 +1,36 @@
+{
+  "host_family": "pooler",
+  "port": "5432",
+  "objects": {
+    "fn_normalize": "true",
+    "tbl_lexical_documents": "false",
+    "col_prose_tsv": "false",
+    "col_lexical_tsv": "false",
+    "fn_workflow_python_state": "false",
+    "idx_msg_fts_simple": "true",
+    "idx_msg_ident_trgm": "true",
+    "fn_candidates": "false",
+    "fn_rpc": "false",
+    "idx_python_chunk_trgm": "false"
+  },
+  "preflight_raw_rc": 0,
+  "lexical_documents": {},
+  "long_txns_gt_60s": [
+    "0"
+  ],
+  "prereq_missing": [
+    "tbl_lexical_documents",
+    "col_prose_tsv",
+    "col_lexical_tsv",
+    "fn_workflow_python_state"
+  ],
+  "prereq_ok": false,
+  "green": false,
+  "blocker": "candidate SQL/RPC live apply is blocked: Phase-1 prerequisites from schema/003 (task 1.2) are not yet live on production (tbl_lexical_documents, col_prose_tsv, col_lexical_tsv, fn_workflow_python_state). Apply schema/003 first, then 008, then 009. The 008/009 code is proven correct on the isolated-cluster rehearsal (full 003->009 chain).",
+  "rehearsal_gate": {
+    "available": true,
+    "green": true,
+    "n_pass": 18,
+    "n_total": 18
+  }
+}

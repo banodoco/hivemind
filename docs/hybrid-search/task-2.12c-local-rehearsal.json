@@ -1,0 +1,28 @@
+{
+  "checks": {
+    "apply_wrote_vectors": true,
+    "contract_not_activated": true,
+    "dry_run_zero_provider_calls": true,
+    "dry_run_zero_vectors": true,
+    "hash_skip_reduced_provider_calls": true,
+    "no_hnsw_evidence": true,
+    "quarantine_and_unavailable": true,
+    "real_vibecomfy_recovery": true,
+    "rerun_completed": true,
+    "snowflake_exact": true
+  },
+  "counts": {
+    "apply_vectors": 14,
+    "dry_chunks": 12,
+    "provider_calls_added_by_rerun": 0,
+    "provider_calls_after_apply": 14,
+    "provider_calls_after_rerun": 14,
+    "provider_calls_dry_run": 0,
+    "vectors_after_rerun": 14
+  },
+  "local_only": true,
+  "provider": "deterministic-fake",
+  "secrets_or_urls_present": false,
+  "status": "passed",
+  "task": "2.12c"
+}

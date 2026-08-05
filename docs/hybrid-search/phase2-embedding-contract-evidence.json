@@ -1,0 +1,68 @@
+{
+  "task": "2.1-embedding-contract-validator",
+  "offline": true,
+  "vector_validation": {
+    "wrong_dimension_rejects": true,
+    "rejects_nan": true,
+    "rejects_inf": true,
+    "rejects_zero": true,
+    "l2_norm_is_one": true
+  },
+  "fake_embedder": {
+    "deterministic": true,
+    "preserves_order": true,
+    "l2_normalized": true,
+    "different_input_different_vector": true,
+    "empty_input_empty": true
+  },
+  "query_normalization": {
+    "whitespace_collapsed": true,
+    "blank_to_empty": true,
+    "deterministic_key": true
+  },
+  "content_hash": {
+    "content_hash_is_frozen_algorithm": true,
+    "crlf_normalizes": true
+  },
+  "contract_identity_anchors": {
+    "384d": {
+      "spec": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 384,
+        "canonicalization_version": 1,
+        "chunking_version": 1
+      },
+      "identity_input": "openai\u001ftext-embedding-3-small\u001f384\u001f1\u001f1",
+      "contract_id": 7571371577804399660,
+      "positive_bigint": true
+    },
+    "1536d": {
+      "spec": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 1536,
+        "canonicalization_version": 1,
+        "chunking_version": 1
+      },
+      "identity_input": "openai\u001ftext-embedding-3-small\u001f1536\u001f1\u001f1",
+      "contract_id": 489652545053900118,
+      "positive_bigint": true
+    },
+    "identical_spec_same_id": true,
+    "different_dimension_different_id": true
+  },
+  "provider_smoke_gate": {
+    "gate": "one authorized provider smoke via Hivemind Edge secret (OPENAI_API_KEY)",
+    "openai_api_key_in_env": false,
+    "embedder_has_credential": false,
+    "edge_secret_registered": true,
+    "live_smoke_status": "PASSED \u2014 authorized smoke recorded",
+    "smoke_dimension": 384,
+    "smoke_elapsed_ms": 162.529,
+    "smoke_evidence_file": "docs/hybrid-search/phase2-embedding-provider-smoke.json",
+    "policy": "one live provider smoke only through Hivemind's Edge secret boundary; if absent, record the gate; never add a key to source/tests/pack",
+    "offline_path_proven": true
+  },
+  "all_pass": true
+}

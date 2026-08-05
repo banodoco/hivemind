@@ -1,0 +1,142 @@
+{
+  "report": "Assumptions for the task-0.7 capacity model",
+  "plan_date": "2026-07-28",
+  "sources": {
+    "openai_embedding_3_small_price": {
+      "value": "$0.02 per 1,000,000 input tokens",
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "retrieved": "2026-07-28",
+      "note": "List price for text-embedding-3-small. Same per-token price regardless of the `dimensions` shortening parameter."
+    },
+    "openai_embedding_3_large_price": {
+      "value": "$0.13 per 1,000,000 input tokens",
+      "url": "https://developers.openai.com/api/docs/pricing",
+      "retrieved": "2026-07-28",
+      "note": "Alternative 'quality' model for a 1536-d path (3-large truncated to 1536). ~6.5x the 3-small price."
+    },
+    "openai_dimensions_param": {
+      "value": "text-embedding-3-small native 1536-d; text-embedding-3-large native 3072-d; `dimensions` param shortens output (256 shown).",
+      "url": "https://developers.openai.com/api/docs/guides/embeddings",
+      "retrieved": "2026-07-28",
+      "note": "So 384-d = 3-small(dimensions=384); 1536-d = 3-small native."
+    },
+    "supabase_pro_plan": {
+      "value": "$25/month base; 8 GB disk included then $0.125/GB (General Purpose); 250 GB egress included.",
+      "url": "https://supabase.com/pricing",
+      "retrieved": "2026-07-28"
+    },
+    "supabase_compute_addons": {
+      "value": "Pro includes $10 compute credit = 1 Micro instance (1 GB RAM). Add-ons: Small $15/2GB, Medium $60/4GB, Large $110/8GB, XL $210/16GB, 2XL $410/32GB, 4XL $960/64GB, 8XL $1870/128GB.",
+      "url": "https://supabase.com/pricing",
+      "retrieved": "2026-07-28",
+      "note": "All ARM, billed hourly; incremental cost below subtracts the $10 Pro credit that already covers a Micro instance."
+    },
+    "supabase_edge_functions": {
+      "value": "2,000,000 invocations included on Pro, then $2 per 1,000,000.",
+      "url": "https://supabase.com/pricing",
+      "retrieved": "2026-07-28"
+    },
+    "pgvector_vector_size": {
+      "value": "A vector(D) value occupies 4*D + 8 bytes.",
+      "url": "https://github.com/pgvector/pgvector",
+      "retrieved": "2026-07-28"
+    },
+    "pgvector_hnsw_defaults": {
+      "value": "HNSW defaults m=16, ef_construction=64, ef_search=40; builds are faster when the graph fits maintenance_work_mem but the index need not be RAM-resident for correct queries.",
+      "url": "https://github.com/pgvector/pgvector",
+      "retrieved": "2026-07-28"
+    }
+  },
+  "measured_facts": {
+    "_source_inventory": "docs/hybrid-search/phase0-inventory.json (task 0.3)",
+    "_source_schema": "docs/hybrid-search/phase0-schema-eligibility-map.md (task 0.2)",
+    "_as_of": "2026-07-28",
+    "messages_eligible": 1245006,
+    "messages_reluples": 1248240,
+    "messages_total_incl_deleted": 1251991,
+    "resources_total": 2759,
+    "workflows_total": 2757,
+    "workflows_with_python": 222,
+    "distillations": 11,
+    "message_est_tokens_mean": 19,
+    "resource_body_est_tokens_mean": 3189,
+    "workflow_python_est_tokens_mean": 34746,
+    "corpus_table_bytes": {
+      "discord_messages": 1210236928,
+      "external_resources": 70295552,
+      "distillations": 188416,
+      "vibecomfy_ratings": 65536,
+      "contributors": 49152,
+      "distillation_cites": 32768
+    }
+  },
+  "priced_assumptions": {
+    "embedding_3small_per_m_tokens": 0.02,
+    "embedding_3large_per_m_tokens": 0.13,
+    "supabase_pro_base_per_month": 25.0,
+    "supabase_disk_included_gb": 8.0,
+    "supabase_disk_per_gb_month": 0.125,
+    "edge_included_invocations": 2000000,
+    "edge_per_m_invocations": 2.0,
+    "compute_addons": [
+      [
+        "Micro",
+        10,
+        1
+      ],
+      [
+        "Small",
+        15,
+        2
+      ],
+      [
+        "Medium",
+        60,
+        4
+      ],
+      [
+        "Large",
+        110,
+        8
+      ],
+      [
+        "XL",
+        210,
+        16
+      ],
+      [
+        "2XL",
+        410,
+        32
+      ],
+      [
+        "4XL",
+        960,
+        64
+      ],
+      [
+        "8XL",
+        1870,
+        128
+      ]
+    ],
+    "pro_compute_credit": 10.0
+  },
+  "model_heuristics": {
+    "hnsw_graph_bytes_per_node_central": 150,
+    "hnsw_graph_bytes_per_node_low": 100,
+    "hnsw_graph_bytes_per_node_high": 250,
+    "row_overhead_bytes_central": 200,
+    "row_overhead_bytes_low": 180,
+    "row_overhead_bytes_high": 240,
+    "chunk_text_bytes_central": 1000,
+    "secondary_indexes_gb_central": 0.15,
+    "prose_chunk_tokens": 512,
+    "python_chunk_tokens": 512,
+    "chunk_overlap_frac": 0.1,
+    "hnsw_ram_safety_factor": 1.25,
+    "searches_per_month": 250000,
+    "query_est_tokens": 20,
+    "embedding_worker_cron_invocations_per_month": 8640
+  }
+}

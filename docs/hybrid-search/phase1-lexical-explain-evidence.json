@@ -1,0 +1,118 @@
+{
+  "task": "1.2",
+  "date": "2026-07-28",
+  "method": "isolated throwaway PostgreSQL 14 cluster (initdb --auth=trust, temp data dir, ephemeral port, unix socket); torn down after capture. No Docker, no network, no production mutation.",
+  "indexes": {
+    "resource_prose": "external_resources_prose_tsv_idx (GIN on generated prose_tsv)",
+    "distillation": "distillations_lexical_tsv_idx (GIN on generated lexical_tsv)",
+    "workflow_python": "lexical_documents_tsv_idx (GIN on generated tsv per code chunk)"
+  },
+  "explain_evidence": {
+    "resource_prose": {
+      "query": "select id from external_resources where prose_tsv @@ websearch_to_tsquery('simple','wanvideo')",
+      "plan_natural": "Seq Scan on external_resources (actual time=0.002..0.432 rows=8 loops=1)\n  Filter: (prose_tsv @@ '''wanvideo'''::tsquery)\n  Rows Removed by Filter: 4002\n  Buffers: shared hit=107\nPlanning:\n  Buffers: shared hit=96\nPlanning Time: 0.165 ms\nExecution Time: 0.437 ms",
+      "plan_forced_index": "Bitmap Heap Scan on external_resources (actual time=0.264..0.266 rows=8 loops=1)\n  Recheck Cond: (prose_tsv @@ '''wanvideo'''::tsquery)\n  Heap Blocks: exact=2\n  ->  Bitmap Index Scan on external_resources_prose_tsv_idx (actual time=0.262..0.262 rows=8 loops=1)\n        Index Cond: (prose_tsv @@ '''wanvideo'''::tsquery)\nPlanning Time: 0.167 ms\nExecution Time: 0.276 ms",
+      "index_name_expected": "external_resources_prose_tsv_idx"
+    },
+    "distillation": {
+      "query": "select id from distillations where lexical_tsv @@ websearch_to_tsquery('simple','upscale')",
+      "plan_natural": "Seq Scan on distillations (actual time=0.002..0.003 rows=1 loops=1)\n  Filter: (lexical_tsv @@ '''upscale'''::tsquery)\n  Rows Removed by Filter: 2\n  Buffers: shared hit=1\nPlanning:\n  Buffers: shared hit=95\nPlanning Time: 0.163 ms\nExecution Time: 0.008 ms",
+      "plan_forced_index": "Bitmap Heap Scan on distillations (actual time=0.009..0.009 rows=1 loops=1)\n  Recheck Cond: (lexical_tsv @@ '''upscale'''::tsquery)\n  Heap Blocks: exact=1\n  ->  Bitmap Index Scan on distillations_lexical_tsv_idx (actual time=0.006..0.006 rows=1 loops=1)\n        Index Cond: (lexical_tsv @@ '''upscale'''::tsquery)\nPlanning Time: 0.215 ms\nExecution Time: 0.024 ms",
+      "index_name_expected": "distillations_lexical_tsv_idx"
+    },
+    "workflow_python": {
+      "query": "select item_id from lexical_documents where tsv @@ websearch_to_tsquery('simple','wanvideosampler')",
+      "plan_natural": "Seq Scan on lexical_documents (actual time=0.003..0.048 rows=23 loops=1)\n  Filter: (tsv @@ '''wanvideosampler'''::tsquery)\n  Rows Removed by Filter: 1\n  Buffers: shared hit=65\nPlanning:\n  Buffers: shared hit=196\nPlanning Time: 0.346 ms\nExecution Time: 0.053 ms",
+      "plan_forced_index": "Bitmap Heap Scan on lexical_documents (actual time=0.028..0.031 rows=23 loops=1)\n  Recheck Cond: (tsv @@ '''wanvideosampler'''::tsquery)\n  Heap Blocks: exact=3\n  ->  Bitmap Index Scan on lexical_documents_tsv_idx (actual time=0.025..0.026 rows=23 loops=1)\n        Index Cond: (tsv @@ '''wanvideosampler'''::tsquery)\nPlanning Time: 0.332 ms\nExecution Time: 0.041 ms",
+      "index_name_expected": "lexical_documents_tsv_idx"
+    }
+  },
+  "assertions": [
+    {
+      "name": "safe_workflow_python_searchable",
+      "ok": true,
+      "detail": "distinct workflows with a wanvideosampler code hit = 5 (expect >=3: payload/body/both)"
+    },
+    {
+      "name": "quarantined_python_has_zero_documents",
+      "ok": true,
+      "detail": "lexical_documents workflow_python rows for 1008 = 0 (expect 0)"
+    },
+    {
+      "name": "quarantined_state_recorded",
+      "ok": true,
+      "detail": "hivemind_workflow_python_state(1008) = quarantined (expect quarantined)"
+    },
+    {
+      "name": "quarantine_accessor_returns_quarantined",
+      "ok": true,
+      "detail": "accessor = quarantined"
+    },
+    {
+      "name": "secret_value_absent_from_state",
+      "ok": true,
+      "detail": "secret-value matches in state = 0 (expect 0)"
+    },
+    {
+      "name": "both_cohort_indexed_once",
+      "ok": true,
+      "detail": "1003 workflow_python doc count = 1 (>0, exactly the payload set)"
+    },
+    {
+      "name": "both_cohort_prose_has_python_stripped",
+      "ok": true,
+      "detail": "1003 prose_tsv matches code-only 'num_frames' = 0 (expect 0); workflow_python matches = 1 (>0) => code indexed once as workflow_python"
+    },
+    {
+      "name": "rejected_distillation_excluded",
+      "ok": true,
+      "detail": "rejected id=3 in eligible set = 0 (expect 0)"
+    },
+    {
+      "name": "pending_approved_distillations_included",
+      "ok": true,
+      "detail": "pending/approved ids 1,2 = 2 (expect 2)"
+    },
+    {
+      "name": "distillation_weighted_rank",
+      "ok": true,
+      "detail": "top 'upscale' distillation = 1 (expect 1: A-weight question)"
+    },
+    {
+      "name": "constraint_rejects_quarantined_workflow_python",
+      "ok": true,
+      "detail": "insert quarantined workflow_python rc = 1 (expect nonzero)"
+    },
+    {
+      "name": "constraint_rejects_negative_chunk_index",
+      "ok": true,
+      "detail": "insert chunk_index=-1 rc = 1 (expect nonzero)"
+    },
+    {
+      "name": "constraint_rejects_bad_entity_type",
+      "ok": true,
+      "detail": "insert bogus entity rc = 1 (expect nonzero)"
+    },
+    {
+      "name": "migration_idempotent",
+      "ok": true,
+      "detail": "re-applied 003 without error"
+    },
+    {
+      "name": "explain_uses_index:resource_prose",
+      "ok": true,
+      "detail": "forced plan references external_resources_prose_tsv_idx: True"
+    },
+    {
+      "name": "explain_uses_index:distillation",
+      "ok": true,
+      "detail": "forced plan references distillations_lexical_tsv_idx: True"
+    },
+    {
+      "name": "explain_uses_index:workflow_python",
+      "ok": true,
+      "detail": "forced plan references lexical_documents_tsv_idx: True"
+    }
+  ],
+  "all_assertions_passed": true
+}

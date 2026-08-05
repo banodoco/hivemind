@@ -1,0 +1,54 @@
+{
+  "host_family": "pooler",
+  "port": "5432",
+  "privilege_matrix": {
+    "fn_candidates": "service_role|EXECUTE|true",
+    "fn_rpc": "service_role|EXECUTE|true",
+    "tbl_lexical_documents": "service_role|DELETE|true",
+    "tbl_lexical_resource_python_state": "service_role|DELETE|true"
+  },
+  "actual_attempts": {
+    "anon_call_candidates": {
+      "denied": true,
+      "err": "ERROR:  permission denied for function hivemind_lexical_candidates"
+    },
+    "anon_select_lexical_documents": {
+      "denied": true,
+      "err": "HINT:  Grant the required privileges to the current role with: GRANT SELECT ON public.lexical_documents TO anon;"
+    },
+    "anon_select_lexical_resource_python_state": {
+      "denied": true,
+      "err": "HINT:  Grant the required privileges to the current role with: GRANT SELECT ON public.lexical_resource_python_state TO anon;"
+    },
+    "authenticated_call_candidates": {
+      "denied": true,
+      "err": "ERROR:  permission denied for function hivemind_lexical_candidates"
+    },
+    "authenticated_select_lexical_documents": {
+      "denied": true,
+      "err": "HINT:  Grant the required privileges to the current role with: GRANT SELECT ON public.lexical_documents TO authenticated;"
+    },
+    "authenticated_select_lexical_resource_python_state": {
+      "denied": true,
+      "err": "HINT:  Grant the required privileges to the current role with: GRANT SELECT ON public.lexical_resource_python_state TO authenticated;"
+    }
+  },
+  "service_role_rpc": {
+    "ok": true,
+    "out": [
+      "10|10"
+    ],
+    "err": ""
+  },
+  "quarantine_resource_2625": {
+    "quarantined_state": "quarantined",
+    "workflow_python_doc_count": "0"
+  },
+  "verdict": {
+    "anon_auth_blocked_candidates_fn": true,
+    "anon_auth_blocked_table_reads": true,
+    "service_role_can_call_rpc": true,
+    "quarantined_has_zero_workflow_python_docs": true
+  },
+  "all_pass": true
+}

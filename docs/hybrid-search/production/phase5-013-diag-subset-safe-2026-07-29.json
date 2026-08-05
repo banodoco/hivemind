@@ -1,0 +1,124 @@
+{
+  "mode": "latency",
+  "golden_path": "/<token>.json",
+  "n_cases": 9,
+  "n_measured": 7,
+  "missing_case_ids": [
+    "G059",
+    "G063"
+  ],
+  "last_started_case_id": "G105",
+  "python_timeout_fired": false,
+  "psql_rc": 0,
+  "elapsed_s": 18.2,
+  "host_family": "pooler",
+  "port": "5432",
+  "methodology": "single persistent psql session (one auth); per-case EXPLAIN (ANALYZE) Execution Time on candidate fn WITH case filters; primed 0; 1 timed; statement_timeout=5000ms; no bodies/snippets/query-strings logged.",
+  "status_counts": {
+    "measured": 7,
+    "statement_timeout": 2
+  },
+  "p50_ms": 260.7,
+  "p95_ms": 4301.5,
+  "p99_ms": 4301.5,
+  "max_ms": 4301.5,
+  "gate_warm_p95_le_750ms": false,
+  "gate_all_measured": false,
+  "cases_over_750ms": 2,
+  "over_750ms_case_ids": [
+    "G006",
+    "G018"
+  ],
+  "per_case": [
+    {
+      "id": "G001",
+      "categories": [
+        "exact_name",
+        "best_is_resource"
+      ],
+      "status": "measured",
+      "time_ms": 721.9
+    },
+    {
+      "id": "G006",
+      "categories": [
+        "exact_name",
+        "code_fragment"
+      ],
+      "status": "measured",
+      "time_ms": 1572.6
+    },
+    {
+      "id": "G018",
+      "categories": [
+        "workflow_code",
+        "exact_name",
+        "timeout_prone"
+      ],
+      "status": "measured",
+      "time_ms": 4301.5
+    },
+    {
+      "id": "G037",
+      "categories": [
+        "workflow_python_evidence",
+        "multi_term",
+        "best_is_resource"
+      ],
+      "status": "measured",
+      "time_ms": 255.7
+    },
+    {
+      "id": "G053",
+      "categories": [
+        "paraphrase",
+        "settings",
+        "best_is_distillation"
+      ],
+      "status": "measured",
+      "time_ms": 260.7
+    },
+    {
+      "id": "G057",
+      "categories": [
+        "settings",
+        "best_is_message",
+        "snowflake"
+      ],
+      "status": "measured",
+      "time_ms": 99.8
+    },
+    {
+      "id": "G059",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "status": "statement_timeout",
+      "time_ms": null,
+      "error_kind": "statement_timeout"
+    },
+    {
+      "id": "G063",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "status": "statement_timeout",
+      "time_ms": null,
+      "error_kind": "statement_timeout"
+    },
+    {
+      "id": "G105",
+      "categories": [
+        "no_hit"
+      ],
+      "status": "measured",
+      "time_ms": 92.4
+    }
+  ]
+}

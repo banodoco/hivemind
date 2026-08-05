@@ -52,8 +52,21 @@ def resolve_anon_key() -> str:
 
 
 def resolve_contributor_key() -> str | None:
-    """Return the contributor key for writes, or *None* if not set."""
-    return os.environ.get("HIVEMIND_CONTRIBUTOR_KEY")
+    """Return the contributor key from the environment or standard key file."""
+    env_key = os.environ.get("HIVEMIND_CONTRIBUTOR_KEY")
+    if env_key:
+        return env_key.strip()
+
+    home_dir = os.environ.get("HOME")
+    if not home_dir:
+        return None
+    key_path = os.path.join(home_dir, ".hivemind", "key")
+    try:
+        with open(key_path, encoding="utf-8") as handle:
+            file_key = handle.read().strip()
+    except (FileNotFoundError, OSError):
+        return None
+    return file_key or None
 
 
 def resolve_contribute_url() -> str:
@@ -161,7 +174,10 @@ def edge_post(
             "contributor key required — set HIVEMIND_CONTRIBUTOR_KEY or pass contributor_key="
         )
     url = (contribute_url or resolve_contribute_url()).rstrip("/")
+    anon_key = resolve_anon_key()
     headers = {
+        "Authorization": f"Bearer {anon_key}",
+        "apikey": anon_key,
         "Content-Type": "application/json",
         "X-Contributor-Key": key,
         "Accept": "application/json",

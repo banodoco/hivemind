@@ -1,0 +1,420 @@
+{
+  "preflight": {
+    "parsed": {
+      "schema_005_prerequisite": [
+        [
+          "t",
+          "t"
+        ]
+      ],
+      "target_identity": [
+        [
+          "distillations",
+          "question",
+          "text",
+          "t",
+          "11",
+          "11"
+        ],
+        [
+          "external_resources",
+          "title",
+          "text",
+          "t",
+          "2759",
+          "2759"
+        ]
+      ],
+      "existing_trgm_indexes": [
+        [
+          "distillations",
+          "distillations_question_trgm",
+          "t",
+          "t",
+          "CREATE INDEX distillations_question_trgm ON public.distillations USING gin (question gin_trgm_ops)",
+          "32768"
+        ],
+        [
+          "distillations",
+          "distillations_answer_trgm",
+          "t",
+          "t",
+          "CREATE INDEX distillations_answer_trgm ON public.distillations USING gin (answer gin_trgm_ops)",
+          "106496"
+        ],
+        [
+          "distillations",
+          "idx_distillations_question_trgm_norm",
+          "t",
+          "t",
+          "CREATE INDEX idx_distillations_question_trgm_norm ON public.distillations USING gin (hivemind_normalize_identifier(question) gin_trgm_ops) WHERE ((status = ANY (ARRAY['pending'::text, 'approved'::text])) AND ((char_length(hivemind_normalize_identifier(question)) >= 1) AND (char_length(hivemind_normalize_identifier(question)) <= 300)))",
+          "40960"
+        ],
+        [
+          "external_resources",
+          "external_resources_body_trgm",
+          "t",
+          "t",
+          "CREATE INDEX external_resources_body_trgm ON public.external_resources USING gin (body gin_trgm_ops)",
+          "14155776"
+        ],
+        [
+          "external_resources",
+          "external_resources_title_trgm",
+          "t",
+          "t",
+          "CREATE INDEX external_resources_title_trgm ON public.external_resources USING gin (title gin_trgm_ops)",
+          "974848"
+        ],
+        [
+          "external_resources",
+          "idx_external_resources_title_trgm_norm",
+          "t",
+          "t",
+          "CREATE INDEX idx_external_resources_title_trgm_norm ON public.external_resources USING gin (hivemind_normalize_identifier(title) gin_trgm_ops) WHERE ((char_length(hivemind_normalize_identifier(title)) >= 1) AND (char_length(hivemind_normalize_identifier(title)) <= 300))",
+          "606208"
+        ]
+      ],
+      "invalid_index_remnants": [],
+      "in_progress_index_builds": [],
+      "database_storage": [
+        [
+          "postgres",
+          "2333831983"
+        ]
+      ],
+      "long_or_locking_transactions": [],
+      "relation_locks": [],
+      "timeout_and_maintenance_settings": [
+        [
+          "lock_timeout",
+          "0",
+          "ms"
+        ],
+        [
+          "maintenance_work_mem",
+          "131072",
+          "kB"
+        ],
+        [
+          "max_parallel_maintenance_workers",
+          "1",
+          ""
+        ],
+        [
+          "statement_timeout",
+          "120000",
+          "ms"
+        ]
+      ]
+    },
+    "raw": {
+      "schema_005_prerequisite": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "target_identity": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "existing_trgm_indexes": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "invalid_index_remnants": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "in_progress_index_builds": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "database_storage": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "long_or_locking_transactions": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "relation_locks": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "timeout_and_maintenance_settings": {
+        "rc": 0,
+        "stderr_tail": ""
+      }
+    },
+    "verdict": {
+      "green": true,
+      "checks": [
+        {
+          "name": "schema_005_prerequisite",
+          "pass": true,
+          "detail": "normalize_fn=t icu_collation=t"
+        },
+        {
+          "name": "target_identity",
+          "pass": true,
+          "detail": "targets_found=[('distillations', 'question'), ('external_resources', 'title')] want=[('distillations', 'question'), ('external_resources', 'title')]"
+        },
+        {
+          "name": "existing_trgm_indexes",
+          "pass": true,
+          "detail": "trgm_indexes=['distillations_question_trgm', 'distillations_answer_trgm', 'idx_distillations_question_trgm_norm', 'external_resources_body_trgm', 'external_resources_title_trgm', 'idx_external_resources_title_trgm_norm']; normalized_targets_already_valid=True"
+        },
+        {
+          "name": "no_invalid_remnants",
+          "pass": true,
+          "detail": "none"
+        },
+        {
+          "name": "no_in_progress_build",
+          "pass": true,
+          "detail": "none"
+        },
+        {
+          "name": "no_blocking_long_txn",
+          "pass": true,
+          "detail": "none"
+        },
+        {
+          "name": "no_relation_locks",
+          "pass": true,
+          "detail": "none"
+        },
+        {
+          "name": "storage_headroom",
+          "pass": true,
+          "detail": "db\u22482.33GB disk=9GB free\u22486.26GB need\u22480.0033GB (idx est\u22481108KB)"
+        },
+        {
+          "name": "settings_inspected",
+          "pass": true,
+          "detail": "lock_timeout=0ms; maintenance_work_mem=131072kB; max_parallel_maintenance_workers=1; statement_timeout=120000ms"
+        },
+        {
+          "name": "session_mode_connection",
+          "pass": true,
+          "detail": "host_family=session port=5432"
+        }
+      ],
+      "reasons": [],
+      "est_rows": 2770,
+      "est_index_bytes": 1108000,
+      "headroom_bytes": 6256102609,
+      "conn_mode": "session",
+      "already_valid": true,
+      "schema_005_needed": false
+    },
+    "host_family": "pooler",
+    "port": "5432"
+  },
+  "schema_005_apply": {
+    "status": "already_present"
+  },
+  "parity_probe": {
+    "checked": 16,
+    "mismatches": 0,
+    "parity_ok": true,
+    "samples": [
+      {
+        "entity": "resource",
+        "id": "1",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "4",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "5",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "6",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "7",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "8",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "9",
+        "parity": true
+      },
+      {
+        "entity": "resource",
+        "id": "10",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "1",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "3",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "4",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "5",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "6",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "7",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "8",
+        "parity": true
+      },
+      {
+        "entity": "distillation",
+        "id": "9",
+        "parity": true
+      }
+    ]
+  },
+  "build": {
+    "status": "already_valid"
+  },
+  "evidence": {
+    "indexes": {
+      "idx_external_resources_title_trgm_norm": {
+        "index_valid": "t",
+        "index_size_bytes": 606208,
+        "index_size_pretty": "592 kB"
+      },
+      "idx_distillations_question_trgm_norm": {
+        "index_valid": "t",
+        "index_size_bytes": 40960,
+        "index_size_pretty": "40 kB"
+      }
+    },
+    "evidence_plans": {
+      "title_wordsim_flux": {
+        "plan": "Limit (actual time=9.839..9.843 rows=20 loops=1)\n  Buffers: shared hit=224\n  ->  Sort (actual time=9.838..9.839 rows=20 loops=1)\n        Sort Key: (word_similarity('flux1'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=224\n        ->  Bitmap Heap Scan on external_resources (actual time=0.222..9.673 rows=236 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('flux1'::text <% (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Heap Blocks: exact=202\n              Buffers: shared hit=215\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.129..0.129 rows=236 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text %> 'flux1'::text)\n                    Buffers: shared hit=13\nPlanning:\n  Buffers: shared hit=289\nPlanning Time: 4.088 ms\nExecution Time: 10.005 ms\n",
+        "forced": false,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "title_wordsim_wan_variant": {
+        "plan": "Limit (actual time=34.227..34.232 rows=20 loops=1)\n  Buffers: shared hit=492\n  ->  Sort (actual time=34.225..34.228 rows=20 loops=1)\n        Sort Key: (word_similarity('wan22'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=492\n        ->  Bitmap Heap Scan on external_resources (actual time=0.432..33.878 rows=841 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('wan22'::text <% (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Heap Blocks: exact=470\n              Buffers: shared hit=483\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.306..0.307 rows=841 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text %> 'wan22'::text)\n                    Buffers: shared hit=13\nPlanning:\n  Buffers: shared hit=289\nPlanning Time: 3.734 ms\nExecution Time: 34.371 ms\n",
+        "forced": false,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "title_wordsim_symbol": {
+        "plan": "Limit (actual time=40.370..40.375 rows=20 loops=1)\n  Buffers: shared hit=550\n  ->  Sort (actual time=40.369..40.371 rows=20 loops=1)\n        Sort Key: (word_similarity('wanvideosampler'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=550\n        ->  Bitmap Heap Scan on external_resources (actual time=0.754..40.047 rows=791 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('wanvideosampler'::text <% (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Rows Removed by Filter: 221\n              Heap Blocks: exact=508\n              Buffers: shared hit=541\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.600..0.600 rows=1012 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text %> 'wanvideosampler'::text)\n                    Buffers: shared hit=33\nPlanning:\n  Buffers: shared hit=289\nPlanning Time: 3.684 ms\nExecution Time: 40.513 ms\n",
+        "forced": false,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "title_similarity_full": {
+        "plan": "Limit (actual time=18.706..18.710 rows=20 loops=1)\n  Buffers: shared hit=499\n  ->  Sort (actual time=18.704..18.706 rows=20 loops=1)\n        Sort Key: (similarity('ltxvideofastvideoworkflow'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=499\n        ->  Bitmap Heap Scan on external_resources (actual time=1.067..18.635 rows=52 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('ltxvideofastvideoworkflow'::text % (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Rows Removed by Filter: 640\n              Heap Blocks: exact=443\n              Buffers: shared hit=490\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.623..0.624 rows=692 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text % 'ltxvideofastvideoworkflow'::text)\n                    Buffers: shared hit=47\nPlanning:\n  Buffers: shared hit=286\nPlanning Time: 3.758 ms\nExecution Time: 18.842 ms\n",
+        "forced": false,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "question_wordsim_upscale": {
+        "plan": "Limit (actual time=0.306..0.306 rows=0 loops=1)\n  Buffers: shared hit=10\n  ->  Sort (actual time=0.304..0.305 rows=0 loops=1)\n        Sort Key: (word_similarity('bestupscalemodel'::text, (COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: quicksort  Memory: 25kB\n        Buffers: shared hit=10\n        ->  Seq Scan on distillations (actual time=0.261..0.261 rows=0 loops=1)\n              Filter: ((status = ANY ('{pending,approved}'::text[])) AND ('bestupscalemodel'::text <% (COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) AND (char_length((COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Rows Removed by Filter: 11\n              Buffers: shared hit=1\nPlanning:\n  Buffers: shared hit=222\nPlanning Time: 3.974 ms\nExecution Time: 0.378 ms\n",
+        "forced": false,
+        "uses_normalized_index": false,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": true,
+        "is_bitmap_heap_scan": false,
+        "plan_present": true
+      },
+      "title_wordsim_flux__forced": {
+        "plan": "Limit (actual time=9.533..9.537 rows=20 loops=1)\n  Buffers: shared hit=224\n  ->  Sort (actual time=9.531..9.533 rows=20 loops=1)\n        Sort Key: (word_similarity('flux1'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=224\n        ->  Bitmap Heap Scan on external_resources (actual time=0.209..9.378 rows=236 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('flux1'::text <% (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Heap Blocks: exact=202\n              Buffers: shared hit=215\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.121..0.121 rows=236 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text %> 'flux1'::text)\n                    Buffers: shared hit=13\nPlanning:\n  Buffers: shared hit=289\nPlanning Time: 3.722 ms\nExecution Time: 9.676 ms\n",
+        "forced": true,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "title_wordsim_wan_variant__forced": {
+        "plan": "Limit (actual time=34.283..34.288 rows=20 loops=1)\n  Buffers: shared hit=492\n  ->  Sort (actual time=34.282..34.284 rows=20 loops=1)\n        Sort Key: (word_similarity('wan22'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=492\n        ->  Bitmap Heap Scan on external_resources (actual time=0.424..33.941 rows=841 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('wan22'::text <% (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Heap Blocks: exact=470\n              Buffers: shared hit=483\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.297..0.298 rows=841 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text %> 'wan22'::text)\n                    Buffers: shared hit=13\nPlanning:\n  Buffers: shared hit=289\nPlanning Time: 3.783 ms\nExecution Time: 34.428 ms\n",
+        "forced": true,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "title_wordsim_symbol__forced": {
+        "plan": "Limit (actual time=40.689..40.693 rows=20 loops=1)\n  Buffers: shared hit=550\n  ->  Sort (actual time=40.687..40.689 rows=20 loops=1)\n        Sort Key: (word_similarity('wanvideosampler'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=550\n        ->  Bitmap Heap Scan on external_resources (actual time=0.765..40.359 rows=791 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('wanvideosampler'::text <% (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Rows Removed by Filter: 221\n              Heap Blocks: exact=508\n              Buffers: shared hit=541\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.596..0.597 rows=1012 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text %> 'wanvideosampler'::text)\n                    Buffers: shared hit=33\nPlanning:\n  Buffers: shared hit=289\nPlanning Time: 3.746 ms\nExecution Time: 40.826 ms\n",
+        "forced": true,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "title_similarity_full__forced": {
+        "plan": "Limit (actual time=18.422..18.426 rows=20 loops=1)\n  Buffers: shared hit=499\n  ->  Sort (actual time=18.421..18.422 rows=20 loops=1)\n        Sort Key: (similarity('ltxvideofastvideoworkflow'::text, (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: top-N heapsort  Memory: 27kB\n        Buffers: shared hit=499\n        ->  Bitmap Heap Scan on external_resources (actual time=1.057..18.354 rows=52 loops=1)\n              Recheck Cond: ((char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Filter: ('ltxvideofastvideoworkflow'::text % (COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)\n              Rows Removed by Filter: 640\n              Heap Blocks: exact=443\n              Buffers: shared hit=490\n              ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm (actual time=0.623..0.623 rows=692 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text % 'ltxvideofastvideoworkflow'::text)\n                    Buffers: shared hit=47\nPlanning:\n  Buffers: shared hit=286\nPlanning Time: 3.684 ms\nExecution Time: 18.553 ms\n",
+        "forced": true,
+        "uses_normalized_index": true,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "question_wordsim_upscale__forced": {
+        "plan": "Limit (actual time=0.296..0.297 rows=0 loops=1)\n  Buffers: shared hit=15\n  ->  Sort (actual time=0.295..0.295 rows=0 loops=1)\n        Sort Key: (word_similarity('bestupscalemodel'::text, (COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text)) DESC NULLS LAST, created_at DESC NULLS LAST, ((id)::text)\n        Sort Method: quicksort  Memory: 25kB\n        Buffers: shared hit=15\n        ->  Index Scan using distillations_status_idx on distillations (actual time=0.259..0.259 rows=0 loops=1)\n              Index Cond: (status = ANY ('{pending,approved}'::text[]))\n              Filter: (('bestupscalemodel'::text <% (COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) AND (char_length((COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((question)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n              Rows Removed by Filter: 11\n              Buffers: shared hit=6\nPlanning:\n  Buffers: shared hit=222\nPlanning Time: 3.545 ms\nExecution Time: 0.363 ms\n",
+        "forced": true,
+        "uses_normalized_index": false,
+        "uses_raw_trgm_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": false,
+        "plan_present": true
+      }
+    },
+    "representative_hit_counts": {
+      "external_resources:Wan2.2": 841,
+      "external_resources:FLUX.1": 236,
+      "distillations:best upscale model": 0
+    },
+    "title_index_used_at_production_scale": true,
+    "question_index_planner_note": "At the current 11-row distillation count the planner seq-scans (natural) or uses distillations_status_idx (forced) and evaluates <% as a filter over 11 rows; the question trigram index is valid and eligibility-correct but not planner-exercised until the table grows. Proven structurally servable in the isolated rehearsal."
+  }
+}

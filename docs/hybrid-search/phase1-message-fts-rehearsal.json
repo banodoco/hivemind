@@ -1,0 +1,99 @@
+{
+  "task": "1.3-rehearsal",
+  "rows_requested": 1250000,
+  "index_name": "idx_discord_messages_content_fts_simple",
+  "index_expression": "to_tsvector('simple'::regconfig, coalesce(content, ''))",
+  "config": "simple",
+  "steps": [],
+  "pg_version": "14.15 (Homebrew)",
+  "cluster": {
+    "isolated": true,
+    "network": "off (unix socket only)"
+  },
+  "seed": {
+    "elapsed_s": 6.9,
+    "actual_rows": 1250000,
+    "deleted_rows": 6944,
+    "null_content_rows": 25000,
+    "disk_free_before_seed_bytes": 3816681472
+  },
+  "baseline_no_simple_index": {
+    "plan": "Limit (actual time=0.038..37.811 rows=20 loops=1)\n  Buffers: shared read=338\n  ->  Seq Scan on discord_messages m (actual time=0.038..37.808 rows=20 loops=1)\n        Filter: ((NOT is_deleted) AND (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''wanvideosampler'''::tsquery))\n        Rows Removed by Filter: 23751\n        Buffers: shared read=338\nPlanning:\n  Buffers: shared hit=94\nPlanning Time: 0.362 ms\nExecution Time: 37.821 ms\n",
+    "uses_simple_index": false,
+    "uses_english_index": false,
+    "is_seq_scan": true,
+    "note": "pre-1.3: a 'simple' query cannot use the 'english' expression index"
+  },
+  "online_build": {
+    "elapsed_s": 6.32,
+    "index_bytes": 27213824,
+    "index_size_pretty": "27.2 MB",
+    "english_index_bytes": 27189248,
+    "english_size_pretty": "27.2 MB",
+    "english_build_elapsed_s": 5.61,
+    "indisvalid": "t",
+    "table_total_bytes": 228122624,
+    "disk_free_before_build_bytes": 3345219584,
+    "disk_free_after_build_bytes": 3300855808
+  },
+  "evidence_plans": {
+    "websearch_default": {
+      "plan": "Limit (actual time=2.663..3.280 rows=20 loops=1)\n  Buffers: shared hit=738 read=539\n  ->  Gather Merge (actual time=2.662..3.278 rows=20 loops=1)\n        Workers Planned: 2\n        Workers Launched: 2\n        Buffers: shared hit=738 read=539\n        ->  Sort (actual time=1.353..1.353 rows=18 loops=3)\n              Sort Key: (ts_rank(to_tsvector('simple'::regconfig, COALESCE(content, ''::text)), '''wanvideosampler'''::tsquery, 32)) DESC, created_at DESC, ((message_id)::text)\n              Sort Method: top-N heapsort  Memory: 26kB\n              Buffers: shared hit=738 read=539\n              Worker 0:  Sort Method: top-N heapsort  Memory: 27kB\n              Worker 1:  Sort Method: top-N heapsort  Memory: 27kB\n              ->  Parallel Bitmap Heap Scan on discord_messages m (actual time=0.259..1.273 rows=333 loops=3)\n                    Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''wanvideosampler'''::tsquery)\n                    Filter: (NOT is_deleted)\n                    Heap Blocks: exact=731\n                    Buffers: shared hit=690 read=539\n                    ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple (actual time=0.123..0.123 rows=1000 loops=1)\n                          Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''wanvideosampler'''::tsquery)\n                          Buffers: shared hit=5\nPlanning:\n  Buffers: shared hit=192 read=7\nPlanning Time: 0.993 ms\nExecution Time: 3.309 ms\n",
+      "uses_simple_index": true,
+      "uses_english_index": false,
+      "is_seq_scan": false,
+      "is_bitmap_heap_scan": true,
+      "plan_present": true
+    },
+    "phrase_exact_name": {
+      "plan": "Limit (actual time=22.600..22.602 rows=20 loops=1)\n  Buffers: shared hit=385 read=384 written=86\n  ->  Sort (actual time=22.599..22.600 rows=20 loops=1)\n        Sort Key: (ts_rank(to_tsvector('simple'::regconfig, COALESCE(content, ''::text)), '''controlnet'' <-> ''settings'''::tsquery, 32)) DESC, created_at DESC, ((message_id)::text)\n        Sort Method: top-N heapsort  Memory: 26kB\n        Buffers: shared hit=385 read=384 written=86\n        ->  Bitmap Heap Scan on discord_messages m (actual time=1.184..22.469 rows=731 loops=1)\n              Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''controlnet'' <-> ''settings'''::tsquery)\n              Filter: (NOT is_deleted)\n              Rows Removed by Filter: 3\n              Heap Blocks: exact=734\n              Buffers: shared hit=376 read=384 written=86\n              ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple (actual time=1.126..1.126 rows=734 loops=1)\n                    Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''controlnet'' <-> ''settings'''::tsquery)\n                    Buffers: shared hit=26\nPlanning:\n  Buffers: shared hit=199\nPlanning Time: 0.433 ms\nExecution Time: 22.627 ms\n",
+      "uses_simple_index": true,
+      "uses_english_index": false,
+      "is_seq_scan": false,
+      "is_bitmap_heap_scan": true,
+      "plan_present": true
+    },
+    "websearch_dotted_name": {
+      "plan": "Limit (actual time=61.496..61.989 rows=20 loops=1)\n  Buffers: shared hit=486 read=290 written=290\n  ->  Gather Merge (actual time=61.496..61.987 rows=20 loops=1)\n        Workers Planned: 2\n        Workers Launched: 2\n        Buffers: shared hit=486 read=290 written=290\n        ->  Sort (actual time=59.855..59.855 rows=14 loops=3)\n              Sort Key: (ts_rank(to_tsvector('simple'::regconfig, COALESCE(content, ''::text)), '''flux.1'''::tsquery, 32)) DESC, created_at DESC, ((message_id)::text)\n              Sort Method: top-N heapsort  Memory: 27kB\n              Buffers: shared hit=486 read=290 written=290\n              Worker 0:  Sort Method: top-N heapsort  Memory: 27kB\n              Worker 1:  Sort Method: top-N heapsort  Memory: 27kB\n              ->  Parallel Bitmap Heap Scan on discord_messages m (actual time=0.404..59.757 rows=167 loops=3)\n                    Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''flux.1'''::tsquery)\n                    Filter: (NOT is_deleted)\n                    Heap Blocks: exact=103\n                    Buffers: shared hit=438 read=290 written=290\n                    ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple (actual time=0.067..0.067 rows=500 loops=1)\n                          Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''flux.1'''::tsquery)\n                          Buffers: shared hit=4\nPlanning:\n  Buffers: shared hit=199\nPlanning Time: 0.353 ms\nExecution Time: 62.014 ms\n",
+      "uses_simple_index": true,
+      "uses_english_index": false,
+      "is_seq_scan": false,
+      "is_bitmap_heap_scan": true,
+      "plan_present": true
+    }
+  },
+  "representative_hit_counts": {
+    "WanVideoSampler": 1000,
+    "controlnet settings": 731,
+    "FLUX.1": 500
+  },
+  "cancellation_rollback": {
+    "builder": {
+      "returncode": 0,
+      "cancelled_via_pg_cancel_backend": true,
+      "builder_pid": 53133,
+      "stderr_tail": "psql:/<token>.sql:3: ERROR:  canceling statement due to user request"
+    },
+    "indisvalid_after_interrupt": "f",
+    "interrupt_left_invalid_index": true,
+    "rollback": {
+      "drop_rc": 0,
+      "stderr_tail": "",
+      "index_remains_after_drop": 0
+    },
+    "rebuild_elapsed_s": 5.73,
+    "indisvalid_after_rebuild": "t"
+  },
+  "verdict": {
+    "all_pass": true,
+    "checks": {
+      "online_build_valid": true,
+      "evidence_uses_simple_index": true,
+      "evidence_does_not_use_english": true,
+      "baseline_cannot_use_english_or_simple": true,
+      "cancellation_left_invalid_index": true,
+      "rollback_removed_index": true,
+      "rebuild_valid_after_rollback": true
+    }
+  }
+}

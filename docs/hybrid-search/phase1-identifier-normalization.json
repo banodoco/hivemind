@@ -1,0 +1,143 @@
+{
+  "version": "identifier-normalization/2026-07-28/v1",
+  "task": "1.4",
+  "date": "2026-07-28",
+  "plan": "docs/architecture/hivemind-hybrid-search-plan.md",
+  "post_hoc_locked": true,
+  "python_module": "executors.identifier_normalization",
+  "sql_migration": "schema/005_identifier_normalization.sql",
+  "fixture_corpus": "eval/retrieval/fixtures/identifier-normalization-v1.json",
+  "validator": "scripts/validate_identifier_normalization.py",
+  "tests": "tests/test_identifier_normalization.py",
+  "normalization_version": 1,
+  "alias_version": 1,
+  "casefold_policy": "NFC + str.lower() (not str.casefold())",
+  "lexical_config": "simple",
+  "forms": {
+    "compact": {
+      "python": "normalize_identifier",
+      "sql": "public.hivemind_normalize_identifier(text)",
+      "rule": "NFC + lower + strip + drop the frozen separator set",
+      "immutable": true
+    },
+    "preserve": {
+      "python": "normalize_identifier_preserve",
+      "sql": "public.hivemind_normalize_identifier_preserve(text)",
+      "rule": "NFC + lower + strip + collapse whitespace to single spaces (punctuation KEPT)",
+      "immutable": true
+    },
+    "ordered_both": {
+      "python": "identifier_forms",
+      "sql": "public.hivemind_identifier_alias_forms(text)",
+      "rule": "(compact, preserve) de-duplicated, compact first; == lexical_contract.identifier_aliases for strings",
+      "immutable": true
+    }
+  },
+  "separator_set_dropped_by_compact": [
+    "whitespace(\\s)", ".", "-", "_", "/", "\\\\", ",", ":", ";",
+    "(", ")", "{", "}", "[", "]", "@", "\"", "'", "`"
+  ],
+  "punctuation_kept_by_preserve_and_compact": ["=", "+", "#", "%", "*", "!", "&", "^", "~", "$"],
+  "casefold_rationale": "str.casefold() multi-char expansions (ss->ss, ligatures) and combining-mark insertions have no single SQL built-in and would break byte-for-byte parity. NFC + str.lower() agrees with PostgreSQL lower(value COLLATE <icu und>) across the BMP Latin/Greek/Cyrillic/CJK corpus.",
+  "sql_locale_independence": {
+    "method": "deterministic ICU collation public.hivemind_unicode (provider=icu, locale='und', deterministic=true); lower(value COLLATE public.hivemind_unicode)",
+    "verified_on_cluster_lc_collate": "C",
+    "stock_lower_C_locale": "lower('UEBER') leaves U-umlaut untouched (the locale trap)",
+    "icu_function_result": "hivemind_normalize_identifier('UEBER CAFE CJK') -> 'ubercafeCJK' regardless of locale"
+  },
+  "alias_representation": {
+    "table": "public.identifier_aliases",
+    "rls": "enabled, no anon policy (internal reference; service-role candidate RPC bypasses RLS)",
+    "generated_columns": ["canonical_key", "alias_compact", "alias_preserve"],
+    "provenance_vocabulary": [
+      "curated",
+      "workflow_semantics.searchable_aliases",
+      "workflow_semantics.node_class",
+      "workflow_semantics.models",
+      "derived_canonical"
+    ],
+    "provenance_priority": {
+      "curated": 100,
+      "workflow_semantics.searchable_aliases": 80,
+      "workflow_semantics.node_class": 70,
+      "workflow_semantics.models": 60,
+      "derived_canonical": 40
+    },
+    "collision_rule": "reported via hivemind_identifier_alias_collisions(); never silently merged; both identities remain candidates ordered by priority then identity",
+    "safe_update_rule": "idempotent upsert on (canonical_kind, canonical_id, alias_compact, provenance); version bump tombstones stale rows (live=false), append-only; fails closed on empty compact key",
+    "no_silent_nl_rewrite": "aliases only add candidate identity edges for the exact-identifier arm; expand_query_identifiers returns identity strings, never rewritten query text; never spliced into FTS/prose tsvector; never relabel an identity"
+  },
+  "distinct_forms_intentionally_not_folded": {
+    "eszett": "ss stays ss (not ss); gross != gross",
+    "ligatures": "fi/fl/ff stay composed; file != file (NFC not NFKC)",
+    "fullwidth": "ABC stays fullwidth; ABC != ABC (NFC not NFKC)",
+    "superscripts": "superscript digits stay distinct (NFC not NFKC)",
+    "turkish_I": "I -> i + U+0307 (not plain i); both engines agree",
+    "confusables": "Latin a / Cyrillic a / Greek alpha = 3 distinct compact keys; confusable folding deliberately absent"
+  },
+  "known_non_equivalences": [
+    {
+      "name": "NFC composition (Python vs SQL)",
+      "detail": "Python applies NFC; PostgreSQL has no built-in NFC. NFD (combining) inputs diverge. Mitigation: ingest stores identifier text in NFC (Python enforces); corpus is NFC-authored; accept-corpus parity is byte-for-byte."
+    },
+    {
+      "name": "identifier_forms(None) vs frozen identifier_aliases(None)",
+      "detail": "identifier_forms(None) -> (); frozen 1.1 identifier_aliases(None) -> ('none',) because it stringifies None. None is the NULL boundary; parity is stated for string inputs only. SQL returns '' for NULL."
+    },
+    {
+      "name": "alias collisions",
+      "detail": "two distinct identities sharing a compact key are reported, not merged; both remain candidates."
+    }
+  ],
+  "corpus_summary": {
+    "version": "identifier-normalization/2026-07-28/v1",
+    "n_fixtures": 86,
+    "n_accept": 77,
+    "n_distinct": 9,
+    "forms_covered": [
+      "dotted", "versioned", "hyphenated", "filename", "python_symbol",
+      "keyword_argument", "alias", "import", "class", "function", "path",
+      "cjk", "diacritic", "code_fragment", "confusable", "distinct",
+      "adversarial", "malformed", "length_bound", "empty", "whitespace",
+      "none", "exact_name", "spelling_variant", "workflow_code", "no_hit"
+    ],
+    "golden_grounded": true
+  },
+  "cluster_evidence": {
+    "engine": "isolated PostgreSQL 14.15 (Homebrew), initdb --auth=trust --no-locale -E UTF8, temp data dir, port 5494, no network; torn down after",
+    "lc_collate": "C",
+    "sql_python_parity_mismatches": 0,
+    "sql_python_parity_fixtures": 86,
+    "immutable_functions": [
+      "hivemind_normalize_identifier(text)",
+      "hivemind_normalize_identifier_preserve(text)",
+      "hivemind_identifier_alias_forms(text)",
+      "hivemind_alias_provenance_priority(text)"
+    ],
+    "expression_index_used": "Index Scan using iproof_idx on hivemind_normalize_identifier(title), 40000 rows",
+    "generated_columns_ok": true,
+    "alias_table_ok": true,
+    "collision_detection_ok": true,
+    "no_production_mutation": true
+  },
+  "test_evidence": {
+    "focused_tests": "tests.test_identifier_normalization -> 42 OK",
+    "validator_offline": "scripts/validate_identifier_normalization.py -> OK",
+    "validator_cluster": "HIVEMIND_EVAL_CLUSTER=1 ... -> OK",
+    "full_suite": "723 OK (642 baseline + this task + concurrent 1.2/1.3)",
+    "lexical_contract_still_validates": true,
+    "workflow_contract_still_validates": true
+  },
+  "deferred_to_later_tasks": {
+    "1.5": "trigram/expression indexes on alias_compact / canonical_key / titles / questions",
+    "1.6": "full-message exact-identifier path (message trigram vs normalized side index)",
+    "1.7": "lexical candidate SQL consuming aliases via deterministic identity expansion",
+    "2.4": "bigint-at-boundary cleanup for distillation_cites.item_id / get_item --id (not in scope)"
+  },
+  "scope_respected": {
+    "created_trigram_indexes": false,
+    "chose_full_message_identifier_structure": false,
+    "implemented_candidate_sql_or_rpc": false,
+    "mutated_production": false
+  }
+}

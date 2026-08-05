@@ -1,0 +1,21 @@
+{
+  "functions": [
+    "hivemind_lexical_candidates|t",
+    "hivemind_lexical_search|t"
+  ],
+  "rpc_smoke_rc": 0,
+  "rpc_smoke_count": 10,
+  "rpc_smoke_results_len": 10,
+  "explain": {
+    "message_ident": {
+      "rc": 0,
+      "uses_index": true,
+      "plan_tail": "              Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text)"
+    },
+    "message_fts": {
+      "rc": 0,
+      "uses_index": true,
+      "plan_tail": "              Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''sampler'' & ''video'''::tsquery)"
+    }
+  }
+}

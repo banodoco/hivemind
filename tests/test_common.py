@@ -454,8 +454,7 @@ class EnvironmentResolutionTests(unittest.TestCase):
 
     def test_resolve_contributor_key_default(self):
         with unittest.mock.patch.dict(os.environ, {}, clear=True):
-            key = resolve_contributor_key()
-            self.assertIsNone(key)
+            self.assertIsNone(resolve_contributor_key())
 
     def test_resolve_contributor_key_env_override(self):
         with unittest.mock.patch.dict(
@@ -465,6 +464,14 @@ class EnvironmentResolutionTests(unittest.TestCase):
         ):
             key = resolve_contributor_key()
             self.assertEqual(key, "hm_" + "a" * 64)
+
+    def test_resolve_contributor_key_file_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            key_path = Path(tmp) / ".hivemind" / "key"
+            key_path.parent.mkdir()
+            key_path.write_text("hm_" + "b" * 64 + "\n", encoding="utf-8")
+            with unittest.mock.patch.dict(os.environ, {"HOME": tmp}, clear=True):
+                self.assertEqual(resolve_contributor_key(), "hm_" + "b" * 64)
 
     def test_resolve_contribute_url_default(self):
         with unittest.mock.patch.dict(os.environ, {}, clear=True):
@@ -605,6 +612,11 @@ class EdgePostTests(unittest.TestCase):
             self.assertEqual(result, {"id": 1, "status": "ok"})
 
             call_args = mock_urlopen.call_args[0][0]
+            self.assertEqual(
+                call_args.get_header("Authorization"),
+                f"Bearer {resolve_anon_key()}",
+            )
+            self.assertEqual(call_args.get_header("Apikey"), resolve_anon_key())
             self.assertEqual(call_args.get_header("Content-type"), "application/json")
             self.assertEqual(call_args.get_header("X-contributor-key"), self.contributor_key)
             self.assertEqual(call_args.get_header("Accept"), "application/json")

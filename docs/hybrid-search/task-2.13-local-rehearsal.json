@@ -1,0 +1,191 @@
+{
+  "checks": {
+    "all_gates_passed": true,
+    "all_vectors_belong_to_eligible_item": true,
+    "contract_remains_draft": true,
+    "deleted_message_has_zero_vectors": true,
+    "dry_run_zero_provider_calls_zero_vectors": true,
+    "final_required_pilot_populations_nonempty": true,
+    "invariants_clean": true,
+    "no_hnsw_created": true,
+    "reason_vocabulary_bounded": true,
+    "rejected_distillation_has_zero_vectors": true,
+    "remediation_before_embedding": true,
+    "required_pilot_populations_nonempty": true,
+    "rerun_zero_added_provider_calls": true,
+    "rerun_zero_duplicate_vectors": true,
+    "snowflake_exact_above_js_safe": true,
+    "stale_tail_detected_and_repaired": true
+  },
+  "counts": {
+    "apply_vectors": 20,
+    "deleted_message_vectors": 0,
+    "dry_chunks": 20,
+    "eligible_message_cohort": 6,
+    "provider_calls_added_by_rerun": 0,
+    "provider_calls_after_apply": 20,
+    "provider_calls_after_remediation": 0,
+    "provider_calls_after_rerun": 20,
+    "rejected_distillation_vectors": 0,
+    "rerun_status": "completed",
+    "vectors_after_apply": 20,
+    "vectors_after_rerun": 20
+  },
+  "coverage": {
+    "all_gates_passed": true,
+    "extra": {
+      "snowflake_item_ids": [
+        "9007199254740992",
+        "9007199254740993",
+        "9007199254740994",
+        "9007199254740995",
+        "9007199254740996",
+        "9007199254740997"
+      ]
+    },
+    "final_coverage_after_stale_probe": {
+      "C1": {
+        "comparator": "==",
+        "denominator": 13,
+        "metric": "active_contract_coverage_distillations_and_resources",
+        "numerator": 13,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 1.0
+      },
+      "C2": {
+        "comparator": ">=",
+        "denominator": 6,
+        "metric": "active_contract_coverage_enabled_message_cohort",
+        "numerator": 6,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 0.95
+      },
+      "C3": {
+        "comparator": "==",
+        "denominator": 1,
+        "metric": "recoverable_workflows_with_materialized_versioned_hashed_python",
+        "numerator": 1,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 1.0
+      },
+      "C4": {
+        "comparator": "==",
+        "denominator": 1,
+        "metric": "unavailable_rows_without_explicit_non_secret_reason",
+        "numerator": 0,
+        "passed": true,
+        "rate": 0.0,
+        "threshold": 0
+      },
+      "C5": {
+        "comparator": "<",
+        "denominator": 19,
+        "metric": "stale_or_mismatched_representation_hashes",
+        "numerator": 0,
+        "passed": true,
+        "rate": 0.0,
+        "threshold": 0.001
+      },
+      "C6": {
+        "comparator": "==",
+        "denominator": 0,
+        "metric": "ineligible_indexed_items",
+        "numerator": 0,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 0
+      }
+    },
+    "gates": {
+      "C1": {
+        "comparator": "==",
+        "denominator": 13,
+        "metric": "active_contract_coverage_distillations_and_resources",
+        "numerator": 13,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 1.0
+      },
+      "C2": {
+        "comparator": ">=",
+        "denominator": 6,
+        "metric": "active_contract_coverage_enabled_message_cohort",
+        "numerator": 6,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 0.95
+      },
+      "C3": {
+        "comparator": "==",
+        "denominator": 1,
+        "metric": "recoverable_workflows_with_materialized_versioned_hashed_python",
+        "numerator": 1,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 1.0
+      },
+      "C4": {
+        "comparator": "==",
+        "denominator": 1,
+        "metric": "unavailable_rows_without_explicit_non_secret_reason",
+        "numerator": 0,
+        "passed": true,
+        "rate": 0.0,
+        "threshold": 0
+      },
+      "C5": {
+        "comparator": "<",
+        "denominator": 19,
+        "metric": "stale_or_mismatched_representation_hashes",
+        "numerator": 0,
+        "passed": true,
+        "rate": 0.0,
+        "threshold": 0.001
+      },
+      "C6": {
+        "comparator": "==",
+        "denominator": 0,
+        "metric": "ineligible_indexed_items",
+        "numerator": 0,
+        "passed": true,
+        "rate": 1.0,
+        "threshold": 0
+      }
+    },
+    "invariants": {
+      "duplicate_chunk_hashes_within_representation": 0,
+      "ineligible_indexed_representations": 0,
+      "orphan_vectors": 0,
+      "quarantined_python_vectors": 0,
+      "workflow_python_reps_max_per_item": 1
+    },
+    "invariants_clean": true,
+    "reason_codes": [
+      "quarantined_python_excluded",
+      "representation_unavailable"
+    ],
+    "reason_vocabulary_bounded": true,
+    "stale_tail_probe": {
+      "c5_stale_detected_after_inject": true,
+      "c5_stale_zero_after_repair": true,
+      "repair_made_provider_call": true,
+      "stale_tail_detected_and_repaired": true,
+      "stored_chunks_after_inject": 2,
+      "stored_chunks_after_repair": 1,
+      "stored_chunks_before": 1,
+      "target_representation": [
+        "resource",
+        "10",
+        "prose"
+      ]
+    }
+  },
+  "local_only": true,
+  "provider": "deterministic-fake",
+  "secrets_or_urls_present": false,
+  "status": "passed",
+  "task": "2.13"
+}

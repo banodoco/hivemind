@@ -6,8 +6,8 @@ description: >
   distillations. Covers generative video/image tooling (Wan, Wan Animate,
   VACE, LTX, Comfy, Kijai's nodes, SCAIL, InfiniteTalk, training, etc.).
   Use this whenever the user asks "what does Banodoco say about X",
-  "best practices for <model>", "what are people doing with <tool>",
-  "what settings did <person> recommend", or wants real-world tips that
+  "best practices for a model", "what are people doing with a tool",
+  "what settings did a named person recommend", or wants real-world tips that
   aren't on the model card / README. Channels like daily_summaries,
   wan_chatter, wan_comfyui, ltx_chatter, comfyui, *_resources are the
   goldmine. For contributing back, use the write path via the contribute
@@ -44,6 +44,28 @@ permanently searchable.
    `python3 executors/search/run.py --query "wan animate"`.
 
 2. **Raw HTTP** (works everywhere, no install): everything below.
+
+## Astrid's shared knowledge layer
+
+Hivemind is Astrid's default shared knowledge pack. Use it alongside Astrid's
+local, file-based evidence rather than as a replacement for project artifacts:
+
+- Search Hivemind before researching community practice or repeating a prior
+  investigation.
+- Keep raw runs, reviews, and `conclusions.json` in the Astrid project.
+- Promote only evidence-backed, generalizable learnings to Hivemind.
+- For an Astrid experiment, contribute a concise experiment report as a
+  resource first, then submit the reusable learning as a distillation that
+  cites that resource.
+- Treat contribution as public publication. Preview or dry-run the payload,
+  remove private paths, prompts, media, and URLs, and obtain explicit user
+  confirmation before sending.
+- Record returned Hivemind item IDs beside the local experiment so later work
+  can retrieve, supersede, or audit the published learning.
+
+Do not copy this skill into a separate agent-specific skill directory. Astrid
+installs this canonical pack skill into Claude Code, Codex, and Hermes with
+`python3 -m astrid skills install hivemind --harness all`.
 
 ## Full Dataset on Huggingface
 

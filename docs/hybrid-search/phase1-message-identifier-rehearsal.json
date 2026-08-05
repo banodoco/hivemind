@@ -1,0 +1,214 @@
+{
+  "task": "1.6-rehearsal",
+  "choice": "normalized_full_message_trigram_length_bounded",
+  "rows_requested": 1250000,
+  "steps": [],
+  "pg_version": "14.15 (Homebrew)",
+  "cluster": {
+    "isolated": true,
+    "network": "off (unix socket only)"
+  },
+  "seed": {
+    "elapsed_s": 8.6,
+    "actual_rows": 1250000,
+    "deleted_rows": 7022,
+    "null_content_rows": 25000,
+    "overlong_excluded_rows": 612,
+    "eligible_rows": 1217649
+  },
+  "chosen_build": {
+    "elapsed_s": 28.78,
+    "indisvalid": "t",
+    "index_bytes": 78241792,
+    "index_size_pretty": "78.2 MB",
+    "source_table_bytes": 165232640,
+    "storage_gate_gb": 12.0,
+    "storage_gate_pass": true
+  },
+  "query_quality": {
+    "queries": [
+      {
+        "query": "FLUX.1",
+        "kind": "variant",
+        "candidate_count": 971,
+        "latency_ms": 21.56,
+        "latency_cold_ms": 20.85,
+        "latency_warm_ms": 21.56,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "Wan2.2",
+        "kind": "variant",
+        "candidate_count": 2912,
+        "latency_ms": 41.1,
+        "latency_cold_ms": 119.42,
+        "latency_warm_ms": 41.1,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "wan_2.2",
+        "kind": "variant",
+        "candidate_count": 2912,
+        "latency_ms": 41.11,
+        "latency_cold_ms": 42.47,
+        "latency_warm_ms": 41.11,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "WanVideoSampler",
+        "kind": "exact",
+        "candidate_count": 972,
+        "latency_ms": 25.6,
+        "latency_cold_ms": 26.26,
+        "latency_warm_ms": 25.6,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "ltx-2-19b-ic-lora-detailer",
+        "kind": "exact",
+        "candidate_count": 969,
+        "latency_ms": 28.21,
+        "latency_cold_ms": 26.35,
+        "latency_warm_ms": 28.21,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "controlnet",
+        "kind": "exact",
+        "candidate_count": 63439,
+        "latency_ms": 429.81,
+        "latency_cold_ms": 444.45,
+        "latency_warm_ms": 429.81,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": ".gguf",
+        "kind": "exact",
+        "candidate_count": 971,
+        "latency_ms": 20.47,
+        "latency_cold_ms": 21.25,
+        "latency_warm_ms": 20.47,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "lightx2v_I2V_14B.safetensors",
+        "kind": "exact",
+        "candidate_count": 968,
+        "latency_ms": 25.17,
+        "latency_cold_ms": 25.47,
+        "latency_warm_ms": 25.17,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "ipadapter",
+        "kind": "variant",
+        "candidate_count": 969,
+        "latency_ms": 23.6,
+        "latency_cold_ms": 22.65,
+        "latency_warm_ms": 23.6,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      },
+      {
+        "query": "CogVideoX",
+        "kind": "exact",
+        "candidate_count": 968,
+        "latency_ms": 25.5,
+        "latency_cold_ms": 24.72,
+        "latency_warm_ms": 25.5,
+        "n_returned": 10,
+        "recall_hit": true,
+        "deleted_leaked": false
+      }
+    ],
+    "recall_at_10": 1.0,
+    "deleted_leak_count": 0,
+    "long_token_recovered": true,
+    "latency_ms_p50": 25.6,
+    "latency_ms_p95": 429.81,
+    "latency_cold_ms_p50": 26.26,
+    "latency_cold_ms_p95": 444.45,
+    "explain_plans": {
+      "contain_flux1": {
+        "plan": "Limit  (cost=215.81..215.84 rows=10 width=40) (actual time=6.271..6.272 rows=20 loops=1)\n  Buffers: shared hit=983 read=4\n  ->  Sort  (cost=215.81..215.84 rows=10 width=40) (actual time=6.270..6.271 rows=20 loops=1)\n        Sort Key: m.created_at DESC NULLS LAST, ((m.message_id)::text)\n        Sort Method: top-N heapsort  Memory: 26kB\n        Buffers: shared hit=983 read=4\n        ->  Bitmap Heap Scan on discord_messages m  (cost=176.08..215.65 rows=10 width=40) (actual time=0.252..6.166 rows=971 loops=1)\n              Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux1%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n              Heap Blocks: exact=970\n              Buffers: shared hit=977 read=4\n              ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..176.07 rows=10 width=0) (actual time=0.171..0.171 rows=971 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux1%'::text)\n                    Buffers: shared hit=7 read=4\nPlanning:\n  Buffers: shared hit=178\nPlanning Time: 1.145 ms\nExecution Time: 6.322 ms\n",
+        "uses_identifier_index": true,
+        "uses_index_scan": true,
+        "is_seq_scan": false
+      },
+      "contain_wanvideosampler": {
+        "plan": "Limit  (cost=748.05..748.05 rows=1 width=40) (actual time=12.311..12.313 rows=20 loops=1)\n  Buffers: shared hit=1347 read=103\n  ->  Sort  (cost=748.05..748.05 rows=1 width=40) (actual time=12.311..12.311 rows=20 loops=1)\n        Sort Key: m.created_at DESC NULLS LAST, ((m.message_id)::text)\n        Sort Method: top-N heapsort  Memory: 26kB\n        Buffers: shared hit=1347 read=103\n        ->  Bitmap Heap Scan on discord_messages m  (cost=744.00..748.04 rows=1 width=40) (actual time=6.350..12.214 rows=972 loops=1)\n              Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n              Heap Blocks: exact=971\n              Buffers: shared hit=1341 read=103\n              ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..744.00 rows=1 width=0) (actual time=6.267..6.268 rows=972 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text)\n                    Buffers: shared hit=370 read=103\nPlanning:\n  Buffers: shared hit=178\nPlanning Time: 1.013 ms\nExecution Time: 12.357 ms\n",
+        "uses_identifier_index": true,
+        "uses_index_scan": true,
+        "is_seq_scan": false
+      },
+      "contain_controlnet": {
+        "plan": "Limit  (cost=464.05..464.05 rows=1 width=40) (actual time=246.238..246.242 rows=20 loops=1)\n  Buffers: shared hit=13393 read=2593\n  ->  Sort  (cost=464.05..464.05 rows=1 width=40) (actual time=246.237..246.240 rows=20 loops=1)\n        Sort Key: m.created_at DESC NULLS LAST, ((m.message_id)::text)\n        Sort Method: top-N heapsort  Memory: 26kB\n        Buffers: shared hit=13393 read=2593\n        ->  Bitmap Heap Scan on discord_messages m  (cost=460.00..464.04 rows=1 width=40) (actual time=9.720..240.967 rows=63439 loops=1)\n              Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%controlnet%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n              Heap Blocks: exact=15748\n              Buffers: shared hit=13387 read=2593\n              ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..460.00 rows=1 width=0) (actual time=8.363..8.365 rows=63439 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%controlnet%'::text)\n                    Buffers: shared hit=194 read=38\nPlanning:\n  Buffers: shared hit=178\nPlanning Time: 0.962 ms\nExecution Time: 246.364 ms\n",
+        "uses_identifier_index": true,
+        "uses_index_scan": true,
+        "is_seq_scan": false
+      }
+    },
+    "recall_gate": 0.95,
+    "recall_gate_pass": true
+  },
+  "write_cost": {
+    "rows": 3000,
+    "with_index_inserts_per_s": 13807.8,
+    "without_index_inserts_per_s": 19572.6,
+    "slowdown_ratio_off_over_with": 1.42,
+    "note": "auto-maintained GIN (no trigger); compare to the side index's ~3.25x trigger slowdown"
+  },
+  "rejected_alternative_side_index": {
+    "status": "ok",
+    "elapsed_s": 15.82,
+    "side_rows": 10056001,
+    "heap_bytes": 884752384,
+    "heap_size_pretty": "884.8 MB",
+    "trgm_index_bytes": 104292352,
+    "trgm_size_pretty": "104.3 MB",
+    "total_bytes": 989044736,
+    "total_size_pretty": "989.0 MB",
+    "candidate_query_uses_index": true,
+    "candidate_query_is_seq_scan": false,
+    "note": "REJECTED alternative (decision record): fanned-out side index, measured larger + slower"
+  },
+  "rollback": {
+    "rollback_rc": 0,
+    "stderr_tail": "",
+    "index_remains": 0,
+    "source_rows_before": 1250025,
+    "source_rows_after": 1250025,
+    "clean": true
+  },
+  "verdict": {
+    "all_pass": true,
+    "checks": {
+      "chosen_storage_gate": true,
+      "chosen_build_valid": true,
+      "query_recall_at_10_gate": true,
+      "query_no_deleted_leak": true,
+      "query_uses_index_not_seqscan": true,
+      "long_token_recovered": true,
+      "write_cost_bounded": true,
+      "chosen_smaller_than_rejected_side_index": true,
+      "rollback_clean": true
+    }
+  }
+}

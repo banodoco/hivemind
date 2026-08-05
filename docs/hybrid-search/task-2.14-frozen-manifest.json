@@ -1,0 +1,121 @@
+{
+  "task": "2.14-embedding-decision-frozen-evidence",
+  "purpose": "immutable offline evidence manifest binding the eval3 decision to the two immutable cache files, the fixed golden file, the frozen candidate grid, and the frozen decision policy",
+  "golden": {
+    "path": "golden-v1.json",
+    "sha256": "d29eb3e1867c5721d662faacda3d684444efd25b9cb8194737c8b8fde135a9be",
+    "version": "golden/2026-07-28/v1",
+    "n_cases": 112,
+    "n_judged": 104,
+    "n_no_hit": 8
+  },
+  "candidate_grid_hash": "1aa27a54e9f3edd340dfbab7b2847c302a5ebf13909f4202175b873f5e701074",
+  "decision_policy_hash": "7d2c3dcb51ae99727fbea8e9520718523243bf036b3d9d59a2e2c0dfe21094ad",
+  "eval3_cohort_manifest_hash": "0ae1c3f4deef42322d10deb53af1d97d6aec75e90424a9a4da3bf735e94a9b34",
+  "accounting_sha256": "89282953fc88a47bc4fa40cd0f6d011b5194f3623169c2ee8fff69a35007b919",
+  "decision_deterministic_core_sha256": "05caa124d4b47d5863439e33bcf301842a838b52ba391cb58cb211faffb9d360",
+  "immutable_caches": {
+    "384": {
+      "path": "cache.384.jsonl",
+      "dimension": 384,
+      "sha256": "70a9fc7454c3374f89464f86022952b62862badd10f9c79becb0ebc95926a2b5",
+      "byte_size": 60091232,
+      "record_count": 27464,
+      "dimension_consistent": true,
+      "mode": "0o600",
+      "mode_is_private": true
+    },
+    "1536": {
+      "path": "cache.1536.jsonl",
+      "dimension": 1536,
+      "sha256": "67640ef966cd72d47ed01ced1d51389cd53b1d9a0f0fa5d97fa5a6359b795284",
+      "byte_size": 228884976,
+      "record_count": 27464,
+      "dimension_consistent": true,
+      "mode": "0o600",
+      "mode_is_private": true
+    }
+  },
+  "eval3_cache_record_count": 27464,
+  "replay_bundle": {
+    "version": 1,
+    "path": ".cache/hivemind-semantic-eval/replay-bundle.json",
+    "canonical_sha256": "b0894a98b536f0c9a6b3b8fe7a1d40f2deb3708692169ba209657400fc08cf9c",
+    "canonical_sha256_label": "SHA-256 over canonical sort_keys JSON of the bundle OBJECT, NOT the written file bytes; used for object integrity, labeled distinctly",
+    "file_sha256": "09dbce078cd896775f48168efb504c42c66bdb08572baeb5873c3073e75799cd",
+    "file_sha256_label": "SHA-256 over the EXACT bytes of the written replay-bundle.json file"
+  },
+  "replay_proof": {
+    "provider_calls_attempted": 0,
+    "network_calls": 0,
+    "zero_provider_calls": true,
+    "zero_network_calls": true,
+    "fail_closed_on_miss": true,
+    "winner_reproduced": "384-small",
+    "eligible_ranking_reproduced": [
+      "384-small",
+      "384-large"
+    ],
+    "checks_passed": [
+      "decision_deterministic_core_hash_matches_bundle",
+      "decision_core_hash_matches_manifest",
+      "grid_hash_matches_manifest",
+      "candidate_grid_hash_recomputed_matches",
+      "policy_hash_recomputed_matches",
+      "cohort_manifest_hash_recomputed_matches",
+      "bundle_winner_matches_decision",
+      "bundle_carries_accounting",
+      "decision_accounting_object_matches_bundle_accounting",
+      "manifest_carries_accounting_sha256",
+      "decision_accounting_hash_matches_bundle",
+      "decision_accounting_hash_matches_manifest",
+      "bundle_accounting_hash_matches_manifest",
+      "bundle_golden_facts_match_manifest",
+      "bundle_policy_hash_matches_manifest",
+      "bundle_cohort_hash_matches_manifest",
+      "bundle_grid_hash_matches_manifest",
+      "bundle_caches_match_manifest",
+      "bundle_record_count_matches_manifest",
+      "bundle_canonical_hash_matches_manifest",
+      "bundle_version_matches_manifest",
+      "golden_sha256_matches",
+      "golden_version_matches",
+      "golden_case_count_matches",
+      "golden_sha256_matches_fixed_literal",
+      "bundle_golden_matches_fixed_literal",
+      "manifest_golden_matches_fixed_literal",
+      "cache.384_sha256_unchanged",
+      "cache.384_byte_size_unchanged",
+      "cache.384_record_count_unchanged",
+      "cache.384_record_count_is_eval3_frozen",
+      "cache.384_dimension_consistent",
+      "cache.384_mode_is_0600",
+      "cache.1536_sha256_unchanged",
+      "cache.1536_byte_size_unchanged",
+      "cache.1536_record_count_unchanged",
+      "cache.1536_record_count_is_eval3_frozen",
+      "cache.1536_dimension_consistent",
+      "cache.1536_mode_is_0600",
+      "cache_dir_mode_is_0700",
+      "bundle_file_mode_is_0600",
+      "bundle_file_sha256_matches_manifest",
+      "winner_reproduced_from_frozen_policy",
+      "eligible_ranking_reproduced"
+    ],
+    "n_checks": 44,
+    "note": "pure offline evidence/cache replay; no transport was instantiated and neither cache file was opened for write or compacted"
+  },
+  "limitation": " cryptographic evidence/cache replay, NOT a recomputation of exact-cosine retrieval from raw text: the first implementation did not persist the raw eval3 texts or identity-to-chunk mapping. The winner/metrics are re-derived from the recorded decision via the frozen policy; the immutable caches are verified by hash/count/dim/mode. No raw queries, bodies, Python, credentials, URLs, or vectors.",
+  "evidence_pair": {
+    "id": "task-2.14-evidence-05caa124d4b47d58",
+    "decision_json": {
+      "path": "docs/hybrid-search/task-2.14-embedding-decision.json",
+      "sha256": "11336330f7dd592f8d7a5ead4f63dc8cf5f294c0b2f9c860c890a9638ee8ee48"
+    },
+    "decision_md": {
+      "path": "docs/hybrid-search/task-2.14-embedding-decision.md",
+      "sha256": "138bd501affa5bf52fe11b89d5049478e00af5a6e94016d9b6532f7cd83891c2"
+    },
+    "note": "shared canonical pair ID (from the decision deterministic core) + exact SHA-256 of the published JSON and Markdown file bytes; the manifest is published last so these bind the pair without recursion"
+  }
+}

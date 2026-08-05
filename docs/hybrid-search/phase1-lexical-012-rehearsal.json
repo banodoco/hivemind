@@ -1,0 +1,567 @@
+{
+  "task": "1.10/1.11 phase-2 latency fix (schema/012)",
+  "counts": {
+    "n_messages": 8000,
+    "n_members": 5,
+    "n_channels": 4,
+    "n_resources": 3,
+    "n_workflow_python_chunks": 2,
+    "n_distillations": 1,
+    "quarantined_resource_id": 7000,
+    "rejected_distillation_id": 2,
+    "cross_boundary_item": "9100",
+    "cross_boundary_needle": "ksampler",
+    "anchor_item": "9200",
+    "anchor_needle": "zzuniqueqxx"
+  },
+  "proacl_after_011": "hivemind_lexical_candidates|{postgres=X/postgres}",
+  "applied_ok": true,
+  "apply_error": "",
+  "proacl_after_012": "hivemind_lexical_candidates|{postgres=X/postgres}",
+  "grants_preserved": true,
+  "functional_assertions": [
+    {
+      "name": "012:workflow_python_fts_finds_20",
+      "ok": true,
+      "detail": "resource workflow_python hits for 'WanVideoSampler' = ['20'] (expect 20 present)"
+    },
+    {
+      "name": "012:workflow_python_representation_20",
+      "ok": true,
+      "detail": "representation_type for 20 = {'workflow_python'} (expect includes workflow_python)"
+    },
+    {
+      "name": "012:workflow_python_finds_64",
+      "ok": true,
+      "detail": "resource workflow_python hits for 'CogVideoX' = ['20', '64'] (expect 64 present)"
+    },
+    {
+      "name": "012:message_prose_containment",
+      "ok": true,
+      "detail": "message prose hits = ['1000000000000000013', '1000000000000000480', '1000000000000000960', '1000000000000001440', '1000000000000001920']... (expect 1000000000000000013 present)"
+    },
+    {
+      "name": "012:quarantined_workflow_python_excluded",
+      "ok": true,
+      "detail": "quarantined workflow 7000 in WanVideoSampler candidates = False (expect False)"
+    },
+    {
+      "name": "012:quarantined_resource_has_matching_chunk",
+      "ok": true,
+      "detail": "resource 7000 workflow_python chunk FTS-matches 'wanvideosampler' = 1 (expect >0: proves safe_wf is the gate excluding it, not a missing chunk)"
+    },
+    {
+      "name": "012:softdeleted_message_excluded",
+      "ok": true,
+      "detail": "soft-deleted 1000000000000000000 in 'sampler video' candidates = False (expect False)"
+    },
+    {
+      "name": "012:rejected_distillation_excluded",
+      "ok": true,
+      "detail": "rejected distillation id 2 in candidates = False (expect False)"
+    },
+    {
+      "name": "012:approved_distillation_present",
+      "ok": true,
+      "detail": "approved distillation id 1 present = True (expect True)"
+    },
+    {
+      "name": "012:single_workflow_scope",
+      "ok": true,
+      "detail": "single_workflow candidates = ['20'] (expect exactly {'20'})"
+    },
+    {
+      "name": "012:global_limit_respected",
+      "ok": true,
+      "detail": "candidate rows with limit=50 = 50 (expect <= 50)"
+    },
+    {
+      "name": "012:candidate_limit_default_100",
+      "ok": true,
+      "detail": "hivemind_lexical_candidates(p_candidate_limit int default 100) — signature default"
+    },
+    {
+      "name": "012:deterministic_order",
+      "ok": true,
+      "detail": "repeated 'controlnet' order identical = True (len=500)"
+    },
+    {
+      "name": "012:no_hit_zero",
+      "ok": true,
+      "detail": "no-hit candidates = 0 (expect 0)"
+    },
+    {
+      "name": "012:gin_servable:message_fts",
+      "ok": true,
+      "detail": "idx_discord_messages_content_fts_simple servable=True real_uses=True real_seq_scan=False"
+    },
+    {
+      "name": "012:gin_servable:message_ident",
+      "ok": true,
+      "detail": "idx_discord_messages_identifier_trgm servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012:gin_servable:resource_prose_fts",
+      "ok": true,
+      "detail": "external_resources_prose_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012:gin_servable:resource_title_ident",
+      "ok": true,
+      "detail": "idx_external_resources_title_trgm_norm servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012:gin_servable:workflow_python_fts",
+      "ok": true,
+      "detail": "lexical_documents_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012:gin_servable:workflow_python_fragment",
+      "ok": true,
+      "detail": "lexical_documents_python_chunk_trgm_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012:gin_servable:distillation_fts",
+      "ok": true,
+      "detail": "distillations_lexical_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012:mv_populated",
+      "ok": true,
+      "detail": "public.lexical_workflow_python_search rows = 3005 (expect >0)"
+    },
+    {
+      "name": "012:mv_trgm_index_servable",
+      "ok": true,
+      "detail": "forced plan references lexical_workflow_python_search_trgm_idx: True"
+    },
+    {
+      "name": "012:channel_filter_direct_predicate",
+      "ok": true,
+      "detail": "CogVideoX channel 'wan_chatter' candidates include 1000000000000000017: ['1000000000000000017', '1000000000000000060', '1000000000000000540', '1000000000000001020', '1000000000000001500', '1000000000000001980']"
+    },
+    {
+      "name": "012:author_filter_direct_predicate",
+      "ok": true,
+      "detail": "CogVideoX author 'QuintForms' candidates include 1000000000000000017: ['1000000000000000017', '1000000000000000060', '1000000000000000540', '1000000000000001020', '1000000000000001500', '1000000000000001980']"
+    },
+    {
+      "name": "012:author_filter_unknown_returns_no_messages",
+      "ok": true,
+      "detail": "unknown author message candidates = 0 (expect 0)"
+    }
+  ],
+  "parity": {
+    "wan_workflow": {
+      "query": "WanVideoSampler",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "n_012": 1,
+      "n_010": 1,
+      "identical": true
+    },
+    "cog_workflow": {
+      "query": "CogVideoX",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "n_012": 2,
+      "n_010": 2,
+      "identical": true
+    },
+    "wan_all": {
+      "query": "WanVideoSampler",
+      "filters": {},
+      "n_012": 15,
+      "n_010": 15,
+      "identical": true
+    },
+    "cog_all": {
+      "query": "CogVideoX",
+      "filters": {},
+      "n_012": 20,
+      "n_010": 20,
+      "identical": true
+    },
+    "controlnet": {
+      "query": "controlnet",
+      "filters": {},
+      "n_012": 500,
+      "n_010": 500,
+      "identical": true
+    },
+    "multi_term": {
+      "query": "upscale model settings",
+      "filters": {},
+      "n_012": 1,
+      "n_010": 1,
+      "identical": true
+    },
+    "distillation": {
+      "query": "reduce motion strength",
+      "filters": {},
+      "n_012": 1,
+      "n_010": 1,
+      "identical": true
+    },
+    "cog_channel": {
+      "query": "CogVideoX",
+      "filters": {
+        "channels": [
+          "wan_chatter"
+        ]
+      },
+      "n_012": 20,
+      "n_010": 20,
+      "identical": true
+    },
+    "cog_author": {
+      "query": "CogVideoX",
+      "filters": {
+        "authors": [
+          "QuintForms"
+        ]
+      },
+      "n_012": 20,
+      "n_010": 20,
+      "identical": true
+    },
+    "wan_single": {
+      "query": "WanVideoSampler",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ],
+        "item_ids": [
+          "20"
+        ]
+      },
+      "n_012": 1,
+      "n_010": 1,
+      "identical": true
+    },
+    "anchor_fix": {
+      "query": "zzuniqueqxx",
+      "filters": {
+        "kinds": [
+          "workflow"
+        ]
+      },
+      "n_012": 1,
+      "n_010": 1,
+      "identical": true
+    },
+    "no_hit": {
+      "query": "zzzznotarealtokenxyz",
+      "filters": {},
+      "n_012": 0,
+      "n_010": 0,
+      "identical": true
+    }
+  },
+  "parity_all": true,
+  "cross_boundary": {
+    "012_cross_boundary_item_absent": true,
+    "012_cross_boundary_stream_ids": [],
+    "corrected_direct_match": false,
+    "buggy_renormalize_match": true,
+    "010_cross_boundary_item_absent": true,
+    "010_cross_boundary_stream_ids": []
+  },
+  "anchor": {
+    "anchor_010_logic": "ANCHOR_TWO",
+    "anchor_012_logic": "ANCHOR_TWO",
+    "anchor_logic_equal": true,
+    "full_row_stream_equal": true,
+    "stream_012": [
+      {
+        "c": "2026-07-29T08:13:00.002565+02",
+        "e": "resource",
+        "i": "9200",
+        "k": "0.93",
+        "r": "workflow_python",
+        "s": "ANCHOR_TWO",
+        "src": "workflow_python_fragment"
+      }
+    ]
+  },
+  "security": {
+    "anon_cannot_select_mv": true,
+    "authenticated_cannot_select_mv": true,
+    "public_cannot_select_mv": true,
+    "anon_select_errors": true,
+    "authenticated_select_errors": true,
+    "anon_no_execute_candidates_after_012": true,
+    "authenticated_no_execute_candidates_after_012": true,
+    "service_role_rpc_ok": true,
+    "service_role_rpc_workflow_results": 1,
+    "quarantined_mv_rows_info": "1",
+    "quarantined_zero_candidates": true
+  },
+  "canonical_012_wan_wf": [
+    {
+      "c": "2026-07-29T08:12:59.388541+02",
+      "e": "resource",
+      "i": "20",
+      "k": "0.93",
+      "r": "workflow_python",
+      "s": "import torch\nclass WanVideoSampler:\n    def __init__(self, lora_weight=0.8, num_frames=81):\n        self.sampler = CogVideoX BackboneSampler()\n        self.vae = VAEEncode()\n",
+      "src": "workflow_python_fragment"
+    }
+  ],
+  "rollback_error": "",
+  "rollback_battery": [
+    {
+      "name": "rollback_to_010:workflow_python_fts_finds_20",
+      "ok": true,
+      "detail": "resource workflow_python hits for 'WanVideoSampler' = ['20'] (expect 20 present)"
+    },
+    {
+      "name": "rollback_to_010:workflow_python_representation_20",
+      "ok": true,
+      "detail": "representation_type for 20 = {'workflow_python'} (expect includes workflow_python)"
+    },
+    {
+      "name": "rollback_to_010:workflow_python_finds_64",
+      "ok": true,
+      "detail": "resource workflow_python hits for 'CogVideoX' = ['20', '64'] (expect 64 present)"
+    },
+    {
+      "name": "rollback_to_010:message_prose_containment",
+      "ok": true,
+      "detail": "message prose hits = ['1000000000000000013', '1000000000000000480', '1000000000000000960', '1000000000000001440', '1000000000000001920']... (expect 1000000000000000013 present)"
+    },
+    {
+      "name": "rollback_to_010:quarantined_workflow_python_excluded",
+      "ok": true,
+      "detail": "quarantined workflow 7000 in WanVideoSampler candidates = False (expect False)"
+    },
+    {
+      "name": "rollback_to_010:quarantined_resource_has_matching_chunk",
+      "ok": true,
+      "detail": "resource 7000 workflow_python chunk FTS-matches 'wanvideosampler' = 1 (expect >0: proves safe_wf is the gate excluding it, not a missing chunk)"
+    },
+    {
+      "name": "rollback_to_010:softdeleted_message_excluded",
+      "ok": true,
+      "detail": "soft-deleted 1000000000000000000 in 'sampler video' candidates = False (expect False)"
+    },
+    {
+      "name": "rollback_to_010:rejected_distillation_excluded",
+      "ok": true,
+      "detail": "rejected distillation id 2 in candidates = False (expect False)"
+    },
+    {
+      "name": "rollback_to_010:approved_distillation_present",
+      "ok": true,
+      "detail": "approved distillation id 1 present = True (expect True)"
+    },
+    {
+      "name": "rollback_to_010:single_workflow_scope",
+      "ok": true,
+      "detail": "single_workflow candidates = ['20'] (expect exactly {'20'})"
+    },
+    {
+      "name": "rollback_to_010:global_limit_respected",
+      "ok": true,
+      "detail": "candidate rows with limit=50 = 50 (expect <= 50)"
+    },
+    {
+      "name": "rollback_to_010:candidate_limit_default_100",
+      "ok": true,
+      "detail": "hivemind_lexical_candidates(p_candidate_limit int default 100) — signature default"
+    },
+    {
+      "name": "rollback_to_010:deterministic_order",
+      "ok": true,
+      "detail": "repeated 'controlnet' order identical = True (len=500)"
+    },
+    {
+      "name": "rollback_to_010:no_hit_zero",
+      "ok": true,
+      "detail": "no-hit candidates = 0 (expect 0)"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:message_fts",
+      "ok": true,
+      "detail": "idx_discord_messages_content_fts_simple servable=True real_uses=True real_seq_scan=False"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:message_ident",
+      "ok": true,
+      "detail": "idx_discord_messages_identifier_trgm servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:resource_prose_fts",
+      "ok": true,
+      "detail": "external_resources_prose_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:resource_title_ident",
+      "ok": true,
+      "detail": "idx_external_resources_title_trgm_norm servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:workflow_python_fts",
+      "ok": true,
+      "detail": "lexical_documents_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:workflow_python_fragment",
+      "ok": true,
+      "detail": "lexical_documents_python_chunk_trgm_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "rollback_to_010:gin_servable:distillation_fts",
+      "ok": true,
+      "detail": "distillations_lexical_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    }
+  ],
+  "rollback_ok": true,
+  "idempotent_ok": true,
+  "idempotent_error": "",
+  "idempotent_battery": [
+    {
+      "name": "012_idempotent:workflow_python_fts_finds_20",
+      "ok": true,
+      "detail": "resource workflow_python hits for 'WanVideoSampler' = ['20'] (expect 20 present)"
+    },
+    {
+      "name": "012_idempotent:workflow_python_representation_20",
+      "ok": true,
+      "detail": "representation_type for 20 = {'workflow_python'} (expect includes workflow_python)"
+    },
+    {
+      "name": "012_idempotent:workflow_python_finds_64",
+      "ok": true,
+      "detail": "resource workflow_python hits for 'CogVideoX' = ['20', '64'] (expect 64 present)"
+    },
+    {
+      "name": "012_idempotent:message_prose_containment",
+      "ok": true,
+      "detail": "message prose hits = ['1000000000000000013', '1000000000000000480', '1000000000000000960', '1000000000000001440', '1000000000000001920']... (expect 1000000000000000013 present)"
+    },
+    {
+      "name": "012_idempotent:quarantined_workflow_python_excluded",
+      "ok": true,
+      "detail": "quarantined workflow 7000 in WanVideoSampler candidates = False (expect False)"
+    },
+    {
+      "name": "012_idempotent:quarantined_resource_has_matching_chunk",
+      "ok": true,
+      "detail": "resource 7000 workflow_python chunk FTS-matches 'wanvideosampler' = 1 (expect >0: proves safe_wf is the gate excluding it, not a missing chunk)"
+    },
+    {
+      "name": "012_idempotent:softdeleted_message_excluded",
+      "ok": true,
+      "detail": "soft-deleted 1000000000000000000 in 'sampler video' candidates = False (expect False)"
+    },
+    {
+      "name": "012_idempotent:rejected_distillation_excluded",
+      "ok": true,
+      "detail": "rejected distillation id 2 in candidates = False (expect False)"
+    },
+    {
+      "name": "012_idempotent:approved_distillation_present",
+      "ok": true,
+      "detail": "approved distillation id 1 present = True (expect True)"
+    },
+    {
+      "name": "012_idempotent:single_workflow_scope",
+      "ok": true,
+      "detail": "single_workflow candidates = ['20'] (expect exactly {'20'})"
+    },
+    {
+      "name": "012_idempotent:global_limit_respected",
+      "ok": true,
+      "detail": "candidate rows with limit=50 = 50 (expect <= 50)"
+    },
+    {
+      "name": "012_idempotent:candidate_limit_default_100",
+      "ok": true,
+      "detail": "hivemind_lexical_candidates(p_candidate_limit int default 100) — signature default"
+    },
+    {
+      "name": "012_idempotent:deterministic_order",
+      "ok": true,
+      "detail": "repeated 'controlnet' order identical = True (len=500)"
+    },
+    {
+      "name": "012_idempotent:no_hit_zero",
+      "ok": true,
+      "detail": "no-hit candidates = 0 (expect 0)"
+    },
+    {
+      "name": "012_idempotent:gin_servable:message_fts",
+      "ok": true,
+      "detail": "idx_discord_messages_content_fts_simple servable=True real_uses=True real_seq_scan=False"
+    },
+    {
+      "name": "012_idempotent:gin_servable:message_ident",
+      "ok": true,
+      "detail": "idx_discord_messages_identifier_trgm servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012_idempotent:gin_servable:resource_prose_fts",
+      "ok": true,
+      "detail": "external_resources_prose_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012_idempotent:gin_servable:resource_title_ident",
+      "ok": true,
+      "detail": "idx_external_resources_title_trgm_norm servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012_idempotent:gin_servable:workflow_python_fts",
+      "ok": true,
+      "detail": "lexical_documents_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012_idempotent:gin_servable:workflow_python_fragment",
+      "ok": true,
+      "detail": "lexical_documents_python_chunk_trgm_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012_idempotent:gin_servable:distillation_fts",
+      "ok": true,
+      "detail": "distillations_lexical_tsv_idx servable=True real_uses=False real_seq_scan=True"
+    },
+    {
+      "name": "012_idempotent:mv_populated",
+      "ok": true,
+      "detail": "public.lexical_workflow_python_search rows = 3005 (expect >0)"
+    },
+    {
+      "name": "012_idempotent:mv_trgm_index_servable",
+      "ok": true,
+      "detail": "forced plan references lexical_workflow_python_search_trgm_idx: True"
+    },
+    {
+      "name": "012_idempotent:channel_filter_direct_predicate",
+      "ok": true,
+      "detail": "CogVideoX channel 'wan_chatter' candidates include 1000000000000000017: ['1000000000000000017', '1000000000000000060', '1000000000000000540', '1000000000000001020', '1000000000000001500', '1000000000000001980']"
+    },
+    {
+      "name": "012_idempotent:author_filter_direct_predicate",
+      "ok": true,
+      "detail": "CogVideoX author 'QuintForms' candidates include 1000000000000000017: ['1000000000000000017', '1000000000000000060', '1000000000000000540', '1000000000000001020', '1000000000000001500', '1000000000000001980']"
+    },
+    {
+      "name": "012_idempotent:author_filter_unknown_returns_no_messages",
+      "ok": true,
+      "detail": "unknown author message candidates = 0 (expect 0)"
+    }
+  ],
+  "proacl_final": "hivemind_lexical_candidates|{postgres=X/postgres}",
+  "cross_ok": true,
+  "anchor_ok": true,
+  "security_ok": true,
+  "all_pass": true,
+  "n_pass": 26,
+  "n_total": 26
+}

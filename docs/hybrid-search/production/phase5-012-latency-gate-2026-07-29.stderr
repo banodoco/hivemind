@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/Users/peteromalley/Documents/banodoco-workspace/hivemind/scripts/probe_golden_latency.py", line 133, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/Users/peteromalley/Documents/banodoco-workspace/hivemind/scripts/probe_golden_latency.py", line 83, in main
+    proc = subprocess.run(
+        ["psql", "-X", "-q", "-t", "-A", "-P", "pager=off", "-v", "ON_ERROR_STOP=0",
+         "-f", str(tmp)],
+        env=env, capture_output=True, text=True, timeout=1800,
+    )
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 556, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1220, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 2153, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1267, in _check_timeout
+    raise TimeoutExpired(
+    ...<2 lines>...
+            stderr=b''.join(stderr_seq) if stderr_seq else None)
+subprocess.TimeoutExpired: Command '['psql', '-X', '-q', '-t', '-A', '-P', 'pager=off', '-v', 'ON_ERROR_STOP=0', '-f', '/var/folders/_w/b3tthv192m77c760dbyzvk200000gn/T/tmp8r6j3bdo.sql']' timed out after 1800 seconds

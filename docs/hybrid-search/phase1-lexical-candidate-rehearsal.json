@@ -1,0 +1,1102 @@
+{
+  "counts": {
+    "n_messages": 60000,
+    "n_members": 5,
+    "n_channels": 4,
+    "n_resources": 3,
+    "n_workflow_python_chunks": 2,
+    "n_distillations": 1
+  },
+  "representative": {
+    "wanvideosampler": {
+      "identities": [
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1000000000000000013"
+        ],
+        [
+          "message",
+          "1000000000000000480"
+        ],
+        [
+          "message",
+          "1000000000000000960"
+        ],
+        [
+          "message",
+          "1000000000000001440"
+        ],
+        [
+          "message",
+          "1000000000000001920"
+        ],
+        [
+          "message",
+          "1000000000000002880"
+        ],
+        [
+          "message",
+          "1000000000000003360"
+        ],
+        [
+          "message",
+          "1000000000000003840"
+        ],
+        [
+          "message",
+          "1000000000000004320"
+        ],
+        [
+          "message",
+          "1000000000000005280"
+        ],
+        [
+          "message",
+          "1000000000000005760"
+        ],
+        [
+          "message",
+          "1000000000000006240"
+        ],
+        [
+          "message",
+          "1000000000000006720"
+        ],
+        [
+          "message",
+          "1000000000000007680"
+        ],
+        [
+          "message",
+          "1000000000000008160"
+        ],
+        [
+          "message",
+          "1000000000000008640"
+        ],
+        [
+          "message",
+          "1000000000000009120"
+        ],
+        [
+          "message",
+          "1000000000000010080"
+        ],
+        [
+          "message",
+          "1000000000000010560"
+        ]
+      ],
+      "count": 20,
+      "latency_ms": 55.57
+    },
+    "cogvideox": {
+      "identities": [
+        [
+          "resource",
+          "64"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1000000000000000017"
+        ],
+        [
+          "message",
+          "1000000000000000060"
+        ],
+        [
+          "message",
+          "1000000000000000540"
+        ],
+        [
+          "message",
+          "1000000000000001020"
+        ],
+        [
+          "message",
+          "1000000000000001500"
+        ],
+        [
+          "message",
+          "1000000000000001980"
+        ],
+        [
+          "message",
+          "1000000000000002460"
+        ],
+        [
+          "message",
+          "1000000000000002940"
+        ],
+        [
+          "message",
+          "1000000000000003420"
+        ],
+        [
+          "message",
+          "1000000000000003900"
+        ],
+        [
+          "message",
+          "1000000000000004380"
+        ],
+        [
+          "message",
+          "1000000000000004860"
+        ],
+        [
+          "message",
+          "1000000000000005340"
+        ],
+        [
+          "message",
+          "1000000000000005820"
+        ],
+        [
+          "message",
+          "1000000000000006300"
+        ],
+        [
+          "message",
+          "1000000000000006780"
+        ],
+        [
+          "message",
+          "1000000000000007260"
+        ],
+        [
+          "message",
+          "1000000000000007740"
+        ]
+      ],
+      "count": 20,
+      "latency_ms": 49.643
+    },
+    "flux1_title": {
+      "identities": [
+        [
+          "message",
+          "1000000000000000007"
+        ],
+        [
+          "message",
+          "1000000000000000120"
+        ],
+        [
+          "message",
+          "1000000000000001080"
+        ],
+        [
+          "message",
+          "1000000000000001560"
+        ],
+        [
+          "message",
+          "1000000000000002040"
+        ],
+        [
+          "message",
+          "1000000000000002520"
+        ],
+        [
+          "message",
+          "1000000000000003480"
+        ],
+        [
+          "message",
+          "1000000000000003960"
+        ],
+        [
+          "message",
+          "1000000000000004440"
+        ],
+        [
+          "message",
+          "1000000000000004920"
+        ],
+        [
+          "message",
+          "1000000000000005880"
+        ],
+        [
+          "message",
+          "1000000000000006360"
+        ],
+        [
+          "message",
+          "1000000000000006840"
+        ],
+        [
+          "message",
+          "1000000000000007320"
+        ],
+        [
+          "message",
+          "1000000000000008280"
+        ],
+        [
+          "message",
+          "1000000000000008760"
+        ],
+        [
+          "message",
+          "1000000000000009240"
+        ],
+        [
+          "message",
+          "1000000000000009720"
+        ],
+        [
+          "message",
+          "1000000000000010680"
+        ],
+        [
+          "message",
+          "1000000000000011160"
+        ]
+      ],
+      "count": 20,
+      "latency_ms": 54.135
+    },
+    "controlnet": {
+      "identities": [
+        [
+          "message",
+          "1000000000000000001"
+        ],
+        [
+          "message",
+          "1000000000000000006"
+        ],
+        [
+          "message",
+          "1000000000000000011"
+        ],
+        [
+          "message",
+          "1000000000000000016"
+        ],
+        [
+          "message",
+          "1000000000000000021"
+        ],
+        [
+          "message",
+          "1000000000000000026"
+        ],
+        [
+          "message",
+          "1000000000000000031"
+        ],
+        [
+          "message",
+          "1000000000000000036"
+        ],
+        [
+          "message",
+          "1000000000000000041"
+        ],
+        [
+          "message",
+          "1000000000000000046"
+        ],
+        [
+          "message",
+          "1000000000000000051"
+        ],
+        [
+          "message",
+          "1000000000000000056"
+        ],
+        [
+          "message",
+          "1000000000000000061"
+        ],
+        [
+          "message",
+          "1000000000000000066"
+        ],
+        [
+          "message",
+          "1000000000000000071"
+        ],
+        [
+          "message",
+          "1000000000000000076"
+        ],
+        [
+          "message",
+          "1000000000000000081"
+        ],
+        [
+          "message",
+          "1000000000000000086"
+        ],
+        [
+          "message",
+          "1000000000000000091"
+        ],
+        [
+          "message",
+          "1000000000000000096"
+        ]
+      ],
+      "count": 20,
+      "latency_ms": 124.37
+    },
+    "multi_term_upscale": {
+      "identities": [
+        [
+          "resource",
+          "900"
+        ]
+      ],
+      "count": 1,
+      "latency_ms": 48.221
+    },
+    "distillation_paraphrase": {
+      "identities": [
+        [
+          "distillation",
+          "1"
+        ]
+      ],
+      "count": 1,
+      "latency_ms": 52.082
+    },
+    "channel_filter": {
+      "identities": [
+        [
+          "resource",
+          "64"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1000000000000000017"
+        ],
+        [
+          "message",
+          "1000000000000000060"
+        ],
+        [
+          "message",
+          "1000000000000000540"
+        ],
+        [
+          "message",
+          "1000000000000001020"
+        ],
+        [
+          "message",
+          "1000000000000001500"
+        ],
+        [
+          "message",
+          "1000000000000001980"
+        ],
+        [
+          "message",
+          "1000000000000002460"
+        ],
+        [
+          "message",
+          "1000000000000002940"
+        ],
+        [
+          "message",
+          "1000000000000003420"
+        ],
+        [
+          "message",
+          "1000000000000003900"
+        ],
+        [
+          "message",
+          "1000000000000004380"
+        ],
+        [
+          "message",
+          "1000000000000004860"
+        ],
+        [
+          "message",
+          "1000000000000005340"
+        ],
+        [
+          "message",
+          "1000000000000005820"
+        ],
+        [
+          "message",
+          "1000000000000006300"
+        ],
+        [
+          "message",
+          "1000000000000006780"
+        ],
+        [
+          "message",
+          "1000000000000007260"
+        ],
+        [
+          "message",
+          "1000000000000007740"
+        ]
+      ],
+      "count": 20,
+      "latency_ms": 57.034
+    },
+    "author_filter": {
+      "identities": [
+        [
+          "resource",
+          "64"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1000000000000000017"
+        ],
+        [
+          "message",
+          "1000000000000000060"
+        ],
+        [
+          "message",
+          "1000000000000000540"
+        ],
+        [
+          "message",
+          "1000000000000001020"
+        ],
+        [
+          "message",
+          "1000000000000001500"
+        ],
+        [
+          "message",
+          "1000000000000001980"
+        ],
+        [
+          "message",
+          "1000000000000002460"
+        ],
+        [
+          "message",
+          "1000000000000002940"
+        ],
+        [
+          "message",
+          "1000000000000003420"
+        ],
+        [
+          "message",
+          "1000000000000003900"
+        ],
+        [
+          "message",
+          "1000000000000004380"
+        ],
+        [
+          "message",
+          "1000000000000004860"
+        ],
+        [
+          "message",
+          "1000000000000005340"
+        ],
+        [
+          "message",
+          "1000000000000005820"
+        ],
+        [
+          "message",
+          "1000000000000006300"
+        ],
+        [
+          "message",
+          "1000000000000006780"
+        ],
+        [
+          "message",
+          "1000000000000007260"
+        ],
+        [
+          "message",
+          "1000000000000007740"
+        ]
+      ],
+      "count": 20,
+      "latency_ms": 52.538
+    },
+    "workflow_only": {
+      "identities": [
+        [
+          "resource",
+          "20"
+        ]
+      ],
+      "count": 1,
+      "latency_ms": 32.994
+    },
+    "single_workflow": {
+      "identities": [
+        [
+          "resource",
+          "20"
+        ]
+      ],
+      "count": 1,
+      "latency_ms": 30.789
+    },
+    "no_hit": {
+      "identities": [],
+      "count": 0,
+      "latency_ms": 55.822
+    }
+  },
+  "eligibility": {
+    "optout_default_includes": true,
+    "optout_enforced_excludes": true,
+    "softdelete_excluded": true,
+    "rejected_distillation_excluded": true,
+    "approved_distillation_present": true
+  },
+  "containment_latency": {
+    "WanVideoSampler": {
+      "p50_ms": 55.617,
+      "p95_ms": 66.84,
+      "max_ms": 66.84,
+      "identities": [
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1000000000000000013"
+        ],
+        [
+          "message",
+          "1000000000000000480"
+        ],
+        [
+          "message",
+          "1000000000000000960"
+        ],
+        [
+          "message",
+          "1000000000000001440"
+        ],
+        [
+          "message",
+          "1000000000000001920"
+        ],
+        [
+          "message",
+          "1000000000000002880"
+        ],
+        [
+          "message",
+          "1000000000000003360"
+        ],
+        [
+          "message",
+          "1000000000000003840"
+        ],
+        [
+          "message",
+          "1000000000000004320"
+        ],
+        [
+          "message",
+          "1000000000000005280"
+        ],
+        [
+          "message",
+          "1000000000000005760"
+        ],
+        [
+          "message",
+          "1000000000000006240"
+        ],
+        [
+          "message",
+          "1000000000000006720"
+        ],
+        [
+          "message",
+          "1000000000000007680"
+        ],
+        [
+          "message",
+          "1000000000000008160"
+        ],
+        [
+          "message",
+          "1000000000000008640"
+        ],
+        [
+          "message",
+          "1000000000000009120"
+        ],
+        [
+          "message",
+          "1000000000000010080"
+        ],
+        [
+          "message",
+          "1000000000000010560"
+        ]
+      ]
+    },
+    "CogVideoX": {
+      "p50_ms": 55.102,
+      "p95_ms": 64.172,
+      "max_ms": 64.172,
+      "identities": [
+        [
+          "resource",
+          "64"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1000000000000000017"
+        ],
+        [
+          "message",
+          "1000000000000000060"
+        ],
+        [
+          "message",
+          "1000000000000000540"
+        ],
+        [
+          "message",
+          "1000000000000001020"
+        ],
+        [
+          "message",
+          "1000000000000001500"
+        ],
+        [
+          "message",
+          "1000000000000001980"
+        ],
+        [
+          "message",
+          "1000000000000002460"
+        ],
+        [
+          "message",
+          "1000000000000002940"
+        ],
+        [
+          "message",
+          "1000000000000003420"
+        ],
+        [
+          "message",
+          "1000000000000003900"
+        ],
+        [
+          "message",
+          "1000000000000004380"
+        ],
+        [
+          "message",
+          "1000000000000004860"
+        ],
+        [
+          "message",
+          "1000000000000005340"
+        ],
+        [
+          "message",
+          "1000000000000005820"
+        ],
+        [
+          "message",
+          "1000000000000006300"
+        ],
+        [
+          "message",
+          "1000000000000006780"
+        ],
+        [
+          "message",
+          "1000000000000007260"
+        ],
+        [
+          "message",
+          "1000000000000007740"
+        ]
+      ]
+    },
+    "controlnet": {
+      "p50_ms": 116.713,
+      "p95_ms": 122.019,
+      "max_ms": 122.019,
+      "identities": [
+        [
+          "message",
+          "1000000000000000001"
+        ],
+        [
+          "message",
+          "1000000000000000006"
+        ],
+        [
+          "message",
+          "1000000000000000011"
+        ],
+        [
+          "message",
+          "1000000000000000016"
+        ],
+        [
+          "message",
+          "1000000000000000021"
+        ],
+        [
+          "message",
+          "1000000000000000026"
+        ],
+        [
+          "message",
+          "1000000000000000031"
+        ],
+        [
+          "message",
+          "1000000000000000036"
+        ],
+        [
+          "message",
+          "1000000000000000041"
+        ],
+        [
+          "message",
+          "1000000000000000046"
+        ],
+        [
+          "message",
+          "1000000000000000051"
+        ],
+        [
+          "message",
+          "1000000000000000056"
+        ],
+        [
+          "message",
+          "1000000000000000061"
+        ],
+        [
+          "message",
+          "1000000000000000066"
+        ],
+        [
+          "message",
+          "1000000000000000071"
+        ],
+        [
+          "message",
+          "1000000000000000076"
+        ],
+        [
+          "message",
+          "1000000000000000081"
+        ],
+        [
+          "message",
+          "1000000000000000086"
+        ],
+        [
+          "message",
+          "1000000000000000091"
+        ],
+        [
+          "message",
+          "1000000000000000096"
+        ]
+      ]
+    },
+    "ipadapter": {
+      "p50_ms": 55.009,
+      "p95_ms": 70.769,
+      "max_ms": 70.769,
+      "identities": [
+        [
+          "message",
+          "1000000000000000360"
+        ],
+        [
+          "message",
+          "1000000000000000840"
+        ],
+        [
+          "message",
+          "1000000000000001320"
+        ],
+        [
+          "message",
+          "1000000000000002280"
+        ],
+        [
+          "message",
+          "1000000000000002760"
+        ],
+        [
+          "message",
+          "1000000000000003240"
+        ],
+        [
+          "message",
+          "1000000000000003720"
+        ],
+        [
+          "message",
+          "1000000000000004680"
+        ],
+        [
+          "message",
+          "1000000000000005160"
+        ],
+        [
+          "message",
+          "1000000000000005640"
+        ],
+        [
+          "message",
+          "1000000000000006120"
+        ],
+        [
+          "message",
+          "1000000000000007080"
+        ],
+        [
+          "message",
+          "1000000000000007560"
+        ],
+        [
+          "message",
+          "1000000000000008040"
+        ],
+        [
+          "message",
+          "1000000000000008520"
+        ],
+        [
+          "message",
+          "1000000000000009480"
+        ],
+        [
+          "message",
+          "1000000000000009960"
+        ],
+        [
+          "message",
+          "1000000000000010440"
+        ],
+        [
+          "message",
+          "1000000000000010920"
+        ],
+        [
+          "message",
+          "1000000000000011880"
+        ]
+      ]
+    }
+  },
+  "explain": {
+    "message_fts": {
+      "sql": "select message_id::text from public.discord_messages where to_tsvector('simple'::regconfig, coalesce(content,'')) @@ websearch_to_tsquery('simple'::regconfig, 'sampler video') and is_deleted=false limit 500",
+      "expected_index": "idx_discord_messages_content_fts_simple",
+      "index_servable": true,
+      "uses_expected_index": true,
+      "real_seq_scan": false,
+      "forced_plan": "Limit  (cost=557.05..561.31 rows=1 width=32) (actual time=1.411..1.521 rows=500 loops=1)\n  Buffers: shared hit=183\n  ->  Bitmap Heap Scan on discord_messages  (cost=557.05..561.31 rows=1 width=32) (actual time=1.411..1.503 rows=500 loops=1)\n        Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''sampler'' & ''video'''::tsquery)\n        Filter: (NOT is_deleted)\n        Rows Removed by Filter: 9\n        Heap Blocks: exact=45\n        Buffers: shared hit=183\n        ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple  (cost=0.00..557.05 rows=1 width=0) (actual time=1.348..1.348 rows=11000 loops=1)\n              Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''sampler'' & ''video'''::tsquery)\n              Buffers: shared hit=138\nPlanning:\n  Buffers: shared hit=213\nPlanning Time: 0.318 ms\nExecution Time: 1.543 ms\n",
+      "real_plan": "Limit  (cost=557.05..561.31 rows=1 width=32) (actual time=1.498..1.625 rows=500 loops=1)\n  Buffers: shared hit=183\n  ->  Bitmap Heap Scan on discord_messages  (cost=557.05..561.31 rows=1 width=32) (actual time=1.497..1.606 rows=500 loops=1)\n        Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''sampler'' & ''video'''::tsquery)\n        Filter: (NOT is_deleted)\n        Rows Removed by Filter: 9\n        Heap Blocks: exact=45\n        Buffers: shared hit=183\n        ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple  (cost=0.00..557.05 rows=1 width=0) (actual time=1.432..1.433 rows=11000 loops=1)\n              Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''sampler'' & ''video'''::tsquery)\n              Buffers: shared hit=138\nPlanning:\n  Buffers: shared hit=213\nPlanning Time: 0.385 ms\nExecution Time: 1.649 ms\n"
+    },
+    "message_ident": {
+      "sql": "with q as (select public.hivemind_normalize_identifier('WanVideoSampler') k) select m.message_id::text from public.discord_messages m, q where m.is_deleted=false and char_length(m.content) between 1 and 8000 and public.hivemind_normalize_identifier(m.content) like '%'||q.k||'%' limit 500",
+      "expected_index": "idx_discord_messages_identifier_trgm",
+      "index_servable": true,
+      "uses_expected_index": true,
+      "real_seq_scan": false,
+      "forced_plan": "Limit  (cost=2123.32..2127.36 rows=1 width=32) (actual time=3.485..3.904 rows=101 loops=1)\n  Buffers: shared hit=619\n  ->  Bitmap Heap Scan on discord_messages m  (cost=2123.32..2127.36 rows=1 width=32) (actual time=3.485..3.900 rows=101 loops=1)\n        Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n        Heap Blocks: exact=101\n        Buffers: shared hit=619\n        ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..2123.32 rows=1 width=0) (actual time=3.467..3.467 rows=101 loops=1)\n              Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text)\n              Buffers: shared hit=518\nPlanning:\n  Buffers: shared hit=206\nPlanning Time: 0.870 ms\nExecution Time: 3.934 ms\n",
+      "real_plan": "Limit  (cost=2123.32..2127.36 rows=1 width=32) (actual time=3.740..4.231 rows=101 loops=1)\n  Buffers: shared hit=619\n  ->  Bitmap Heap Scan on discord_messages m  (cost=2123.32..2127.36 rows=1 width=32) (actual time=3.740..4.227 rows=101 loops=1)\n        Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n        Heap Blocks: exact=101\n        Buffers: shared hit=619\n        ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..2123.32 rows=1 width=0) (actual time=3.720..3.721 rows=101 loops=1)\n              Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text)\n              Buffers: shared hit=518\nPlanning:\n  Buffers: shared hit=206\nPlanning Time: 0.953 ms\nExecution Time: 4.266 ms\n"
+    },
+    "resource_prose_fts": {
+      "sql": "select id::text from public.external_resources where prose_tsv @@ websearch_to_tsquery('simple'::regconfig, 'upscale') limit 500",
+      "expected_index": "external_resources_prose_tsv_idx",
+      "index_servable": true,
+      "uses_expected_index": false,
+      "real_seq_scan": true,
+      "forced_plan": "Limit  (cost=365.61..405.05 rows=13 width=32) (actual time=0.336..0.337 rows=1 loops=1)\n  Buffers: shared hit=87\n  ->  Bitmap Heap Scan on external_resources  (cost=365.61..405.05 rows=13 width=32) (actual time=0.336..0.336 rows=1 loops=1)\n        Recheck Cond: (prose_tsv @@ '''upscale'''::tsquery)\n        Heap Blocks: exact=1\n        Buffers: shared hit=87\n        ->  Bitmap Index Scan on external_resources_prose_tsv_idx  (cost=0.00..365.60 rows=13 width=0) (actual time=0.332..0.332 rows=1 loops=1)\n              Index Cond: (prose_tsv @@ '''upscale'''::tsquery)\n              Buffers: shared hit=86\nPlanning:\n  Buffers: shared hit=253\nPlanning Time: 0.462 ms\nExecution Time: 0.350 ms\n",
+      "real_plan": "Limit  (cost=0.00..154.34 rows=13 width=32) (actual time=0.006..0.418 rows=1 loops=1)\n  Buffers: shared hit=121\n  ->  Seq Scan on external_resources  (cost=0.00..154.34 rows=13 width=32) (actual time=0.005..0.418 rows=1 loops=1)\n        Filter: (prose_tsv @@ '''upscale'''::tsquery)\n        Rows Removed by Filter: 3002\n        Buffers: shared hit=121\nPlanning:\n  Buffers: shared hit=253\nPlanning Time: 0.411 ms\nExecution Time: 0.425 ms\n"
+    },
+    "resource_title_ident": {
+      "sql": "select id::text from public.external_resources where char_length(public.hivemind_normalize_identifier(title)) between 1 and 300 and public.hivemind_normalize_identifier(title) like '%flux%' limit 500",
+      "expected_index": "idx_external_resources_title_trgm_norm",
+      "index_servable": true,
+      "uses_expected_index": false,
+      "real_seq_scan": true,
+      "forced_plan": "Limit  (cost=624.95..628.99 rows=1 width=32) (actual time=0.507..0.507 rows=0 loops=1)\n  Buffers: shared hit=147\n  ->  Bitmap Heap Scan on external_resources  (cost=624.95..628.99 rows=1 width=32) (actual time=0.507..0.507 rows=0 loops=1)\n        Recheck Cond: (((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux%'::text) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n        Buffers: shared hit=147\n        ->  Bitmap Index Scan on idx_external_resources_title_trgm_norm  (cost=0.00..624.95 rows=1 width=0) (actual time=0.506..0.506 rows=0 loops=1)\n              Index Cond: ((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux%'::text)\n              Buffers: shared hit=147\nPlanning:\n  Buffers: shared hit=236\nPlanning Time: 0.736 ms\nExecution Time: 0.536 ms\n",
+      "real_plan": "Limit  (cost=0.00..220.83 rows=1 width=32) (actual time=3.578..3.578 rows=0 loops=1)\n  Buffers: shared hit=125\n  ->  Seq Scan on external_resources  (cost=0.00..220.83 rows=1 width=32) (actual time=3.577..3.578 rows=0 loops=1)\n        Filter: (((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux%'::text) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) >= 1) AND (char_length((COALESCE(regexp_replace(lower((title)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text) <= 300))\n        Rows Removed by Filter: 3003\n        Buffers: shared hit=125\nPlanning:\n  Buffers: shared hit=236\nPlanning Time: 0.768 ms\nExecution Time: 3.588 ms\n"
+    },
+    "workflow_python_fts": {
+      "sql": "select item_id from public.lexical_documents where tsv @@ websearch_to_tsquery('simple'::regconfig, 'wanvideosampler') limit 500",
+      "expected_index": "lexical_documents_tsv_idx",
+      "index_servable": true,
+      "uses_expected_index": false,
+      "real_seq_scan": true,
+      "forced_plan": "Limit  (cost=276.35..315.73 rows=13 width=32) (actual time=0.280..0.280 rows=1 loops=1)\n  Buffers: shared hit=66\n  ->  Bitmap Heap Scan on lexical_documents  (cost=276.35..315.73 rows=13 width=32) (actual time=0.280..0.280 rows=1 loops=1)\n        Recheck Cond: (tsv @@ '''wanvideosampler'''::tsquery)\n        Heap Blocks: exact=1\n        Buffers: shared hit=66\n        ->  Bitmap Index Scan on lexical_documents_tsv_idx  (cost=0.00..276.35 rows=13 width=0) (actual time=0.278..0.278 rows=1 loops=1)\n              Index Cond: (tsv @@ '''wanvideosampler'''::tsquery)\n              Buffers: shared hit=65\nPlanning:\n  Buffers: shared hit=259\nPlanning Time: 0.380 ms\nExecution Time: 0.294 ms\n",
+      "real_plan": "Limit  (cost=0.00..152.76 rows=13 width=32) (actual time=0.005..0.421 rows=1 loops=1)\n  Buffers: shared hit=121\n  ->  Seq Scan on lexical_documents  (cost=0.00..152.76 rows=13 width=32) (actual time=0.005..0.420 rows=1 loops=1)\n        Filter: (tsv @@ '''wanvideosampler'''::tsquery)\n        Rows Removed by Filter: 3001\n        Buffers: shared hit=121\nPlanning:\n  Buffers: shared hit=259\nPlanning Time: 0.396 ms\nExecution Time: 0.426 ms\n"
+    },
+    "workflow_python_fragment": {
+      "sql": "select item_id from public.lexical_documents where char_length(chunk_text) between 1 and 8000 and public.hivemind_normalize_identifier(chunk_text) like '%cogvideox%' limit 500",
+      "expected_index": "lexical_documents_python_chunk_trgm_idx",
+      "index_servable": true,
+      "uses_expected_index": false,
+      "real_seq_scan": true,
+      "forced_plan": "Limit  (cost=1195.26..1199.29 rows=1 width=32) (actual time=1.658..1.675 rows=2 loops=1)\n  Buffers: shared hit=286\n  ->  Bitmap Heap Scan on lexical_documents  (cost=1195.26..1199.29 rows=1 width=32) (actual time=1.657..1.674 rows=2 loops=1)\n        Recheck Cond: (((COALESCE(regexp_replace(lower((chunk_text)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%cogvideox%'::text) AND (char_length(chunk_text) >= 1) AND (char_length(chunk_text) <= 8000))\n        Heap Blocks: exact=1\n        Buffers: shared hit=286\n        ->  Bitmap Index Scan on lexical_documents_python_chunk_trgm_idx  (cost=0.00..1195.26 rows=1 width=0) (actual time=1.482..1.482 rows=2 loops=1)\n              Index Cond: ((COALESCE(regexp_replace(lower((chunk_text)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%cogvideox%'::text)\n              Buffers: shared hit=281\nPlanning:\n  Buffers: shared hit=244\nPlanning Time: 0.818 ms\nExecution Time: 1.708 ms\n",
+      "real_plan": "Limit  (cost=0.00..190.88 rows=1 width=32) (actual time=0.162..10.423 rows=2 loops=1)\n  Buffers: shared hit=125\n  ->  Seq Scan on lexical_documents  (cost=0.00..190.88 rows=1 width=32) (actual time=0.162..10.422 rows=2 loops=1)\n        Filter: ((char_length(chunk_text) >= 1) AND (char_length(chunk_text) <= 8000) AND ((COALESCE(regexp_replace(lower((chunk_text)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%cogvideox%'::text))\n        Rows Removed by Filter: 3000\n        Buffers: shared hit=125\nPlanning:\n  Buffers: shared hit=244\nPlanning Time: 0.726 ms\nExecution Time: 10.432 ms\n"
+    },
+    "distillation_fts": {
+      "sql": "select id::text from public.distillations where lexical_tsv @@ websearch_to_tsquery('simple'::regconfig, 'motion strength') limit 500",
+      "expected_index": "distillations_lexical_tsv_idx",
+      "index_servable": true,
+      "uses_expected_index": false,
+      "real_seq_scan": true,
+      "forced_plan": "Limit  (cost=501.70..505.72 rows=1 width=32) (actual time=0.696..0.697 rows=2 loops=1)\n  Buffers: shared hit=119\n  ->  Bitmap Heap Scan on distillations  (cost=501.70..505.72 rows=1 width=32) (actual time=0.696..0.696 rows=2 loops=1)\n        Recheck Cond: (lexical_tsv @@ '''motion'' & ''strength'''::tsquery)\n        Heap Blocks: exact=1\n        Buffers: shared hit=119\n        ->  Bitmap Index Scan on distillations_lexical_tsv_idx  (cost=0.00..501.70 rows=1 width=0) (actual time=0.692..0.692 rows=2 loops=1)\n              Index Cond: (lexical_tsv @@ '''motion'' & ''strength'''::tsquery)\n              Buffers: shared hit=118\nPlanning:\n  Buffers: shared hit=221\nPlanning Time: 0.347 ms\nExecution Time: 0.710 ms\n",
+      "real_plan": "Limit  (cost=0.00..221.38 rows=1 width=32) (actual time=0.614..0.615 rows=2 loops=1)\n  Buffers: shared hit=161\n  ->  Seq Scan on distillations  (cost=0.00..221.38 rows=1 width=32) (actual time=0.614..0.614 rows=2 loops=1)\n        Filter: (lexical_tsv @@ '''motion'' & ''strength'''::tsquery)\n        Rows Removed by Filter: 4000\n        Buffers: shared hit=161\nPlanning:\n  Buffers: shared hit=221\nPlanning Time: 0.397 ms\nExecution Time: 0.623 ms\n"
+    }
+  },
+  "verdict": {
+    "checks": [
+      {
+        "name": "index_use:message_fts",
+        "ok": true,
+        "detail": "index_servable=idx_discord_messages_content_fts_simple real_uses=True real_seq_scan=False"
+      },
+      {
+        "name": "index_use:message_ident",
+        "ok": true,
+        "detail": "index_servable=idx_discord_messages_identifier_trgm real_uses=True real_seq_scan=False"
+      },
+      {
+        "name": "index_use:resource_prose_fts",
+        "ok": true,
+        "detail": "index_servable=external_resources_prose_tsv_idx real_uses=False real_seq_scan=True"
+      },
+      {
+        "name": "index_use:resource_title_ident",
+        "ok": true,
+        "detail": "index_servable=idx_external_resources_title_trgm_norm real_uses=False real_seq_scan=True"
+      },
+      {
+        "name": "index_use:workflow_python_fts",
+        "ok": true,
+        "detail": "index_servable=lexical_documents_tsv_idx real_uses=False real_seq_scan=True"
+      },
+      {
+        "name": "index_use:workflow_python_fragment",
+        "ok": true,
+        "detail": "index_servable=lexical_documents_python_chunk_trgm_idx real_uses=False real_seq_scan=True"
+      },
+      {
+        "name": "index_use:distillation_fts",
+        "ok": true,
+        "detail": "index_servable=distillations_lexical_tsv_idx real_uses=False real_seq_scan=True"
+      },
+      {
+        "name": "containment_wanvideosampler",
+        "ok": true,
+        "detail": "workflow 20 present: identities=[('resource', '20'), ('message', '1000000000000000013'), ('message', '1000000000000000480'), ('message', '1000000000000000960'), ('message', '1000000000000001440'), ('message', '1000000000000001920'), ('message', '1000000000000002880'), ('message', '1000000000000003360'), ('message', '1000000000000003840'), ('message', '1000000000000004320'), ('message', '1000000000000005280'), ('message', '1000000000000005760'), ('message', '1000000000000006240'), ('message', '1000000000000006720'), ('message', '1000000000000007680'), ('message', '1000000000000008160'), ('message', '1000000000000008640'), ('message', '1000000000000009120'), ('message', '1000000000000010080'), ('message', '1000000000000010560')]"
+      },
+      {
+        "name": "containment_cogvideox",
+        "ok": true,
+        "detail": "workflow 64 present: identities=[('resource', '64'), ('resource', '20'), ('message', '1000000000000000017'), ('message', '1000000000000000060'), ('message', '1000000000000000540'), ('message', '1000000000000001020'), ('message', '1000000000000001500'), ('message', '1000000000000001980'), ('message', '1000000000000002460'), ('message', '1000000000000002940'), ('message', '1000000000000003420'), ('message', '1000000000000003900'), ('message', '1000000000000004380'), ('message', '1000000000000004860'), ('message', '1000000000000005340'), ('message', '1000000000000005820'), ('message', '1000000000000006300'), ('message', '1000000000000006780'), ('message', '1000000000000007260'), ('message', '1000000000000007740')]"
+      },
+      {
+        "name": "workflow_only_kind",
+        "ok": true,
+        "detail": "[('resource', '20')]"
+      },
+      {
+        "name": "single_workflow_only_item",
+        "ok": true,
+        "detail": "[('resource', '20')]"
+      },
+      {
+        "name": "no_hit_zero",
+        "ok": true,
+        "detail": "0"
+      },
+      {
+        "name": "eligibility:optout_default_includes",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "eligibility:optout_enforced_excludes",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "eligibility:softdelete_excluded",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "eligibility:rejected_distillation_excluded",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "eligibility:approved_distillation_present",
+        "ok": true,
+        "detail": ""
+      },
+      {
+        "name": "latency_p95_under_750ms",
+        "ok": true,
+        "detail": "max_p95=122.0ms"
+      }
+    ],
+    "all_pass": true,
+    "n_pass": 18,
+    "n_total": 18
+  },
+  "migrations_applied": [
+    "001_unified_corpus.sql",
+    "003_lexical_resource_documents.sql",
+    "004_discord_message_fts.sql",
+    "005_identifier_normalization.sql",
+    "006_short_field_trigram.sql",
+    "007_message_identifier_index.sql",
+    "008_lexical_candidate_sql.sql",
+    "009_lexical_search_rpc.sql"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "task": "live-merge apply+rollback rehearsal",
+  "migrations": [
+    "003_lexical_resource_documents.sql",
+    "008_lexical_candidate_sql.sql",
+    "009_lexical_search_rpc.sql"
+  ],
+  "checks": [
+    {
+      "name": "forward_apply_all_batch_objects_present",
+      "ok": true,
+      "detail": {
+        "fn:hivemind_workflow_python_state": true,
+        "tbl:lexical_documents": true,
+        "tbl:lexical_resource_python_state": true,
+        "gencol:external_resources.prose_tsv": true,
+        "gencol:distillations.lexical_tsv": true,
+        "fn:hivemind_lexical_candidates": true,
+        "fn:hivemind_lexical_search": true,
+        "idx:lexical_documents_python_chunk_trgm_idx": true
+      }
+    },
+    {
+      "name": "rollback_009_008_drops_rpc_candidate_index",
+      "ok": true,
+      "detail": {
+        "fn:hivemind_lexical_search": true,
+        "fn:hivemind_lexical_candidates": true,
+        "idx:trgm": true,
+        "tbl:lexical_documents_still_present": true
+      }
+    },
+    {
+      "name": "rollback_003_drops_tables_gencols_helpers",
+      "ok": true,
+      "detail": {
+        "tbl:lexical_documents": true,
+        "tbl:lexical_resource_python_state": true,
+        "gencol:prose_tsv": true,
+        "gencol:lexical_tsv": true,
+        "fn:hivemind_workflow_python_state": true,
+        "fn:hivemind_workflow_prose": true,
+        "fn:hivemind_jsonb_leaves": true
+      }
+    },
+    {
+      "name": "rollback_preserves_source_rows",
+      "ok": true,
+      "detail": {
+        "before": {
+          "checksum": "2|83|1|31"
+        },
+        "after": {
+          "checksum": "2|83|1|31"
+        }
+      }
+    },
+    {
+      "name": "forward_reapply_after_rollback_idempotent",
+      "ok": true,
+      "detail": {
+        "reapplied": true,
+        "error": "",
+        "objects": {
+          "fn:hivemind_lexical_search": true,
+          "tbl:lexical_documents": true,
+          "gencol:external_resources.prose_tsv": true
+        }
+      }
+    },
+    {
+      "name": "double_apply_idempotent",
+      "ok": true,
+      "detail": {}
+    }
+  ],
+  "all_pass": true,
+  "n_pass": 6,
+  "n_total": 6
+}

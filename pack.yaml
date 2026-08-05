@@ -3,9 +3,9 @@ id: hivemind
 name: Hivemind
 version: 2.0.0
 origin: external
-install_tier: optional
+install_tier: default
 pack_type: capability
-domain: knowledge
+domain: integration
 stability: experimental
 support: community
 visibility: visible

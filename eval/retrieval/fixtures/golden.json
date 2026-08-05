@@ -1,0 +1,90 @@
+{
+  "cases": [
+    {
+      "id": "GC01",
+      "query": "WanVideoSampler",
+      "expected": [{"kind": "workflow", "item_id": "2580", "grade": 3}],
+      "categories": ["exact_name", "workflow_code"],
+      "limit": 20,
+      "notes": "Exact Python symbol living only in a workflow body; legacy ILIKE substring-matches it."
+    },
+    {
+      "id": "GC02",
+      "query": "VAEEncode",
+      "expected": [{"kind": "workflow", "item_id": "2581", "grade": 3}],
+      "categories": ["workflow_code"],
+      "limit": 20,
+      "notes": "ComfyUI node class / import name in workflow Python."
+    },
+    {
+      "id": "GC03",
+      "query": "block_swap",
+      "expected": [{"kind": "workflow", "item_id": "2580", "grade": 3}],
+      "categories": ["single_workflow", "workflow_code"],
+      "filters": {"kinds": ["workflow"], "item_ids": ["2580"]},
+      "limit": 20,
+      "notes": "Single-workflow scoped code query. Legacy cannot honor item_ids; the lexical adapter (1.8) will."
+    },
+    {
+      "id": "GC04",
+      "query": "reduce motion strength",
+      "expected": [
+        {"kind": "distillation", "item_id": "d1", "grade": 3},
+        {"kind": "message", "item_id": "1111111111111111111", "grade": 2}
+      ],
+      "categories": ["paraphrase", "cross_source", "best_is_distillation"],
+      "limit": 20,
+      "notes": "Paraphrase: the message rephrases intent with low contiguous overlap, so legacy ILIKE finds only the distillation."
+    },
+    {
+      "id": "GC05",
+      "query": "upscale model settings",
+      "expected": [{"kind": "article", "item_id": "900", "grade": 3}],
+      "categories": ["multi_term", "best_is_resource"],
+      "limit": 20,
+      "notes": "Multi-term query whose answer is an article resource."
+    },
+    {
+      "id": "GC06",
+      "query": "motion",
+      "expected": [{"kind": "distillation", "item_id": "d1", "grade": 3}],
+      "categories": ["time_scoped"],
+      "filters": {"since": "2024-04-01"},
+      "limit": 20,
+      "notes": "Date filter excludes the older message that also mentions motion; only the distillation remains eligible."
+    },
+    {
+      "id": "GC07",
+      "query": "CFG scale",
+      "expected": [{"kind": "message", "item_id": "2987654321098765432", "grade": 3}],
+      "categories": ["exact_name", "snowflake"],
+      "limit": 20,
+      "notes": "Retrieves a message whose item_id is a >2^53 Discord snowflake; exercises string identity round-trips."
+    },
+    {
+      "id": "GC08",
+      "query": "zzzznotfoundxyz",
+      "categories": ["no_hit"],
+      "expect_no_hit": true,
+      "limit": 20,
+      "notes": "Expected no-result query; a healthy system returns an empty list, not an error."
+    },
+    {
+      "id": "GC09",
+      "query": "rare_token_deep_inside",
+      "expected": [{"kind": "article", "item_id": "910", "grade": 3}],
+      "categories": ["long_resource_chunk"],
+      "limit": 20,
+      "notes": "Match lives deep inside a long resource body (late-chunk territory for semantic search in 2.6)."
+    },
+    {
+      "id": "GC10",
+      "query": "Florence2",
+      "expected": [{"kind": "workflow", "item_id": "2580", "grade": 3}],
+      "categories": ["workflow_only"],
+      "filters": {"kinds": ["workflow"]},
+      "limit": 20,
+      "notes": "Workflow-only search; the dotted/versioned model name appears in a workflow title."
+    }
+  ]
+}

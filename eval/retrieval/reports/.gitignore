@@ -1,0 +1,4 @@
+# Generated evaluation reports live here. Keep the directory, ignore outputs.
+*
+!.gitignore
+!.emb_cache/

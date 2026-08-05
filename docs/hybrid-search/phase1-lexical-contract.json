@@ -1,0 +1,329 @@
+{
+  "lexical_config": "simple",
+  "lexicalization_version": 1,
+  "ts_rank_normalization": 32,
+  "rrf_k": 60,
+  "weight_multipliers": {
+    "A": 1.0,
+    "B": 0.4,
+    "C": 0.2,
+    "D": 0.1
+  },
+  "query_constructors": {
+    "default": "websearch_to_tsquery",
+    "phrase": "phraseto_tsquery"
+  },
+  "specs": [
+    {
+      "entity_type": "distillation",
+      "representation_type": "prose",
+      "config": "simple",
+      "chunked": false,
+      "arms": [
+        {
+          "field": "question",
+          "source": "question",
+          "weight": "A"
+        },
+        {
+          "field": "conditions",
+          "source": "conditions",
+          "weight": "B"
+        },
+        {
+          "field": "answer",
+          "source": "answer",
+          "weight": "C"
+        }
+      ],
+      "identity": [
+        "entity_type",
+        "item_id",
+        "representation_type",
+        "chunk_index"
+      ],
+      "expression": "setweight(to_tsvector('simple'::regconfig, coalesce(question, '')), 'A') || setweight(to_tsvector('simple'::regconfig, coalesce(conditions, '')), 'B') || setweight(to_tsvector('simple'::regconfig, coalesce(answer, '')), 'C')"
+    },
+    {
+      "entity_type": "resource",
+      "representation_type": "prose",
+      "config": "simple",
+      "chunked": false,
+      "arms": [
+        {
+          "field": "title",
+          "source": "title",
+          "weight": "A"
+        },
+        {
+          "field": "tags_semantics",
+          "source": "hivemind_resource_tags(metadata) || ' ' || hivemind_workflow_semantics_text(metadata)",
+          "weight": "B"
+        },
+        {
+          "field": "body",
+          "source": "hivemind_workflow_prose(body, kind)",
+          "weight": "C"
+        }
+      ],
+      "identity": [
+        "entity_type",
+        "item_id",
+        "representation_type",
+        "chunk_index"
+      ],
+      "expression": "setweight(to_tsvector('simple'::regconfig, coalesce(title, '')), 'A') || setweight(to_tsvector('simple'::regconfig, coalesce(hivemind_resource_tags(metadata) || ' ' || hivemind_workflow_semantics_text(metadata), '')), 'B') || setweight(to_tsvector('simple'::regconfig, coalesce(hivemind_workflow_prose(body, kind), '')), 'C')"
+    },
+    {
+      "entity_type": "resource",
+      "representation_type": "workflow_python",
+      "config": "simple",
+      "chunked": true,
+      "arms": [
+        {
+          "field": "python_chunk",
+          "source": "chunk_text",
+          "weight": "C"
+        }
+      ],
+      "identity": [
+        "entity_type",
+        "item_id",
+        "representation_type",
+        "chunk_index"
+      ],
+      "expression": "setweight(to_tsvector('simple'::regconfig, coalesce(chunk_text, '')), 'C')"
+    }
+  ],
+  "message_bare_source": "content",
+  "chunk_collapse": {
+    "identity": [
+      "entity_type",
+      "item_id",
+      "representation_type",
+      "chunk_index"
+    ],
+    "within_representation": "best ts_rank per (entity_type, item_id, representation_type)",
+    "across_representations": "best ts_rank per (entity_type, item_id); carry matched_representation/snippet",
+    "one_identity": "exactly one ranked row per (entity_type, item_id)"
+  },
+  "workflow_python_chunk": {
+    "target_tokens": 512,
+    "overlap_tokens": 50
+  },
+  "snippet_window_chars": 240,
+  "lexical_rank_sql": "ts_rank(tsv, tsq, 32)",
+  "tie_break": "ORDER BY lexical_rank DESC NULLS LAST, created_at DESC NULLS LAST, entity_type ASC, item_id ASC",
+  "version": "lexical-contract/2026-07-28/v1",
+  "task": "1.1",
+  "date": "2026-07-28",
+  "post_hoc_locked": true,
+  "plan": "docs/architecture/hivemind-hybrid-search-plan.md",
+  "config_decision": {
+    "regconfig": "simple",
+    "applies_to": [
+      "message",
+      "resource",
+      "distillation"
+    ],
+    "applies_representations": [
+      "prose",
+      "workflow_python"
+    ],
+    "superseded_live_index": {
+      "name": "idx_discord_messages_content_fts",
+      "expression": "to_tsvector('english'::regconfig, content)",
+      "size_mb": 85,
+      "usable_by_canonical_simple_query": false,
+      "disposition": "additive decision in task 1.3 (drop 85MB optional); never required by canonical path"
+    },
+    "rationale_ref": "LEXICAL_CONFIG_RATIONALE in executors/lexical_contract.py"
+  },
+  "simple_vs_english_evidence": {
+    "method": "isolated PostgreSQL 14.15 (Homebrew) throwaway cluster, 2026-07-28; read-only to_tsvector/tsquery/EXPLAIN probes",
+    "config_mismatch": {
+      "to_tsvector('english','WanVideoSampler') @@ websearch_to_tsquery('simple','WanVideoSampler')": false,
+      "to_tsvector('english','WanVideoSampler') @@ websearch_to_tsquery('english','WanVideoSampler')": true,
+      "to_tsvector('simple','WanVideoSampler') @@ websearch_to_tsquery('simple','WanVideoSampler')": true
+    },
+    "stemming": {
+      "simple_WanVideoSampler": "wanvideosampler",
+      "english_WanVideoSampler": "wanvideosampl",
+      "note": "english snowball stemmer strips '-er' from identifiers"
+    },
+    "stopwords": {
+      "simple_keeps": [
+        "the",
+        "is",
+        "not",
+        "a"
+      ],
+      "english_drops": [
+        "the",
+        "is",
+        "not",
+        "a"
+      ],
+      "note": "simple dict has no stopword list (dictinitoption NULL); english_stem uses stopwords='english'"
+    },
+    "identifier_query_mismatch": {
+      "doc": "Wan 2.2",
+      "doc_tsvector_simple": "'2.2':2 'wan':1",
+      "query_no_space": "Wan2.2",
+      "query_tsquery_simple": "'wan2.2'",
+      "match": false,
+      "resolution": "exact-identifier normalize_identifier arm collapses both to 'wan22'"
+    },
+    "explain_index_usage": {
+      "simple_query_uses": "Bitmap Index Scan on <simple expression index> only",
+      "cannot_use_english_index": "expression-index matching requires identical expression"
+    }
+  },
+  "eligibility": {
+    "message": {
+      "base_table": "public.discord_messages",
+      "identity_column": "message_id::text",
+      "predicates": [
+        "m.is_deleted = false",
+        "(NOT :author_optout_enabled OR EXISTS (SELECT 1 FROM public.members mb WHERE mb.member_id = m.author_id AND COALESCE(mb.allow_content_sharing, true) = true))",
+        "(NOT :bots_excluded OR NOT EXISTS (SELECT 1 FROM public.members mb WHERE mb.member_id = m.author_id AND COALESCE(mb.bot, false) OR COALESCE(mb.system, false)))"
+      ],
+      "note": "queries discord_messages directly (not message_feed); service-role RLS bypass => predicates encoded in RPC"
+    },
+    "distillation": {
+      "base_table": "public.distillations",
+      "identity_column": "id::text",
+      "predicates": [
+        "d.status IN ('pending', 'approved')"
+      ]
+    },
+    "resource_prose": {
+      "base_table": "public.external_resources",
+      "identity_column": "id::text",
+      "predicates": [
+        "true"
+      ]
+    },
+    "workflow_python": {
+      "base_table": "public.external_resources",
+      "identity_column": "id::text",
+      "predicates": [
+        "r.kind = 'workflow' AND hivemind_workflow_python_state(r.id) = 'safe'"
+      ],
+      "note": "only kind=workflow + safe (non-quarantined) python; 0.8 secret scanner gate"
+    },
+    "author_optout_policy": {
+      "decision": "default-OFF, flag-bound (hivemind.author_optout_enabled=false)",
+      "rationale": "0.2: no live opt-out rule exists to preserve; allow_content_sharing enforced only in HF dataset export",
+      "binding": "implementation-safe predicate gated behind off-by-default flag; preserves current behavior exactly at launch"
+    },
+    "bot_system_policy": {
+      "decision": "include by default (preserve current behavior); same flag family can exclude later",
+      "counts_2026_07_28": {
+        "bot_members": 19,
+        "system_members": 2
+      }
+    }
+  },
+  "bounded_workflow_code_policy": {
+    "identity_key": [
+      "entity_type",
+      "item_id",
+      "representation_type",
+      "chunk_index"
+    ],
+    "chunk_target_tokens": 512,
+    "chunk_overlap_tokens": 50,
+    "no_silent_truncation": true,
+    "coverage_guard": "workflow_representation.coverage_ok (0.8)",
+    "python_precedence": "payload.python_source -> body delimiter -> recoverable -> unavailable (0.8)",
+    "no_duplication": "strip body block when payload bytes also in body; index authoritative python exactly once",
+    "quarantine": "secret-scanner hit (0.8 safe policy) => no workflow_python lexical document",
+    "collapse": {
+      "within_representation": "best ts_rank per (entity_type, item_id, representation_type)",
+      "across_representations": "best ts_rank per (entity_type, item_id); carry matched_representation/snippet",
+      "one_identity": "exactly one ranked row per (entity_type, item_id)"
+    },
+    "refresh": "lexical state refreshed only after source-row patch commits; lexicalization_version + representation_hash/chunk_hash track freshness",
+    "measured_sizes_0_3": {
+      "payload_python_max_chars": 1415262,
+      "payload_python_p99_chars": 719694,
+      "approx_chunks_at_512tok_max": 76
+    }
+  },
+  "snowflake_boundary": {
+    "item_ids_are_text": true,
+    "snowflake_text_columns": [
+      "discord_messages.message_id::text",
+      "discord_messages.channel_id::text",
+      "discord_messages.author_id::text",
+      "discord_messages.guild_id::text"
+    ],
+    "note": "bigint in DB, cast to ::text at lexical candidate + JSON boundary; item_ids validated JSON strings, bound via allow-listed predicate, never interpolated SQL"
+  },
+  "pumpernickel_attribution": {
+    "ported": [
+      "websearch_to_tsquery('simple')",
+      "ts_rank(...,32)",
+      "RRF K=60",
+      "normalize_query (NFC+whitespace)"
+    ],
+    "rewritten": [
+      "mediator.* SQL",
+      "v_searchable_content (use hivemind tables)",
+      "UUID source identity",
+      "visibility/RLS rules"
+    ],
+    "runtime_dependency": false
+  },
+  "golden_fixture_freeze": {
+    "set": "eval/retrieval/golden/golden-v1.json",
+    "n_cases": 112,
+    "n_judged": 104,
+    "n_no_hit": 8,
+    "version": "golden/2026-07-28/v1",
+    "acceptance_categories": {
+      "exact_name": 25,
+      "workflow_code": 32,
+      "multi_term": 10,
+      "paraphrase": 10,
+      "settings": 7,
+      "named_author": 4,
+      "channel_scoped": 4,
+      "time_scoped": 4,
+      "cross_source": 6,
+      "best_is_distillation": 17,
+      "best_is_message": 17,
+      "best_is_resource": 8,
+      "long_resource_chunk": 4,
+      "workflow_only": 6,
+      "single_workflow": 8,
+      "spelling_variant": 8,
+      "no_hit": 8,
+      "workflow_python_evidence": 8,
+      "pending_status": 2,
+      "timeout_prone": 3,
+      "selective_filter": 11,
+      "code_fragment": 6,
+      "snowflake": 18
+    },
+    "blocking_gates_for_1_10_1_11": {
+      "exact_identifier_recall_at_10": ">=0.95 and within 0.02 of best lexical",
+      "workflow_code_exact_match_recall_at_10": ">=0.95",
+      "single_workflow": "every judged single_workflow query returns only its item_id",
+      "no_duplicate_python_indexing": 0,
+      "duplicate_item_after_collapse": 0
+    }
+  },
+  "deferred_to_later_tasks": {
+    "1.2": "create the weighted tsvector columns + chunked workflow_python doc table + GIN indexes; IMMUTABLE SQL functions mirroring workflow_representation.py",
+    "1.3": "build the canonical simple index on discord_messages; decide english index retention/drop (85MB)",
+    "1.4": "implement + test normalize_identifier exact-identifier arm on titles/questions",
+    "1.5": "bounded trigram indexes on high-value short fields (resource titles, distillation questions)",
+    "1.6": "full-message exact-identifier path (message trigram index vs normalized identifier side index)",
+    "1.7": "lexical candidate SQL combining fts/phrase/ident/code-fragment arms + collapse",
+    "1.8": "filters (kind/item_id/source/date/author/channel) + post-limit hydration",
+    "1.9": "hardened SECURITY DEFINER RPC",
+    "2.14": "production chunk configuration (final target tokens/overlap)"
+  }
+}

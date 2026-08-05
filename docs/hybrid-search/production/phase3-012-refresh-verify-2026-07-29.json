@@ -1,0 +1,35 @@
+{
+  "by_cohort": {
+    "unavailable": 2535,
+    "payload_python": 222
+  },
+  "state_rows": 2757,
+  "python_chunks": 15265,
+  "by_public_state": {
+    "safe": 2756,
+    "quarantined": 1
+  },
+  "workflows_total": 2757,
+  "quarantined_docs": 0,
+  "quarantined_rows": 1,
+  "python_distinct_items": 221,
+  "unavailable_safe_rows": 2535,
+  "unrefreshed_workflows": 0,
+  "chunk_count_mismatches": 0,
+  "body_duplicate_state_rows": 222,
+  "safe_available_python_rows": 221,
+  "safe_plus_quarantined_minus_unavailable_safe": 2757,
+  "duplicate_chunk_hashes_within_item": "0",
+  "mv": {
+    "present": true,
+    "distinct_items": "221",
+    "expected_distinct_items": "221"
+  },
+  "mv_present": true,
+  "mv_distinct_items": "221",
+  "mv_expected_distinct_items": "221",
+  "mv_read_path_active": true,
+  "warnings": [],
+  "ok": true,
+  "reasons": []
+}

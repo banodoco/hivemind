@@ -1,0 +1,151 @@
+{
+  "task": "2.2-2.5-embedding-schema-rehearsal",
+  "cluster_isolated": true,
+  "pg_version": "14.15 (Homebrew)",
+  "migrations": {
+    "migrations_applied": [
+      "020_enable_pgvector.sql",
+      "021_embedding_contracts.sql",
+      "022_content_embeddings.sql",
+      "023_embedding_contract_switch.sql",
+      "024_identity_and_canonical_representations.sql"
+    ]
+  },
+  "pgvector": {
+    "extension_version": "0.8.5",
+    "vector_type_usable": true,
+    "cosine_operator_usable": true
+  },
+  "contract_id_parity": {
+    "sql_id": 7571371577804399660,
+    "python_id": 7571371577804399660,
+    "parity": true
+  },
+  "dimension_mixing": {
+    "physical_384_into_384_ok": true,
+    "physical_1536_into_384_rejected": true,
+    "data_trigger_384_under_1536_contract_rejected": true
+  },
+  "identity_and_snowflake": {
+    "snowflake_roundtrips_exact_text": true,
+    "snowflake_value": "1234567890123456789",
+    "distinct_representation_types_for_one_resource": [
+      "prose",
+      "workflow_python"
+    ],
+    "representation_row_count_for_resource_42": 2,
+    "prose_and_python_distinct_identity": true
+  },
+  "contract_switch": {
+    "one_active_after_first_activate": true,
+    "low_coverage_replacement_rejected": true,
+    "equal_coverage_switch_ok": true,
+    "old_contract_superseded": true,
+    "new_contract_active": true,
+    "one_active_after_switch": true
+  },
+  "identity_mapping_parity": {
+    "message": {
+      "sql": "message",
+      "python": "message",
+      "parity": true
+    },
+    "resource": {
+      "sql": "resource",
+      "python": "resource",
+      "parity": true
+    },
+    "workflow": {
+      "sql": "resource",
+      "python": "resource",
+      "parity": true
+    },
+    "article": {
+      "sql": "resource",
+      "python": "resource",
+      "parity": true
+    },
+    "transcript": {
+      "sql": "resource",
+      "python": "resource",
+      "parity": true
+    },
+    "distillation": {
+      "sql": "distillation",
+      "python": "distillation",
+      "parity": true
+    }
+  },
+  "canonical_parity": {
+    "cases": [
+      {
+        "type": "message",
+        "text_parity": true,
+        "hash_parity": true,
+        "hash": "58593e5eac63f4984bb7b5c4bf83bd55dab20699432f24f28ed4d0fa5e03363a"
+      },
+      {
+        "type": "resource",
+        "text_parity": true,
+        "hash_parity": true,
+        "hash": "c50e1c1f96be426b51e1b1d209427d642d1d72a41b83384e55daaec59266072a"
+      },
+      {
+        "type": "distillation",
+        "text_parity": true,
+        "hash_parity": true,
+        "hash": "17a4f0357475b845ad9cbe81f02671e78dda29462297acbd6388822f41e6ecd2"
+      },
+      {
+        "type": "distillation_empty_conditions",
+        "text_parity": true
+      }
+    ]
+  },
+  "rollback": {
+    "steps": [
+      {
+        "stmt_head": "drop function if exists hivemind_representation_",
+        "ok": true
+      },
+      {
+        "stmt_head": "drop function if exists hivemind_set_active_embe",
+        "ok": true
+      },
+      {
+        "stmt_head": "drop table if exists content_embeddings cascade;",
+        "ok": true
+      },
+      {
+        "stmt_head": "drop table if exists embedding_contracts cascade",
+        "ok": true
+      },
+      {
+        "stmt_head": "drop extension if exists vector cascade;",
+        "ok": true
+      }
+    ],
+    "vector_extension_dropped": true,
+    "table_dropped": true
+  },
+  "verdict": {
+    "all_pass": true,
+    "checks": {
+      "2.2_vector_type_usable": true,
+      "2.2_cosine_operator_usable": true,
+      "2.3_contract_id_python_sql_parity": true,
+      "2.3_dimension_mixing_physical_rejected": true,
+      "2.3_dimension_mixing_data_trigger_rejected": true,
+      "2.3_prose_vs_python_distinct_identity": true,
+      "2.3_low_coverage_switch_rejected": true,
+      "2.3_equal_coverage_switch_ok": true,
+      "2.3_one_active_contract_after_switch": true,
+      "2.4_snowflake_roundtrips_exact_text": true,
+      "2.4_result_kind_mapping_parity": true,
+      "2.5_canonical_text_parity": true,
+      "2.5_canonical_hash_parity": true,
+      "rollback_vector_extension_dropped": true,
+      "rollback_table_dropped": true
+    }
+  }
+}

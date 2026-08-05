@@ -1,0 +1,312 @@
+{
+  "preflight": {
+    "parsed": {
+      "table_column_identity": [
+        [
+          "discord_messages",
+          "content",
+          "text",
+          "f",
+          "1248240",
+          "1250380"
+        ]
+      ],
+      "existing_fts_indexes": [
+        [
+          "idx_discord_messages_content_fts",
+          "t",
+          "t",
+          "CREATE INDEX idx_discord_messages_content_fts ON public.discord_messages USING gin (to_tsvector('english'::regconfig, content))",
+          "89382912"
+        ]
+      ],
+      "invalid_index_remnants": [],
+      "in_progress_index_builds": [],
+      "database_storage": [
+        [
+          "postgres",
+          "2263028527",
+          "90"
+        ]
+      ],
+      "long_or_locking_transactions": [],
+      "relation_locks": [],
+      "timeout_and_maintenance_settings": [
+        [
+          "default_transaction_isolation",
+          "read committed",
+          ""
+        ],
+        [
+          "lock_timeout",
+          "0",
+          "ms"
+        ],
+        [
+          "maintenance_work_mem",
+          "131072",
+          "kB"
+        ],
+        [
+          "max_parallel_maintenance_workers",
+          "1",
+          ""
+        ],
+        [
+          "statement_timeout",
+          "120000",
+          "ms"
+        ]
+      ]
+    },
+    "raw": {
+      "table_column_identity": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "existing_fts_indexes": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "invalid_index_remnants": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "in_progress_index_builds": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "database_storage": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "long_or_locking_transactions": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "relation_locks": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "timeout_and_maintenance_settings": {
+        "rc": 0,
+        "stderr_tail": ""
+      }
+    },
+    "verdict": {
+      "green": true,
+      "checks": [
+        {
+          "name": "table_column_identity",
+          "pass": true,
+          "detail": "column=content type=text not_null=f"
+        },
+        {
+          "name": "target_index_absent_or_known",
+          "pass": true,
+          "detail": "existing fts indexes=['idx_discord_messages_content_fts']; target already valid=False"
+        },
+        {
+          "name": "no_invalid_remnants",
+          "pass": true,
+          "detail": "none"
+        },
+        {
+          "name": "no_in_progress_build",
+          "pass": true,
+          "detail": "none"
+        },
+        {
+          "name": "no_blocking_long_txn",
+          "pass": true,
+          "detail": "0 open txn(s) on db"
+        },
+        {
+          "name": "no_relation_locks",
+          "pass": true,
+          "detail": "0 holder(s) of locks on discord_messages"
+        },
+        {
+          "name": "storage_headroom",
+          "pass": true,
+          "detail": "db\u22482.26GB disk=9GB free\u22486.33GB need\u22480.33GB (idx est\u2248109MB \u00d73)"
+        },
+        {
+          "name": "settings_inspected",
+          "pass": true,
+          "detail": "default_transaction_isolation=read committed; lock_timeout=0ms; maintenance_work_mem=131072kB; max_parallel_maintenance_workers=1; statement_timeout=120000ms"
+        },
+        {
+          "name": "session_mode_connection",
+          "pass": true,
+          "detail": "host_family=session port=5432"
+        }
+      ],
+      "reasons": [],
+      "est_rows": 1250380,
+      "est_index_bytes": 108783060,
+      "headroom_bytes": 6326906065,
+      "conn_mode": "session",
+      "already_valid": false
+    },
+    "host_family": "pooler",
+    "port": "5432"
+  },
+  "build": {
+    "status": "ok",
+    "returncode": 0,
+    "elapsed_s": 42.08,
+    "stderr_tail": "DETAIL:  Words longer than 2047 characters are ignored.",
+    "samples": [
+      {
+        "t": 5.5,
+        "phase": "building index",
+        "blocks_done": "19977",
+        "blocks_total": "84676",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      },
+      {
+        "t": 10.8,
+        "phase": "building index",
+        "blocks_done": "50034",
+        "blocks_total": "84676",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      },
+      {
+        "t": 16.1,
+        "phase": "building index",
+        "blocks_done": "58720",
+        "blocks_total": "84676",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      },
+      {
+        "t": 21.3,
+        "phase": "building index",
+        "blocks_done": "67433",
+        "blocks_total": "84676",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      },
+      {
+        "t": 26.6,
+        "phase": "building index",
+        "blocks_done": "76393",
+        "blocks_total": "84676",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      },
+      {
+        "t": 31.8,
+        "phase": "index validation: scanning index",
+        "blocks_done": "0",
+        "blocks_total": "0",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      },
+      {
+        "t": 37.1,
+        "phase": "index validation: scanning table",
+        "blocks_done": "66208",
+        "blocks_total": "84676",
+        "tuples_done": "0",
+        "tuples_total": "0"
+      }
+    ],
+    "build_sql": "SET ROLE postgres;\nSET lock_timeout = '30s';\nSET statement_timeout = '1800s';\nCREATE INDEX CONCURRENTLY IF NOT EXISTS idx_discord_messages_content_fts_simple\n    ON public.discord_messages\n    USING gin (to_tsvector('simple'::regconfig, coalesce(content, '')));\n"
+  },
+  "evidence": {
+    "index_valid": "t",
+    "index_size_bytes": 70033408,
+    "index_size_pretty": "67 MB",
+    "evidence_plans": {
+      "websearch_default": {
+        "plan": "Limit (actual time=8.207..10.619 rows=20 loops=1)\n  Buffers: shared hit=287\n  ->  Gather Merge (actual time=8.205..10.614 rows=20 loops=1)\n        Workers Planned: 1\n        Workers Launched: 1\n        Buffers: shared hit=287\n        ->  Sort (actual time=5.128..5.130 rows=15 loops=2)\n              Sort Key: (ts_rank(to_tsvector('simple'::regconfig, COALESCE(content, ''::text)), '''wanvideosampler'''::tsquery, 32)) DESC, created_at DESC, ((message_id)::text)\n              Sort Method: top-N heapsort  Memory: 30kB\n              Buffers: shared hit=287\n              Worker 0:  Sort Method: quicksort  Memory: 26kB\n              ->  Parallel Bitmap Heap Scan on discord_messages m (actual time=1.061..5.036 rows=58 loops=2)\n                    Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''wanvideosampler'''::tsquery)\n                    Filter: (NOT is_deleted)\n                    Heap Blocks: exact=100\n                    Buffers: shared hit=263\n                    ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple (actual time=0.348..0.348 rows=116 loops=1)\n                          Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''wanvideosampler'''::tsquery)\n                          Buffers: shared hit=5\nPlanning:\n  Buffers: shared hit=358\nPlanning Time: 2.806 ms\nExecution Time: 10.722 ms\n",
+        "uses_simple_index": true,
+        "uses_english_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "phrase_exact_name": {
+        "plan": "Limit (actual time=8.028..8.032 rows=11 loops=1)\n  Buffers: shared hit=129\n  ->  Sort (actual time=8.027..8.028 rows=11 loops=1)\n        Sort Key: (ts_rank(to_tsvector('simple'::regconfig, COALESCE(content, ''::text)), '''controlnet'' <-> ''settings'''::tsquery, 32)) DESC, created_at DESC, ((message_id)::text)\n        Sort Method: quicksort  Memory: 26kB\n        Buffers: shared hit=129\n        ->  Bitmap Heap Scan on discord_messages m (actual time=1.297..7.975 rows=11 loops=1)\n              Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''controlnet'' <-> ''settings'''::tsquery)\n              Rows Removed by Index Recheck: 56\n              Filter: (NOT is_deleted)\n              Heap Blocks: exact=66\n              Buffers: shared hit=120\n              ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple (actual time=0.926..0.926 rows=67 loops=1)\n                    Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''controlnet'' <-> ''settings'''::tsquery)\n                    Buffers: shared hit=17\nPlanning:\n  Buffers: shared hit=358\nPlanning Time: 3.078 ms\nExecution Time: 8.120 ms\n",
+        "uses_simple_index": true,
+        "uses_english_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      },
+      "websearch_dotted_name": {
+        "plan": "Limit (actual time=7.516..9.846 rows=20 loops=1)\n  Buffers: shared hit=281\n  ->  Gather Merge (actual time=7.514..9.841 rows=20 loops=1)\n        Workers Planned: 1\n        Workers Launched: 1\n        Buffers: shared hit=281\n        ->  Sort (actual time=4.223..4.235 rows=10 loops=2)\n              Sort Key: (ts_rank(to_tsvector('simple'::regconfig, COALESCE(content, ''::text)), '''flux.1'''::tsquery, 32)) DESC, created_at DESC, ((message_id)::text)\n              Sort Method: top-N heapsort  Memory: 28kB\n              Buffers: shared hit=281\n              Worker 0:  Sort Method: quicksort  Memory: 25kB\n              ->  Parallel Bitmap Heap Scan on discord_messages m (actual time=1.107..4.144 rows=56 loops=2)\n                    Recheck Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''flux.1'''::tsquery)\n                    Filter: (NOT is_deleted)\n                    Heap Blocks: exact=105\n                    Buffers: shared hit=257\n                    ->  Bitmap Index Scan on idx_discord_messages_content_fts_simple (actual time=0.364..0.364 rows=112 loops=1)\n                          Index Cond: (to_tsvector('simple'::regconfig, COALESCE(content, ''::text)) @@ '''flux.1'''::tsquery)\n                          Buffers: shared hit=5\nPlanning:\n  Buffers: shared hit=358\nPlanning Time: 2.884 ms\nExecution Time: 9.972 ms\n",
+        "uses_simple_index": true,
+        "uses_english_index": false,
+        "is_seq_scan": false,
+        "is_bitmap_heap_scan": true,
+        "plan_present": true
+      }
+    },
+    "representative_hit_counts": {
+      "WanVideoSampler": 116,
+      "controlnet settings": 67,
+      "FLUX.1": 112
+    }
+  },
+  "preflight_verdict": {
+    "green": true,
+    "checks": [
+      {
+        "name": "table_column_identity",
+        "pass": true,
+        "detail": "column=content type=text not_null=f"
+      },
+      {
+        "name": "target_index_absent_or_known",
+        "pass": true,
+        "detail": "existing fts indexes=['idx_discord_messages_content_fts']; target already valid=False"
+      },
+      {
+        "name": "no_invalid_remnants",
+        "pass": true,
+        "detail": "none"
+      },
+      {
+        "name": "no_in_progress_build",
+        "pass": true,
+        "detail": "none"
+      },
+      {
+        "name": "no_blocking_long_txn",
+        "pass": true,
+        "detail": "0 open txn(s) on db"
+      },
+      {
+        "name": "no_relation_locks",
+        "pass": true,
+        "detail": "0 holder(s) of locks on discord_messages"
+      },
+      {
+        "name": "storage_headroom",
+        "pass": true,
+        "detail": "db\u22482.26GB disk=9GB free\u22486.33GB need\u22480.33GB (idx est\u2248109MB \u00d73)"
+      },
+      {
+        "name": "settings_inspected",
+        "pass": true,
+        "detail": "default_transaction_isolation=read committed; lock_timeout=0ms; maintenance_work_mem=131072kB; max_parallel_maintenance_workers=1; statement_timeout=120000ms"
+      },
+      {
+        "name": "session_mode_connection",
+        "pass": true,
+        "detail": "host_family=session port=5432"
+      }
+    ],
+    "reasons": [],
+    "est_rows": 1250380,
+    "est_index_bytes": 108783060,
+    "headroom_bytes": 6326906065,
+    "conn_mode": "session",
+    "already_valid": false
+  }
+}

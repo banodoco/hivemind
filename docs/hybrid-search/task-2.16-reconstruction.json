@@ -1,0 +1,138 @@
+{
+  "benchmark": {
+    "canonical_function_broad_calls": 6,
+    "canonical_function_idx_scan_after": 12,
+    "canonical_function_idx_scan_before": 0,
+    "canonical_function_idx_scan_delta": 12,
+    "canonical_function_idx_scan_delta_positive": true,
+    "canonical_function_note": "Strictly positive idx_scan delta from BROAD calls to the ACTUAL public hivemind_semantic_candidates(vector,int,text[],text[]) on REAL cached 384-small content; the partial HNSW index is the natural driving path. The direct inner kNN is diagnostic only.",
+    "canonical_function_uses_hnsw": true,
+    "cluster_isolated": true,
+    "environment": {
+      "pg_bindir": "/opt/homebrew/opt/postgresql@14/bin",
+      "pgvector_extversion": "0.8.5",
+      "server_version": "14.15 (Homebrew)"
+    },
+    "exact_vs_ann_recall_at_10_by_ef": {
+      "120": {
+        "mean_recall_at_10": 0.979,
+        "n_pairs": 100
+      },
+      "200": {
+        "mean_recall_at_10": 0.988,
+        "n_pairs": 100
+      },
+      "40": {
+        "mean_recall_at_10": 0.928,
+        "n_pairs": 100
+      },
+      "80": {
+        "mean_recall_at_10": 0.971,
+        "n_pairs": 100
+      }
+    },
+    "index_catalog": {
+      "exists": true,
+      "indisready": "t",
+      "indisvalid": "t",
+      "opclass": "vector_cosine_ops",
+      "predicate": "(contract_id = '1360541028304258884'::bigint)",
+      "reloptions": "m=16,ef_construction=64",
+      "size_pretty": "45 MB"
+    },
+    "limitations": [
+      "Local isolated PG14/pgvector cluster only; NOT a production-like staging run. Hosted Q8/Q9 latency and P3 recurring-compute gates remain unproven.",
+      "Vectors are the REAL cached 384-small embeddings from the paid Task 2.14 cache (read-only); no provider call was made.",
+      "chunk_text is a placeholder in the throwaway cluster (not the real corpus text); the benchmark measures distance over REAL embeddings only."
+    ],
+    "n_applicable_queries": 100,
+    "n_vectors_loaded": 23138,
+    "run_class": "representative_local_content_nonproduction_compute"
+  },
+  "cache_facts": {
+    "byte_size": 60091232,
+    "dimension": 384,
+    "dimension_consistent": true,
+    "dimensions_seen": [
+      384
+    ],
+    "mode_is_private": true,
+    "mode_oct": "0o600",
+    "path_name": "cache.384.jsonl",
+    "record_count": 27464,
+    "sha256": "70a9fc7454c3374f89464f86022952b62862badd10f9c79becb0ebc95926a2b5"
+  },
+  "chunk_cache_hit_rate": 1.0,
+  "cohort_noop_selected_inline": true,
+  "contract_activated": false,
+  "frozen_high_water": "1532071167588958368",
+  "golden_split": {
+    "applicable_case_ids_sha256": "0943ba1572ec945991c100bfa40ed0590b4e6ad186763b1f496cd297d0ce2dd6",
+    "future_case_ids_sha256": "ce95d01543176e42cf98eaa53be043429fb528e84d5d2a52a999b2a2f3884b1d",
+    "future_filter_key_sets": [
+      [
+        "authors"
+      ],
+      [
+        "channels"
+      ],
+      [
+        "since"
+      ]
+    ],
+    "n_applicable": 100,
+    "n_applicable_expect_no_hit": 7,
+    "n_applicable_judged": 93,
+    "n_cases_total": 112,
+    "n_future_filter_diagnostic": 12
+  },
+  "hygiene_clean": true,
+  "hygiene_findings": [],
+  "limitations": [
+    "Genuinely OFFLINE representative rebuild: the cohort is read from the persisted raw reconstruction snapshot, NOT a live PostgREST read (network_calls=0). No embedding provider call was made (provider_calls=0).",
+    "Local isolated PG14/pgvector cluster only (seeded and torn down); NOT a production-like staging run. Hosted Q8/Q9 latency and P3 recurring-compute gates remain unproven.",
+    "Vectors are the REAL cached 384-small embeddings from the paid Task 2.14 cache (read-only); chunk_text is a placeholder in the throwaway cluster (not real corpus text); the benchmark measures distance over REAL embeddings only.",
+    "Task 2.14 NEVER persisted the raw eval3 identity-to-chunk mapping or raw texts (neither into tracked evidence nor into the surviving private cache dir, which holds only cache.384.jsonl, cache.1536.jsonl, replay-bundle.json). Therefore reconstruction can verify COUNTS (entities/chunks/prose/workflow_python/unique), the frozen high-water, and the count-level eval3_cohort_manifest_hash. It COMPUTES and FREEZES a fresh entity_order_identity_hash, per_representation_chunk_map_hash, text_hash_multiset_hash, and snapshot file hash in a NEW private snapshot, but there is NO Task-2.14-persisted equivalent to compare them against (only the count-level manifest hash is comparable). No old identity-to-chunk hash is invented."
+  ],
+  "mode": "reconstruct-offline",
+  "n_chunk_keys_missing": 0,
+  "n_chunk_keys_required": 22850,
+  "n_query_keys_missing": 0,
+  "n_query_keys_required": 92,
+  "network_calls": 0,
+  "production_mutated": false,
+  "provider_calls": 0,
+  "query_cache_hit_rate": 1.0,
+  "raw_reconstruction_snapshot": {
+    "content_sha256": "9c5709b685fd74fd542c76dcac2ab327893dd92b8ef2e56fea355dc976c8d80e",
+    "file_mode": "0o600",
+    "n_entities": 7769,
+    "parent_mode": "0o700",
+    "path": "raw-reconstructed-snapshot.json",
+    "version": 2
+  },
+  "reconstructed_counts": {
+    "n_chunks": 23138,
+    "n_duplicate_chunks_collapsed": 288,
+    "n_entities": 7769,
+    "n_unique_embeddable_texts": 22850,
+    "prose_chunks": 7873,
+    "workflow_python_chunks": 15265
+  },
+  "representative_run_is_offline": true,
+  "representative_semantic_evidence": true,
+  "run_class": "representative_local_content_nonproduction_compute",
+  "selected_candidate": "384-small",
+  "selected_contract_id": 1360541028304258884,
+  "selected_index_name": "content_embeddings_hnsw_c1360541028304258884",
+  "source_mutations": 0,
+  "task": "2.16-representative-reconstruction",
+  "v2_noop_proof": {
+    "cohort_noop_all": true,
+    "network_calls": 0,
+    "path": "v2-cache-only-reconstruction-proof.json",
+    "provider_calls": 0,
+    "verdict": true
+  },
+  "verdict": "representative_local_content_nonproduction_compute"
+}

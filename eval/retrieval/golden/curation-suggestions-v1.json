@@ -1,0 +1,2297 @@
+{
+  "suggestions": [
+    {
+      "id": "SUGG_SYM_79259",
+      "query": "WanVideoSampler",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "9",
+          "title": "Audio-Driven WanVideo Talking Head Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "19",
+          "title": "Wan Video Generation with ATI Tracks and Image Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "title": "WanVideo Image-to-Video Generation with ControlNet and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "24",
+          "title": "WanVideo Text-to-Video with Florence2 Captioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "31",
+          "title": "WanVideo Text/Image to Video Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "39",
+          "title": "WanVideo Text-to-Video and Image-to-Video Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "43",
+          "title": "WanVideo Pose-Guided Animation with Reference Embeddings"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "48",
+          "title": "WanVideo Multi-Model Video Generation with LoRA and Block Swap"
+        }
+      ],
+      "notes": "symbol 'WanVideoSampler' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_17154",
+      "query": "KSampler",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "10",
+          "title": "LTX Video Generation with Florence2 and Groq LLM Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "12",
+          "title": "AuraFlow Image Generation with Grid Filler"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "13",
+          "title": "Qwen Image Generation with Detail Boost and Upscaling"
+        }
+      ],
+      "notes": "symbol 'KSampler' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_71550",
+      "query": "VAEEncode",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "title": "LTX Video Workflow with Audio and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "16",
+          "title": "AnimateDiff Video Upscaling with FILM Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "30",
+          "title": "WanVideo Image-to-Video with Bindweave Embeds"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "32",
+          "title": "ICLight Video Relighting with Shape Masks"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "34",
+          "title": "SDXL Outpainting with Masking and Feathering"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "36",
+          "title": "HiDream Image Generation with SD3 Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "37",
+          "title": "Video-to-Video with ControlNet and LCM"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "45",
+          "title": "Qwen Image Editing with AuraFlow Sampling"
+        }
+      ],
+      "notes": "symbol 'VAEEncode' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_64025",
+      "query": "VAEDecode",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "12",
+          "title": "AuraFlow Image Generation with Grid Filler"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "16",
+          "title": "AnimateDiff Video Upscaling with FILM Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "17",
+          "title": "LTX Video and Audio Generation with LoRA and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "22",
+          "title": "LTX Video Generation with Audio and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "25",
+          "title": "LTX Video 2.3 Image-to-Video with Audio and Upscaling"
+        }
+      ],
+      "notes": "symbol 'VAEDecode' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_64527",
+      "query": "LoadImage",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "14",
+          "title": "DreamID-V Video Generation with Rgthree Nodes"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "19",
+          "title": "Wan Video Generation with ATI Tracks and Image Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "21",
+          "title": "Image to Video with Markdown Notes"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "22",
+          "title": "LTX Video Generation with Audio and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "24",
+          "title": "WanVideo Text-to-Video with Florence2 Captioning"
+        }
+      ],
+      "notes": "symbol 'LoadImage' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_49279",
+      "query": "CheckpointLoaderSimple",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "title": "LTXV Video Generation with Upscaling and LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "10",
+          "title": "LTX Video Generation with Florence2 and Groq LLM Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "16",
+          "title": "AnimateDiff Video Upscaling with FILM Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "22",
+          "title": "LTX Video Generation with Audio and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "29",
+          "title": "Hunyuan DiT Inpainting with Captioning and Translation"
+        }
+      ],
+      "notes": "symbol 'CheckpointLoaderSimple' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_35199",
+      "query": "CLIPTextEncode",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "title": "LTXV Video Generation with Upscaling and LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "9",
+          "title": "Audio-Driven WanVideo Talking Head Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "10",
+          "title": "LTX Video Generation with Florence2 and Groq LLM Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        }
+      ],
+      "notes": "symbol 'CLIPTextEncode' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_21035",
+      "query": "LoraLoader",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "title": "LTXV Video Generation with Upscaling and LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "16",
+          "title": "AnimateDiff Video Upscaling with FILM Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "18",
+          "title": "AuraFlow Multi-Save Image Generation with Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "22",
+          "title": "LTX Video Generation with Audio and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "25",
+          "title": "LTX Video 2.3 Image-to-Video with Audio and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "26",
+          "title": "Wan2.1 Image-to-Video with MAGREF and Tiled VAE Decode"
+        }
+      ],
+      "notes": "symbol 'LoraLoader' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_57237",
+      "query": "EmptyLatentImage",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "12",
+          "title": "AuraFlow Image Generation with Grid Filler"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "29",
+          "title": "Hunyuan DiT Inpainting with Captioning and Translation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "33",
+          "title": "AnimateDiff Video Generation with IPAdapter and Image Randomization"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "34",
+          "title": "SDXL Outpainting with Masking and Feathering"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "49",
+          "title": "Animate Anyone Video Generation with Pose Guider and ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "54",
+          "title": "Stable Diffusion Text-to-Image Generation"
+        }
+      ],
+      "notes": "symbol 'EmptyLatentImage' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_06653",
+      "query": "ModelSamplingDiscrete",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "61",
+          "title": "Anime Video ControlNet Pipeline with LineArt and Tile Preprocessors"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "88",
+          "title": "AnimateDiff Video Generation with IP-Adapter and ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "113",
+          "title": "AnimateDiff with IP-Adapter and FreeU"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "156",
+          "title": "AnimateDiff Video Generation with LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "286",
+          "title": "AnimateDiff Video Generation with FreeU and LCM LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "315",
+          "title": "Anime Video Frame Interpolation with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "435",
+          "title": "AnimateDiff Video with ControlNet and Matting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "507",
+          "title": "AnimateDiff with IPAdapter and FreeU for SDXL"
+        }
+      ],
+      "notes": "symbol 'ModelSamplingDiscrete' present in 30 workflow body/bodies (python cohort: 5)"
+    },
+    {
+      "id": "SUGG_SYM_69135",
+      "query": "ControlNetApply",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "29",
+          "title": "Hunyuan DiT Inpainting with Captioning and Translation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "37",
+          "title": "Video-to-Video with ControlNet and LCM"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "40",
+          "title": "Advanced WanVideo Generation with ControlNet, IP-Adapter, and AnimateDiff"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "49",
+          "title": "Animate Anyone Video Generation with Pose Guider and ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "61",
+          "title": "Anime Video ControlNet Pipeline with LineArt and Tile Preprocessors"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "62",
+          "title": "AnimateDiff Video Generation with IPAdapter and LoRA Stacking"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "67",
+          "title": "AnimateDiff Video Generation with IP-Adapter and SUPIR Upscaling"
+        }
+      ],
+      "notes": "symbol 'ControlNetApply' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_22293",
+      "query": "def ",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "25",
+          "title": "LTX Video 2.3 Image-to-Video with Audio and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "126",
+          "title": "Multi-Model Image Generation with InstantID, SUPIR Upscaling, and Face Detailer"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "146",
+          "title": "Dual Checkpoint XL Upscaling with LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "242",
+          "title": "AnimateDiff Video Generation with IP-Adapter and GroundingDINO-SAM Segmentation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "260",
+          "title": "Mochi Video Generation with Video Input"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "286",
+          "title": "AnimateDiff Video Generation with FreeU and LCM LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "321",
+          "title": "Flux and SDXL Multi-Model Image Generation with Face Parsing and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "325",
+          "title": "WanVideo Multi-Output Video Generation and Upscaling"
+        }
+      ],
+      "notes": "symbol 'def ' present in 30 workflow body/bodies (python cohort: 0)"
+    },
+    {
+      "id": "SUGG_SYM_94291",
+      "query": "class ",
+      "categories": [
+        "workflow_code",
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "2537",
+          "title": "Video Processing and Preview Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2538",
+          "title": "Video Processing with Florence2 and CLIP"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2539",
+          "title": "Video Processing and Image Preview Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2540",
+          "title": "VHS Video Processing Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2542",
+          "title": "Video Processing and Segmentation Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2543",
+          "title": "Video and Audio Processing Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2544",
+          "title": "Audio-Video Processing Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2545",
+          "title": "VHS Video Processing Workflow"
+        }
+      ],
+      "notes": "symbol 'class ' present in 30 workflow body/bodies (python cohort: 30)"
+    },
+    {
+      "id": "SUGG_NAME_70540",
+      "query": "FLUX.1",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "29",
+          "title": "Hunyuan DiT Inpainting with Captioning and Translation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "41",
+          "title": "Flux Nunchaku Workflow with LoRA and RGThree Switches"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "53",
+          "title": "Hunyuan Video Generation with Florence2 and Detail Enhancement"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "58",
+          "title": "Flux2 Image Generation with Patch Sage Attention"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "86",
+          "title": "Flux Dev FP8 Image Generation with GPT-4 Vision Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "96",
+          "title": "Flux Multi-Reference Image Editing with Qwen"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "97",
+          "title": "Hunyuan Video Workflow with Forward/Reverse ODE Sampling"
+        }
+      ],
+      "notes": "exact name 'FLUX.1' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_95931",
+      "query": "FLUX.1 dev",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "1764",
+          "title": "FLUX Image Generation Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2098",
+          "title": "FLUX.1 Dev Image Generation with LoRA and PuLID"
+        }
+      ],
+      "notes": "exact name 'FLUX.1 dev' present in 2 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_39012",
+      "query": "Flux 2",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "1757",
+          "title": "Flux 2 Image Generation with LoRA Enhancement"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2059",
+          "title": "Flux 2 Klein 9B Image Generation with OpenRouter"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2100",
+          "title": "Ideogram 4 Flux Dual Model Image Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2202",
+          "title": "Ideogram 4 with Flux 2 VAE and Qwen3VL Text Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2308",
+          "title": "Ideogram 4 Flux Dual Model Image Generation with APG"
+        }
+      ],
+      "notes": "exact name 'Flux 2' present in 5 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_72619",
+      "query": "Wan 2.2",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "169",
+          "title": "Wan 2.2 Video Animation with Pose Control and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "648",
+          "title": "WanVideo Multi-Output Video Generation Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "967",
+          "title": "Wan 2.2 I2V Video Generation with Pose Control and SCAIL"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1068",
+          "title": "Wan Alpha Video Generation with LoRA and GGUF UNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1272",
+          "title": "Wan2.2 I2V Video Generation with LoRA and Frame Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1534",
+          "title": "Wan2.2 Image-to-Video with Upscaling and Frame Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1538",
+          "title": "Wan 2.2 Text-to-Video with LightX2V LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1581",
+          "title": "Wan2.2 Image-to-Video with Multiple LoRA Adapters"
+        }
+      ],
+      "notes": "exact name 'Wan 2.2' present in 14 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_25915",
+      "query": "Wan 2.1",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "1167",
+          "title": "Wan2.1 Multi-Talk Image-to-Video with Audio Separation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1421",
+          "title": "Wan Video Generation with TeaCache and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1952",
+          "title": "WanVideo MultiTalk Image-to-Video with Audio Separation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2215",
+          "title": "WanVideo Inpainting with Segmentation and Masking"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2279",
+          "title": "Wan 2.1 Video Generation with Clownshark Samplers"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "2582",
+          "title": "WanVideo Text-to-Video Generation with LoRA"
+        }
+      ],
+      "notes": "exact name 'Wan 2.1' present in 6 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_93770",
+      "query": "Wan2.2",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "28",
+          "title": "WanVideo Segmentation and Pose-Driven Video Compositing"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "46",
+          "title": "Wan2.2 Text-to-Video with Dual UNET and Model Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "48",
+          "title": "WanVideo Multi-Model Video Generation with LoRA and Block Swap"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "52",
+          "title": "Wan2.2 Image-to-Video with LoRA and Dual Noise"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "72",
+          "title": "Wan2.2 Image-to-Video with Frame Interpolation and Color Match"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "78",
+          "title": "WanVideo Pose-Guided Animation Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "80",
+          "title": "Wan2.2 I2V Video Generation with Loop and Index Switching"
+        }
+      ],
+      "notes": "exact name 'Wan2.2' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_23652",
+      "query": "Qwen",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "12",
+          "title": "AuraFlow Image Generation with Grid Filler"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "13",
+          "title": "Qwen Image Generation with Detail Boost and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "18",
+          "title": "AuraFlow Multi-Save Image Generation with Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "45",
+          "title": "Qwen Image Editing with AuraFlow Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "94",
+          "title": "Image Editing with Qwen and ControlNet Depth/Canny"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "96",
+          "title": "Flux Multi-Reference Image Editing with Qwen"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "106",
+          "title": "AuraFlow Upscaling with Image Comparison"
+        }
+      ],
+      "notes": "exact name 'Qwen' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_97834",
+      "query": "Qwen Image",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "12",
+          "title": "AuraFlow Image Generation with Grid Filler"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "13",
+          "title": "Qwen Image Generation with Detail Boost and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "18",
+          "title": "AuraFlow Multi-Save Image Generation with Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "45",
+          "title": "Qwen Image Editing with AuraFlow Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "94",
+          "title": "Image Editing with Qwen and ControlNet Depth/Canny"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "96",
+          "title": "Flux Multi-Reference Image Editing with Qwen"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "106",
+          "title": "AuraFlow Upscaling with Image Comparison"
+        }
+      ],
+      "notes": "exact name 'Qwen Image' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_24296",
+      "query": "LightX2V",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "24",
+          "title": "WanVideo Text-to-Video with Florence2 Captioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "26",
+          "title": "Wan2.1 Image-to-Video with MAGREF and Tiled VAE Decode"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "39",
+          "title": "WanVideo Text-to-Video and Image-to-Video Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "43",
+          "title": "WanVideo Pose-Guided Animation with Reference Embeddings"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "45",
+          "title": "Qwen Image Editing with AuraFlow Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "52",
+          "title": "Wan2.2 Image-to-Video with LoRA and Dual Noise"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "59",
+          "title": "WanVideo Video Enhancement with LoRA and SLG"
+        }
+      ],
+      "notes": "exact name 'LightX2V' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_03813",
+      "query": "LTX2",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "title": "LTX Video Workflow with Audio and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "17",
+          "title": "LTX Video and Audio Generation with LoRA and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "21",
+          "title": "Image to Video with Markdown Notes"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "22",
+          "title": "LTX Video Generation with Audio and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "25",
+          "title": "LTX Video 2.3 Image-to-Video with Audio and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "35",
+          "title": "LTX Video with Audio and ICLoRA Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "38",
+          "title": "LTX Video to Video with ICLoRA and Depth Control"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "47",
+          "title": "LTX Video Generation with Image-to-Video and Audio"
+        }
+      ],
+      "notes": "exact name 'LTX2' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_01523",
+      "query": "LTX-Video",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "title": "LTXV Video Generation with Upscaling and LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "10",
+          "title": "LTX Video Generation with Florence2 and Groq LLM Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "15",
+          "title": "LTX Video Workflow with Audio and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "16",
+          "title": "AnimateDiff Video Upscaling with FILM Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "17",
+          "title": "LTX Video and Audio Generation with LoRA and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "21",
+          "title": "Image to Video with Markdown Notes"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "22",
+          "title": "LTX Video Generation with Audio and LoRA"
+        }
+      ],
+      "notes": "exact name 'LTX-Video' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_03267",
+      "query": "VACE",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "20",
+          "title": "WanVideo Image-to-Video Generation with ControlNet and LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "24",
+          "title": "WanVideo Text-to-Video with Florence2 Captioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "31",
+          "title": "WanVideo Text/Image to Video Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "40",
+          "title": "Advanced WanVideo Generation with ControlNet, IP-Adapter, and AnimateDiff"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "42",
+          "title": "WanVideo Multi-Output Video Generation with Enhancement and Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "56",
+          "title": "WanVideo Multi-Output Video Generation with Frame Continuation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "59",
+          "title": "WanVideo Video Enhancement with LoRA and SLG"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "73",
+          "title": "WanVideo Frame Interpolation and Upscaling Workflow"
+        }
+      ],
+      "notes": "exact name 'VACE' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_43557",
+      "query": "Bernini",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "83",
+          "title": "Wan2.1 Text-to-Video with Bernini Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "180",
+          "title": "Video Generation and Upscaling with Bernini and Wan2.1 Models"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "209",
+          "title": "Wan2.2 Bernini Image-to-Video with LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1313",
+          "title": "Wan2.1 Bernini Video Generation with Frame Interpolation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1381",
+          "title": "Video-to-Video with Bernini Conditioning and Attention Patching"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1515",
+          "title": "Bernini Video Generation with Lightx2v and Dual LoRA"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1555",
+          "title": "Wan2.2 Video Generation with LoRA and Bernini Models"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1707",
+          "title": "Wan Video Generation with Bernini Conditioning and LoRA"
+        }
+      ],
+      "notes": "exact name 'Bernini' present in 11 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_61453",
+      "query": "Hunyuan",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "29",
+          "title": "Hunyuan DiT Inpainting with Captioning and Translation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "46",
+          "title": "Wan2.2 Text-to-Video with Dual UNET and Model Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "51",
+          "title": "HyVideo Workflow with Masking, Rotation, and Composition"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "53",
+          "title": "Hunyuan Video Generation with Florence2 and Detail Enhancement"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "79",
+          "title": "3D Model Generation and Texture Baking Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "97",
+          "title": "Hunyuan Video Workflow with Forward/Reverse ODE Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "99",
+          "title": "Wan2.2 Video Generation with Style and LoRA"
+        }
+      ],
+      "notes": "exact name 'Hunyuan' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_54636",
+      "query": "CogVideoX",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "64",
+          "title": "Video Enhancement with VEnhancer"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "140",
+          "title": "Inpaint and Video Composition with Spline Path"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "171",
+          "title": "CogVideo Text-to-Video Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "296",
+          "title": "CogVideo Text-to-Video Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "328",
+          "title": "CogVideo Tora Trajectory Video Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "432",
+          "title": "CogVideo Text-to-Video Generation with Image Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "433",
+          "title": "CogVideo Tora Trajectory Video Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "439",
+          "title": "CogVideoX Fun Video-to-Video with Pose Control"
+        }
+      ],
+      "notes": "exact name 'CogVideoX' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_61172",
+      "query": "Mochi",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "260",
+          "title": "Mochi Video Generation with Video Input"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "501",
+          "title": "Mochi Video Workflow with Unsampling and Resampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "668",
+          "title": "Mochi Video Generation with Spatial Tiling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "887",
+          "title": "Mochi Video Generation from Text"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1018",
+          "title": "Mochi Video Generation from Text"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1040",
+          "title": "Mochi Video Unsampling and Resampling Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1049",
+          "title": "Mochi Video Generation with Text Prompts"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1320",
+          "title": "Mochi Video Inpainting and Frame Interpolation Workflow"
+        }
+      ],
+      "notes": "exact name 'Mochi' present in 14 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_97966",
+      "query": "SDXL",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "33",
+          "title": "AnimateDiff Video Generation with IPAdapter and Image Randomization"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "34",
+          "title": "SDXL Outpainting with Masking and Feathering"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "67",
+          "title": "AnimateDiff Video Generation with IP-Adapter and SUPIR Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "79",
+          "title": "3D Model Generation and Texture Baking Workflow"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "88",
+          "title": "AnimateDiff Video Generation with IP-Adapter and ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "113",
+          "title": "AnimateDiff with IP-Adapter and FreeU"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "123",
+          "title": "SDXL Dual Checkpoint Image Generation with LoRA"
+        }
+      ],
+      "notes": "exact name 'SDXL' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_79986",
+      "query": "Stable Diffusion",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "36",
+          "title": "HiDream Image Generation with SD3 Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "54",
+          "title": "Stable Diffusion Text-to-Image Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "98",
+          "title": "Stable Diffusion Text-to-Image Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "126",
+          "title": "Multi-Model Image Generation with InstantID, SUPIR Upscaling, and Face Detailer"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "175",
+          "title": "SD3 Dual Image Generation with Automatic CFG"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "206",
+          "title": "Flux Dev Kontext Image Generation with Reference Latent"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "240",
+          "title": "UltraCascade Multi-Model Image Generation with Advanced Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "265",
+          "title": "Dual Image Generation with Stable Diffusion v1.5"
+        }
+      ],
+      "notes": "exact name 'Stable Diffusion' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_22593",
+      "query": "Cascade",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "240",
+          "title": "UltraCascade Multi-Model Image Generation with Advanced Sampling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "712",
+          "title": "Stable Cascade Dual Checkpoint Image Generation with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "806",
+          "title": "Stable Cascade Video Generation with DynamiCrafter and Face Detailer"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1143",
+          "title": "UltraCascade Flux Sampling Workflow with Clown Options"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1243",
+          "title": "Stable Cascade Image Variation with CLIP Vision"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1322",
+          "title": "Stable Cascade Image Generation with Stage B Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1353",
+          "title": "Stable Cascade Stage B Image Generation with CLIP Vision Conditioning"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "1450",
+          "title": "Stable Cascade Image-to-Video with Face Detailer"
+        }
+      ],
+      "notes": "exact name 'Cascade' present in 13 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_20598",
+      "query": ".safetensors",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "4",
+          "title": "LTXV Video Generation with Upscaling and LoRAs"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "6",
+          "title": "LTX Video Image-to-Video Generation with WebP Output"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "7",
+          "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "8",
+          "title": "Wan2.2 Image-to-Video with LoRAs and Noise Scheduling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "9",
+          "title": "Audio-Driven WanVideo Talking Head Generation"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "10",
+          "title": "LTX Video Generation with Florence2 and Groq LLM Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "11",
+          "title": "SVD Image-to-Video with SDXL Turbo"
+        }
+      ],
+      "notes": "exact name '.safetensors' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_NAME_51341",
+      "query": ".gguf",
+      "categories": [
+        "exact_name"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "workflow",
+          "item_id": "5",
+          "title": "Flux Image Inpainting and Compositing with ControlNet"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "10",
+          "title": "LTX Video Generation with Florence2 and Groq LLM Prompting"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "13",
+          "title": "Qwen Image Generation with Detail Boost and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "17",
+          "title": "LTX Video and Audio Generation with LoRA and Upscaling"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "48",
+          "title": "WanVideo Multi-Model Video Generation with LoRA and Block Swap"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "72",
+          "title": "Wan2.2 Image-to-Video with Frame Interpolation and Color Match"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "110",
+          "title": "WanVideo Image-to-Video Generation with LoRA and Block Swap"
+        },
+        {
+          "kind": "workflow",
+          "item_id": "114",
+          "title": "LTX Video 2.3 Audio-Video Generation with Upscaling"
+        }
+      ],
+      "notes": "exact name '.gguf' present in 20 workflow resource(s)"
+    },
+    {
+      "id": "SUGG_MSG_70334",
+      "query": "upscale",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531607167076012122",
+          "author": "QuintForms",
+          "context": "krea-2-image"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531449356857639053",
+          "author": "devnullblackcat",
+          "context": "krea-2-image"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531400124343783524",
+          "author": "Juan Gea",
+          "context": "flux"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531380577587171519",
+          "author": "Hippotes",
+          "context": "flux"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531358712277504222",
+          "author": "QuintForms",
+          "context": "krea-2-image"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531327666064588810",
+          "author": "dischordo",
+          "context": "nsfw"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531280658469486662",
+          "author": "Hippotes",
+          "context": "chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531156445154906152",
+          "author": "shotgun messiah",
+          "context": "krea-2-image"
+        }
+      ],
+      "notes": "term 'upscale' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_MSG_69962",
+      "query": "lora",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531732226474246244",
+          "author": "Quality_Control",
+          "context": "nsfw"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531724110558920724",
+          "author": "buggz",
+          "context": "flux"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531723906308771967",
+          "author": "buggz",
+          "context": "flux"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531723834581979227",
+          "author": "buggz",
+          "context": "flux"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531714016236409054",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531701625868128397",
+          "author": "psylent_gamer",
+          "context": "ltx_resources"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531700587438145628",
+          "author": "hicho",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531698885939036363",
+          "author": "BNDC",
+          "context": "live_updates"
+        }
+      ],
+      "notes": "term 'lora' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_MSG_04079",
+      "query": "controlnet",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531669483226398891",
+          "author": "BillyBuckets",
+          "context": "krea-2-image"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531344153131352206",
+          "author": "hicho",
+          "context": "wan_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531284476775370863",
+          "author": "spacepxl",
+          "context": "wan_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530223809414828163",
+          "author": "yuvraj",
+          "context": "ltx_training"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530223623053377717",
+          "author": "JonkoXL",
+          "context": "ltx_training"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530223529528655952",
+          "author": "yuvraj",
+          "context": "ltx_training"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530222951410958416",
+          "author": "JonkoXL",
+          "context": "ltx_training"
+        },
+        {
+          "kind": "message",
+          "item_id": "1528876103362412705",
+          "author": "RuneX",
+          "context": "krea-2-image"
+        }
+      ],
+      "notes": "term 'controlnet' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_MSG_81620",
+      "query": "sampler",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531693288141230103",
+          "author": "ucren",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531487496771469422",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531487459404419102",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531482592518606872",
+          "author": "Chandler ✨ 🎈",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531373102964019221",
+          "author": "ͯ𝖑𝖚𝖈𝖎𝖋𝖊𝖗",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531371764519538689",
+          "author": "RuneX",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531371193238814751",
+          "author": "Mandalorian",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531371102096457798",
+          "author": "ͯ𝖑𝖚𝖈𝖎𝖋𝖊𝖗",
+          "context": "ltx_chatter"
+        }
+      ],
+      "notes": "term 'sampler' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_MSG_86821",
+      "query": "VAE",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531732489159184569",
+          "author": "Mandalorian",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531722733917048912",
+          "author": "hicho",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531722557873717248",
+          "author": "RuneX",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531722314788638841",
+          "author": "hicho",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531719890136993862",
+          "author": "yi",
+          "context": "cosmos"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531719434430058707",
+          "author": "yi",
+          "context": "cosmos"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531638664336113704",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531632199315624097",
+          "author": "yi",
+          "context": "cosmos"
+        }
+      ],
+      "notes": "term 'VAE' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_MSG_73269",
+      "query": "batch",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531167188051038352",
+          "author": "shotgun messiah",
+          "context": "ideogram"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531108040693252096",
+          "author": "djbfilmz",
+          "context": "wan_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531064596440416268",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530980333909180607",
+          "author": "Lumifel",
+          "context": "nsfw"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530977000339144744",
+          "author": "Lumifel",
+          "context": "nsfw"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530678627451142196",
+          "author": "hudson223",
+          "context": "ltx_gens"
+        },
+        {
+          "kind": "message",
+          "item_id": "1530582064938745897",
+          "author": "Hashu",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1528868154049302568",
+          "author": "hudson223",
+          "context": "ltx_training"
+        }
+      ],
+      "notes": "term 'batch' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_MSG_17883",
+      "query": "mask",
+      "categories": [
+        "best_is_message"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "message",
+          "item_id": "1531728869349003414",
+          "author": "Lumifel",
+          "context": "nsfw"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531714016236409054",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531714008862691340",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531714005544996966",
+          "author": "BNDC",
+          "context": "live_updates"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531711322037682237",
+          "author": "Ablejones",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531704888348643378",
+          "author": "Ablejones",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531701678368231425",
+          "author": "Ablejones",
+          "context": "ltx_chatter"
+        },
+        {
+          "kind": "message",
+          "item_id": "1531701017970999357",
+          "author": "Ablejones",
+          "context": "ltx_chatter"
+        }
+      ],
+      "notes": "term 'mask' in 12 sampled message(s)"
+    },
+    {
+      "id": "SUGG_DIST_1",
+      "query": "What do people use to upscale AI-generated video?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "1",
+          "title": "What do people use to upscale AI-generated video?"
+        }
+      ],
+      "notes": "distillation id=1 status=pending conf=low cites=2"
+    },
+    {
+      "id": "SUGG_DIST_3",
+      "query": "What reference-driven workflow gives Seedance 2 the most precise control?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "3",
+          "title": "What reference-driven workflow gives Seedance 2 the most precise control?"
+        }
+      ],
+      "notes": "distillation id=3 status=pending conf=medium cites=3"
+    },
+    {
+      "id": "SUGG_DIST_4",
+      "query": "When does Wan Animate apply color matching or relighting to the input character?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "4",
+          "title": "When does Wan Animate apply color matching or relighting to the input character?"
+        }
+      ],
+      "notes": "distillation id=4 status=pending conf=medium cites=2"
+    },
+    {
+      "id": "SUGG_DIST_5",
+      "query": "What motion trade-off does LightX2V introduce when applied to a global Wan model?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "5",
+          "title": "What motion trade-off does LightX2V introduce when applied to a global Wan model?"
+        }
+      ],
+      "notes": "distillation id=5 status=pending conf=medium cites=5"
+    },
+    {
+      "id": "SUGG_DIST_6",
+      "query": "What does the LTX2 Attention Tuner Patch control, and is it a speed optimization?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "6",
+          "title": "What does the LTX2 Attention Tuner Patch control, and is it a speed optimization?"
+        }
+      ],
+      "notes": "distillation id=6 status=pending conf=medium cites=4"
+    },
+    {
+      "id": "SUGG_DIST_7",
+      "query": "How should masks and control frames be wired for localized VACE inpainting?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "7",
+          "title": "How should masks and control frames be wired for localized VACE inpainting?"
+        }
+      ],
+      "notes": "distillation id=7 status=pending conf=high cites=3"
+    },
+    {
+      "id": "SUGG_DIST_8",
+      "query": "How does Qwen Image Edit compare with Flux 2 Klein for image editing?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "8",
+          "title": "How does Qwen Image Edit compare with Flux 2 Klein for image editing?"
+        }
+      ],
+      "notes": "distillation id=8 status=pending conf=low cites=1"
+    },
+    {
+      "id": "SUGG_DIST_9",
+      "query": "What training scale and VRAM should I budget for a video control LoRA?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "9",
+          "title": "What training scale and VRAM should I budget for a video control LoRA?"
+        }
+      ],
+      "notes": "distillation id=9 status=pending conf=medium cites=4"
+    },
+    {
+      "id": "SUGG_DIST_10",
+      "query": "How can I fix a Bernini OOM caused by ClownShark in ComfyUI?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "10",
+          "title": "How can I fix a Bernini OOM caused by ClownShark in ComfyUI?"
+        }
+      ],
+      "notes": "distillation id=10 status=pending conf=high cites=4"
+    },
+    {
+      "id": "SUGG_DIST_11",
+      "query": "Why can Wan INT8 quantization make a LightX2V LoRA seem too weak?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "11",
+          "title": "Why can Wan INT8 quantization make a LightX2V LoRA seem too weak?"
+        }
+      ],
+      "notes": "distillation id=11 status=pending conf=medium cites=2"
+    },
+    {
+      "id": "SUGG_DIST_12",
+      "query": "Which searchable semantics should a VibeComfy workflow resource preserve?",
+      "categories": [
+        "best_is_distillation",
+        "paraphrase"
+      ],
+      "filters": {},
+      "matches": [
+        {
+          "kind": "distillation",
+          "item_id": "12",
+          "title": "Which searchable semantics should a VibeComfy workflow resource preserve?"
+        }
+      ],
+      "notes": "distillation id=12 status=pending conf=high cites=3"
+    }
+  ],
+  "n": 52
+}

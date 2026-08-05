@@ -9,3 +9,5 @@ scripts/
 .megaplan/
 install.sh
 DESIGN.md
+# Internal hybrid-search planning/audit docs — not part of the public pack.
+docs/hybrid-search/

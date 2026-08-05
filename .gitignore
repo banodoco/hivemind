@@ -5,3 +5,12 @@ __pycache__/
 .megaplan/schemas/
 .megaplan/verification/
 .DS_Store
+# Private resumable embedding-eval cache (task 2.14): holds raw snapshot text +
+# vectors for resume/replay. Must never be committed or copied into evidence.
+.cache/
+# Private task-2.16 representative-reconstruction snapshot (raw identity/chunk
+# hashes). Must never be committed. (Already covered by .cache/ above; explicit
+# for clarity per the task-2.16 reconstruction brief.)
+.cache/hivemind-hnsw-task-2.16/
+# Live-DB probe scratch (inventory dumps, backfill scratch). Never commit.
+.codex_tmp/

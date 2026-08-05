@@ -1,0 +1,13 @@
+{
+  "label": "phase2-012-latency-mv-apply",
+  "migration": "/Users/peteromalley/Documents/banodoco-workspace/hivemind/schema/012_lexical_latency_phase2.sql",
+  "host_family": "pooler",
+  "port": "5432",
+  "preflight_green": true,
+  "apply_rc": 0,
+  "ok": true,
+  "post_check_rc": 0,
+  "post_check_out": [
+    "{\"mv_rows\": 221, \"mv_items\": 221, \"mv_exists\": true, \"fn_refs_mv\": true, \"items_match\": true, \"expected_items\": 221, \"bad_acl_entries\": 0}"
+  ]
+}

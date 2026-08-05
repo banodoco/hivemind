@@ -1,0 +1,50 @@
+{
+  "apply": {
+    "ok": true,
+    "elapsed_s": 10.05,
+    "role": "postgres",
+    "stderr_tail": "",
+    "before": {
+      "rows_er": "2759",
+      "rows_dist": "11",
+      "size_er": "68 MB",
+      "size_dist": "224 kB"
+    },
+    "after": {
+      "rows_er": "2759",
+      "rows_dist": "11",
+      "size_er": "69 MB",
+      "size_dist": "288 kB",
+      "size_ld": "64 kB",
+      "rows_ld": "0",
+      "prose_tsv_notnull": "2759",
+      "lexical_tsv_notnull": "11"
+    },
+    "source_rows_unchanged": true
+  },
+  "verify": {
+    "all_objects_present": true,
+    "objects_absent": [],
+    "objects_present_count": 18,
+    "rls": {
+      "rls_lexical_documents": "true",
+      "rls_lexical_resource_python_state": "true"
+    },
+    "privileges_anon_authenticated": {
+      "anon_ld_select": "true",
+      "anon_state_select": "true",
+      "anon_ld_insert": "true",
+      "authenticated_ld_select": "true"
+    },
+    "generated_columns_stored": {
+      "gen_prose_tsv": "s",
+      "gen_lexical_tsv": "s"
+    },
+    "ok": false
+  },
+  "preflight": {
+    "rows_external_resources": "2759",
+    "rows_distillations": "11",
+    "heap_external_resources": "4848 kB"
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "checks": [
+    {
+      "detail": "1360541028304258884",
+      "name": "selected_contract_resolved_from_artifacts",
+      "ok": true
+    },
+    {
+      "detail": "1360541028304258884",
+      "name": "selected_literal_applied",
+      "ok": true
+    },
+    {
+      "detail": "{\"payload_only\": true, \"legacy_body_only\": true, \"duplicated\": true, \"changed\": true, \"huge_generated\": true, \"parser_fallback\": true, \"unavailable\": true, \"quarantined\": true, \"recoverable\": true}",
+      "name": "parity_python_sql_all_safe_fixtures",
+      "ok": true
+    },
+    {
+      "detail": "{\"huge_generated\": {\"chunks\": 5, \"max_len\": 2249, \"later_chunk_index_gt0\": true}, \"parser_fallback\": {\"chunks\": 5, \"max_len\": 2248, \"later_chunk_index_gt0\": true}}",
+      "name": "oversized_line_bounded",
+      "ok": true
+    },
+    {
+      "detail": "7 vs expected 7",
+      "name": "worker_one_embed_per_safe_python_rep",
+      "ok": true
+    },
+    {
+      "detail": "{'completed': 7}",
+      "name": "worker_all_jobs_terminal",
+      "ok": true
+    },
+    {
+      "detail": "{\"6101\": 1, \"6102\": 1, \"6103\": 1, \"6104\": 1, \"6105\": 5, \"6106\": 5, \"6109\": 1}",
+      "name": "safe_python_vectors_written",
+      "ok": true
+    },
+    {
+      "detail": "count=0",
+      "name": "unavailable_zero_python_vectors",
+      "ok": true
+    },
+    {
+      "detail": "count=0",
+      "name": "quarantined_zero_python_vectors",
+      "ok": true
+    },
+    {
+      "detail": "[6101, 6102, 6103, 6104, 6105, 6106, 6109]",
+      "name": "quarantined_unavailable_excluded_from_safe_drain",
+      "ok": true
+    },
+    {
+      "detail": "new=1",
+      "name": "changed_new_marker_stored",
+      "ok": true
+    },
+    {
+      "detail": "old2=0",
+      "name": "changed_old_marker_replaced",
+      "ok": true
+    },
+    {
+      "detail": "processed=6 unique=6",
+      "name": "concurrency_no_duplicate_processing",
+      "ok": true
+    },
+    {
+      "detail": "6",
+      "name": "concurrency_all_six_converged",
+      "ok": true
+    },
+    {
+      "detail": "1/pending",
+      "name": "crash_lease_recovered",
+      "ok": true
+    },
+    {
+      "detail": "status=done",
+      "name": "crash_lease_reprocessed_terminal",
+      "ok": true
+    },
+    {
+      "detail": "{'outcome': 'source_changed'}",
+      "name": "source_change_detected",
+      "ok": true
+    },
+    {
+      "detail": "new-under-stale=0",
+      "name": "source_change_no_stale_authority",
+      "ok": true
+    },
+    {
+      "detail": "{'outcome': 'validation_failed'}",
+      "name": "wrong_dimension_rejected",
+      "ok": true
+    },
+    {
+      "detail": "failed",
+      "name": "wrong_dimension_job_failed",
+      "ok": true
+    },
+    {
+      "detail": "intact=1",
+      "name": "wrong_dimension_no_partial_wipe",
+      "ok": true
+    },
+    {
+      "detail": "[{\"item_id\": \"6105\", \"chunk_index\": 4, \"entity_type\": \"resource\", \"semantic_distance\": 0.5, \"representation_type\": \"workflow_python\"}]",
+      "name": "semantic_later_workflow_python_chunk_can_win",
+      "ok": true
+    },
+    {
+      "detail": "13",
+      "name": "semantic_one_row_per_item",
+      "ok": true
+    },
+    {
+      "detail": "decoy ranked=False",
+      "name": "wrong_contract_vector_excluded",
+      "ok": true
+    },
+    {
+      "detail": "vec=1 sem=1",
+      "name": "snowflake_survives_full_protocol",
+      "ok": true
+    },
+    {
+      "detail": "t",
+      "name": "hnsw_index_present",
+      "ok": true
+    },
+    {
+      "detail": "selected literal baked into the semantic function source",
+      "name": "semantic_function_binds_selected_literal",
+      "ok": true
+    }
+  ],
+  "concurrency": {
+    "claimers": 3,
+    "duplicates": 0,
+    "jobs": 6,
+    "processed": 6,
+    "provider_calls": 6,
+    "unique": 6
+  },
+  "deterministic_core_hash": "af6db8fb9afe83026ea416dc0e4f35c63d2ac2cd203dadcede0c45963c140100",
+  "embedding_provider_calls": 0,
+  "evidence_scan": {
+    "ok": true,
+    "problems": []
+  },
+  "fixture_manifest": [
+    {
+      "available": true,
+      "name": "payload_only",
+      "public_state": "safe",
+      "python_chunk_count": 1
+    },
+    {
+      "available": true,
+      "name": "legacy_body_only",
+      "public_state": "safe",
+      "python_chunk_count": 1
+    },
+    {
+      "available": true,
+      "name": "duplicated",
+      "public_state": "safe",
+      "python_chunk_count": 1
+    },
+    {
+      "available": true,
+      "name": "changed",
+      "public_state": "safe",
+      "python_chunk_count": 1
+    },
+    {
+      "available": true,
+      "name": "huge_generated",
+      "public_state": "safe",
+      "python_chunk_count": 5
+    },
+    {
+      "available": true,
+      "name": "parser_fallback",
+      "public_state": "safe",
+      "python_chunk_count": 5
+    },
+    {
+      "available": false,
+      "name": "unavailable",
+      "public_state": "safe",
+      "python_chunk_count": 0
+    },
+    {
+      "available": true,
+      "name": "quarantined",
+      "public_state": "quarantined",
+      "python_chunk_count": 0
+    },
+    {
+      "available": true,
+      "name": "recoverable",
+      "public_state": "safe",
+      "python_chunk_count": 1
+    }
+  ],
+  "isolated_cluster": true,
+  "migrations_applied": [
+    "003_lexical_resource_documents.sql",
+    "020_enable_pgvector.sql",
+    "021_embedding_contracts.sql",
+    "022_content_embeddings.sql",
+    "023_embedding_contract_switch.sql",
+    "024_identity_and_canonical_representations.sql",
+    "025_embedding_jobs.sql",
+    "026_embedding_job_rpc.sql",
+    "027_embedding_worker_surface.sql",
+    "028_embedding_worker_cron.sql",
+    "029_embedding_cleanup.sql",
+    "032_semantic_candidate_sql.sql",
+    "033_selected_contract_hnsw.sql",
+    "034_phase2_acceptance_contract.sql"
+  ],
+  "network_calls": 0,
+  "oversized_bounds": {
+    "huge_generated": {
+      "chunks": 5,
+      "later_chunk_index_gt0": true,
+      "max_len": 2249
+    },
+    "parser_fallback": {
+      "chunks": 5,
+      "later_chunk_index_gt0": true,
+      "max_len": 2248
+    }
+  },
+  "parity_python_sql": {
+    "changed": true,
+    "duplicated": true,
+    "huge_generated": true,
+    "legacy_body_only": true,
+    "parser_fallback": true,
+    "payload_only": true,
+    "quarantined": true,
+    "recoverable": true,
+    "unavailable": true
+  },
+  "pgvector_version": "0.8.5",
+  "postgres_version": "PostgreSQL 14.15 (Homebrew) on aarch64-apple-darwin23.6.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.4), 64-bit",
+  "production_mutated": false,
+  "recovery": {
+    "recovered": 1,
+    "requeued_status": "pending"
+  },
+  "selected": {
+    "candidate": "384-small",
+    "chunk_config_identity_sha256": "076b54b8d12ec6462c1b129144fd86b80ced8513184fe5fc1a2fad00a958a500",
+    "dimension": 384,
+    "eval_contract_id_hex": "12e19cdb566b8744",
+    "production_activated": false,
+    "prose_overlap": 50,
+    "prose_target": 512,
+    "python_overlap": 50,
+    "python_target": 512,
+    "selected_contract_id": "1360541028304258884"
+  },
+  "selected_literal_applied": "1360541028304258884",
+  "semantic": {
+    "returned": 13
+  },
+  "snowflake": {
+    "item_id": "9007199254740993",
+    "semantic_hit": 1,
+    "vectors": 1
+  },
+  "source_change": {
+    "outcome": "source_changed"
+  },
+  "verdict": true,
+  "worker_protocol": {
+    "claimed_unique": 7,
+    "outcomes": {
+      "completed": 7
+    },
+    "provider_calls": 7
+  },
+  "workflow_python_vectors": {
+    "6101": 1,
+    "6102": 1,
+    "6103": 1,
+    "6104": 1,
+    "6105": 5,
+    "6106": 5,
+    "6109": 1
+  },
+  "wrong_contract": {
+    "decoy_contract_id": "1678546417949277102",
+    "decoy_ranked": false
+  },
+  "wrong_dimension": {
+    "existing_vectors_intact": 1,
+    "job_status": "failed",
+    "outcome": "validation_failed"
+  }
+}

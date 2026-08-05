@@ -1,0 +1,449 @@
+{
+  "report": "Hivemind hybrid-search capacity & cost model (task 0.7)",
+  "generated_at": "2026-07-28T19:03:10.062536+00:00",
+  "plan_date": "2026-07-28",
+  "measured_as_of": "2026-07-28",
+  "gates": {
+    "initial_spend_usd": 25.0,
+    "new_storage_gb": 12.0,
+    "monthly_incremental_usd": 50.0
+  },
+  "scenarios": [
+    {
+      "id": "pilot_384",
+      "dimension": 384,
+      "scale": "pilot",
+      "label": "Pilot (distillations + all resources + workflow Python + 5,000-msg sample) @ 384-d",
+      "vectors": {
+        "messages": 5000,
+        "resource_prose": 19313,
+        "workflow_python": 16872,
+        "distillations": 11,
+        "total": 41196
+      },
+      "backfill_tokens": {
+        "messages": 95000.0,
+        "resource_prose": 9678296.100000001,
+        "workflow_python": 8484973.200000001,
+        "distillations": 1650.0,
+        "total": 18259919.300000004
+      },
+      "storage": {
+        "vector_bytes_per_node": 1544,
+        "raw_vector_payload_gib": 0.0589,
+        "heap_gib": 0.1006,
+        "hnsw_index_gib": {
+          "low": 0.0631,
+          "central": 0.065,
+          "high": 0.0688
+        },
+        "secondary_indexes_gib": 0.15,
+        "new_storage_gb": {
+          "low": 0.326,
+          "central": 0.328,
+          "high": 0.332
+        },
+        "hnsw_build_maintenance_work_mem_note": 0.06499329954385757
+      },
+      "current_db": {
+        "corpus_table_bytes": 1280868352,
+        "corpus_table_gib": 1.1929,
+        "full_project_db_note": "Unmeasured (537 relations incl. larger Banodoco app); true total is larger. Measure before backfill.",
+        "total_db_after_central_gib": 1.4982,
+        "extra_storage_gb": 0.0
+      },
+      "spend": {
+        "backfill_cost_3small_usd": 0.3652,
+        "backfill_cost_3large_usd": 2.3738,
+        "per_query_embedding_cost_usd": 4.0000000000000003e-07,
+        "monthly_query_cost_usd": 0.1
+      },
+      "edge": {
+        "monthly_invocations": 258640,
+        "included_invocations": 2000000,
+        "monthly_cost_usd": 0.0
+      },
+      "compute": {
+        "hnsw_index_central_gib": 0.065,
+        "needed_ram_gib": 0.0812,
+        "baseline_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1,
+          "note": "Included Micro (covered by the $10 Pro credit). Index served disk-cached; meets capacity, warm p95 unproven.",
+          "incremental_over_pro_credit_usd": 0.0
+        },
+        "recommended_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1,
+          "note": "Smallest tier holding the HNSW index in RAM (latency-safe).",
+          "incremental_over_pro_credit_usd": 0.0
+        },
+        "minimal_ram_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1
+        }
+      },
+      "monthly_steady_state_usd": {
+        "baseline_disk_cached": 0.1,
+        "ram_resident": 0.1,
+        "components": {
+          "extra_storage": 0.0,
+          "compute_incremental_ram_resident": 0.0,
+          "edge": 0.0,
+          "query_embeddings": 0.1
+        }
+      },
+      "gate_verdicts": {
+        "initial_spend_25usd": {
+          "verdict": "PASS",
+          "value_usd": 0.3652,
+          "limit_usd": 25.0
+        },
+        "new_storage_12gb": {
+          "verdict": "PASS",
+          "value_gb_central": 0.328,
+          "value_gb_high_overhead": 0.332,
+          "limit_gb": 12.0,
+          "central_verdict": "PASS",
+          "high_overhead_verdict": "PASS"
+        },
+        "monthly_incremental_50usd": {
+          "verdict": "PASS",
+          "value_baseline_disk_cached_usd": 0.1,
+          "value_ram_resident_usd": 0.1,
+          "limit_usd": 50.0
+        }
+      }
+    },
+    {
+      "id": "full_384",
+      "dimension": 384,
+      "scale": "full",
+      "label": "Full eligible corpus (messages=1,245,006 + resources + workflow Python + distillations) @ 384-d",
+      "vectors": {
+        "messages": 1245006,
+        "resource_prose": 19313,
+        "workflow_python": 16872,
+        "distillations": 11,
+        "total": 1281202
+      },
+      "backfill_tokens": {
+        "messages": 23655114.0,
+        "resource_prose": 9678296.100000001,
+        "workflow_python": 8484973.200000001,
+        "distillations": 1650.0,
+        "total": 41820033.300000004
+      },
+      "storage": {
+        "vector_bytes_per_node": 1544,
+        "raw_vector_payload_gib": 1.8328,
+        "heap_gib": 2.1147,
+        "hnsw_index_gib": {
+          "low": 1.9616,
+          "central": 2.0213,
+          "high": 2.1406
+        },
+        "secondary_indexes_gib": 0.15,
+        "new_storage_gb": {
+          "low": 4.527,
+          "central": 4.591,
+          "high": 4.719
+        },
+        "hnsw_build_maintenance_work_mem_note": 2.0213017128407955
+      },
+      "current_db": {
+        "corpus_table_bytes": 1280868352,
+        "corpus_table_gib": 1.1929,
+        "full_project_db_note": "Unmeasured (537 relations incl. larger Banodoco app); true total is larger. Measure before backfill.",
+        "total_db_after_central_gib": 5.4686,
+        "extra_storage_gb": 0.0
+      },
+      "spend": {
+        "backfill_cost_3small_usd": 0.8364,
+        "backfill_cost_3large_usd": 5.4366,
+        "per_query_embedding_cost_usd": 4.0000000000000003e-07,
+        "monthly_query_cost_usd": 0.1
+      },
+      "edge": {
+        "monthly_invocations": 258640,
+        "included_invocations": 2000000,
+        "monthly_cost_usd": 0.0
+      },
+      "compute": {
+        "hnsw_index_central_gib": 2.0213,
+        "needed_ram_gib": 2.5266,
+        "baseline_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1,
+          "note": "Included Micro (covered by the $10 Pro credit). Index served disk-cached; meets capacity, warm p95 unproven.",
+          "incremental_over_pro_credit_usd": 0.0
+        },
+        "recommended_tier": {
+          "name": "Medium",
+          "price": 60,
+          "ram_gb": 4,
+          "note": "Smallest tier holding the HNSW index in RAM (latency-safe).",
+          "incremental_over_pro_credit_usd": 50.0
+        },
+        "minimal_ram_tier": {
+          "name": "Medium",
+          "price": 60,
+          "ram_gb": 4
+        }
+      },
+      "monthly_steady_state_usd": {
+        "baseline_disk_cached": 0.1,
+        "ram_resident": 50.1,
+        "components": {
+          "extra_storage": 0.0,
+          "compute_incremental_ram_resident": 50.0,
+          "edge": 0.0,
+          "query_embeddings": 0.1
+        }
+      },
+      "gate_verdicts": {
+        "initial_spend_25usd": {
+          "verdict": "PASS",
+          "value_usd": 0.8364,
+          "limit_usd": 25.0
+        },
+        "new_storage_12gb": {
+          "verdict": "PASS",
+          "value_gb_central": 4.591,
+          "value_gb_high_overhead": 4.719,
+          "limit_gb": 12.0,
+          "central_verdict": "PASS",
+          "high_overhead_verdict": "PASS"
+        },
+        "monthly_incremental_50usd": {
+          "verdict": "CONDITIONAL",
+          "value_baseline_disk_cached_usd": 0.1,
+          "value_ram_resident_usd": 50.1,
+          "limit_usd": 50.0
+        }
+      }
+    },
+    {
+      "id": "pilot_1536",
+      "dimension": 1536,
+      "scale": "pilot",
+      "label": "Pilot (distillations + all resources + workflow Python + 5,000-msg sample) @ 1536-d",
+      "vectors": {
+        "messages": 5000,
+        "resource_prose": 19313,
+        "workflow_python": 16872,
+        "distillations": 11,
+        "total": 41196
+      },
+      "backfill_tokens": {
+        "messages": 95000.0,
+        "resource_prose": 9678296.100000001,
+        "workflow_python": 8484973.200000001,
+        "distillations": 1650.0,
+        "total": 18259919.300000004
+      },
+      "storage": {
+        "vector_bytes_per_node": 6152,
+        "raw_vector_payload_gib": 0.2357,
+        "heap_gib": 0.2774,
+        "hnsw_index_gib": {
+          "low": 0.2399,
+          "central": 0.2418,
+          "high": 0.2456
+        },
+        "secondary_indexes_gib": 0.15,
+        "new_storage_gb": {
+          "low": 0.705,
+          "central": 0.707,
+          "high": 0.712
+        },
+        "hnsw_build_maintenance_work_mem_note": 0.241787351667881
+      },
+      "current_db": {
+        "corpus_table_bytes": 1280868352,
+        "corpus_table_gib": 1.1929,
+        "full_project_db_note": "Unmeasured (537 relations incl. larger Banodoco app); true total is larger. Measure before backfill.",
+        "total_db_after_central_gib": 1.8518,
+        "extra_storage_gb": 0.0
+      },
+      "spend": {
+        "backfill_cost_3small_usd": 0.3652,
+        "backfill_cost_3large_usd": 2.3738,
+        "per_query_embedding_cost_usd": 4.0000000000000003e-07,
+        "monthly_query_cost_usd": 0.1
+      },
+      "edge": {
+        "monthly_invocations": 258640,
+        "included_invocations": 2000000,
+        "monthly_cost_usd": 0.0
+      },
+      "compute": {
+        "hnsw_index_central_gib": 0.2418,
+        "needed_ram_gib": 0.3022,
+        "baseline_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1,
+          "note": "Included Micro (covered by the $10 Pro credit). Index served disk-cached; meets capacity, warm p95 unproven.",
+          "incremental_over_pro_credit_usd": 0.0
+        },
+        "recommended_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1,
+          "note": "Smallest tier holding the HNSW index in RAM (latency-safe).",
+          "incremental_over_pro_credit_usd": 0.0
+        },
+        "minimal_ram_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1
+        }
+      },
+      "monthly_steady_state_usd": {
+        "baseline_disk_cached": 0.1,
+        "ram_resident": 0.1,
+        "components": {
+          "extra_storage": 0.0,
+          "compute_incremental_ram_resident": 0.0,
+          "edge": 0.0,
+          "query_embeddings": 0.1
+        }
+      },
+      "gate_verdicts": {
+        "initial_spend_25usd": {
+          "verdict": "PASS",
+          "value_usd": 0.3652,
+          "limit_usd": 25.0
+        },
+        "new_storage_12gb": {
+          "verdict": "PASS",
+          "value_gb_central": 0.707,
+          "value_gb_high_overhead": 0.712,
+          "limit_gb": 12.0,
+          "central_verdict": "PASS",
+          "high_overhead_verdict": "PASS"
+        },
+        "monthly_incremental_50usd": {
+          "verdict": "PASS",
+          "value_baseline_disk_cached_usd": 0.1,
+          "value_ram_resident_usd": 0.1,
+          "limit_usd": 50.0
+        }
+      }
+    },
+    {
+      "id": "full_1536",
+      "dimension": 1536,
+      "scale": "full",
+      "label": "Full eligible corpus (messages=1,245,006 + resources + workflow Python + distillations) @ 1536-d",
+      "vectors": {
+        "messages": 1245006,
+        "resource_prose": 19313,
+        "workflow_python": 16872,
+        "distillations": 11,
+        "total": 1281202
+      },
+      "backfill_tokens": {
+        "messages": 23655114.0,
+        "resource_prose": 9678296.100000001,
+        "workflow_python": 8484973.200000001,
+        "distillations": 1650.0,
+        "total": 41820033.300000004
+      },
+      "storage": {
+        "vector_bytes_per_node": 6152,
+        "raw_vector_payload_gib": 7.3311,
+        "heap_gib": 7.613,
+        "hnsw_index_gib": {
+          "low": 7.46,
+          "central": 7.5196,
+          "high": 7.6389
+        },
+        "secondary_indexes_gib": 0.15,
+        "new_storage_gb": {
+          "low": 16.334,
+          "central": 16.399,
+          "high": 16.527
+        },
+        "hnsw_build_maintenance_work_mem_note": 7.519624199718237
+      },
+      "current_db": {
+        "corpus_table_bytes": 1280868352,
+        "corpus_table_gib": 1.1929,
+        "full_project_db_note": "Unmeasured (537 relations incl. larger Banodoco app); true total is larger. Measure before backfill.",
+        "total_db_after_central_gib": 16.4652,
+        "extra_storage_gb": 9.6794
+      },
+      "spend": {
+        "backfill_cost_3small_usd": 0.8364,
+        "backfill_cost_3large_usd": 5.4366,
+        "per_query_embedding_cost_usd": 4.0000000000000003e-07,
+        "monthly_query_cost_usd": 0.1
+      },
+      "edge": {
+        "monthly_invocations": 258640,
+        "included_invocations": 2000000,
+        "monthly_cost_usd": 0.0
+      },
+      "compute": {
+        "hnsw_index_central_gib": 7.5196,
+        "needed_ram_gib": 9.3995,
+        "baseline_tier": {
+          "name": "Micro",
+          "price": 10,
+          "ram_gb": 1,
+          "note": "Included Micro (covered by the $10 Pro credit). Index served disk-cached; meets capacity, warm p95 unproven.",
+          "incremental_over_pro_credit_usd": 0.0
+        },
+        "recommended_tier": {
+          "name": "XL",
+          "price": 210,
+          "ram_gb": 16,
+          "note": "Smallest tier holding the HNSW index in RAM (latency-safe).",
+          "incremental_over_pro_credit_usd": 200.0
+        },
+        "minimal_ram_tier": {
+          "name": "Large",
+          "price": 110,
+          "ram_gb": 8
+        }
+      },
+      "monthly_steady_state_usd": {
+        "baseline_disk_cached": 1.31,
+        "ram_resident": 201.31,
+        "components": {
+          "extra_storage": 1.21,
+          "compute_incremental_ram_resident": 200.0,
+          "edge": 0.0,
+          "query_embeddings": 0.1
+        }
+      },
+      "gate_verdicts": {
+        "initial_spend_25usd": {
+          "verdict": "PASS",
+          "value_usd": 0.8364,
+          "limit_usd": 25.0
+        },
+        "new_storage_12gb": {
+          "verdict": "FAIL",
+          "value_gb_central": 16.399,
+          "value_gb_high_overhead": 16.527,
+          "limit_gb": 12.0,
+          "central_verdict": "FAIL",
+          "high_overhead_verdict": "FAIL"
+        },
+        "monthly_incremental_50usd": {
+          "verdict": "CONDITIONAL",
+          "value_baseline_disk_cached_usd": 1.31,
+          "value_ram_resident_usd": 201.31,
+          "limit_usd": 50.0
+        }
+      }
+    }
+  ]
+}

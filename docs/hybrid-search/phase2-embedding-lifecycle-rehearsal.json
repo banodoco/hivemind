@@ -1,0 +1,87 @@
+{
+  "task": "2.7-2.10-embedding-lifecycle-rehearsal",
+  "cluster_isolated": true,
+  "active_contract_id": 6368594834396668537,
+  "migrations_applied": [
+    "025_embedding_jobs.sql",
+    "026_embedding_job_rpc.sql",
+    "027_embedding_worker_surface.sql",
+    "028_embedding_worker_cron.sql",
+    "029_embedding_cleanup.sql"
+  ],
+  "triggers_2_7": {
+    "message_insert_one_embed": true,
+    "message_update_reembed": true,
+    "message_noop_update_no_extra_job": true,
+    "message_dedup_one_pending": true,
+    "message_soft_delete_drop": true,
+    "workflow_insert_two_streams": true,
+    "workflow_insert_kinds_embed": true,
+    "python_change_only_python_stream": true,
+    "distillation_approved_embed": true,
+    "distillation_rejected_no_job": true,
+    "distillation_status_to_rejected_drop": true
+  },
+  "concurrency_2_8": {
+    "seeded_pool_40": true,
+    "concurrency_no_double_claim": true,
+    "concurrency_all_processed": true,
+    "concurrency_no_errors": true,
+    "concurrency_all_done": true
+  },
+  "state_machine_2_8": {
+    "claim_empty_when_none_pending": true,
+    "bounded_retries_then_failed": true,
+    "attempts_never_exceed_max_plus_one": true,
+    "nonretryable_immediate_failed": true,
+    "stale_lease_recovered": true,
+    "cancel_makes_terminal": true,
+    "cancelled_not_claimable": true,
+    "reenqueue_after_cancel_is_fresh": true,
+    "change_while_processing_enqueues_fresh": true
+  },
+  "worker_surface_2_9": {
+    "chunk_text_single_for_short": true,
+    "chunk_text_multi_for_long": true,
+    "chunk_text_deterministic": true,
+    "payload_message_available": true,
+    "payload_deleted_unavailable": true,
+    "payload_workflow_python_available": true,
+    "upsert_writes_one": true,
+    "upsert_atomic_replace": true,
+    "upsert_rejects_wrong_dimension": true,
+    "drop_removes_rows": true
+  },
+  "protocol_2_9": {
+    "protocol_claimed_target_job": true,
+    "protocol_payload_returned_chunks": true,
+    "protocol_vectors_384d": true,
+    "protocol_upsert_wrote_chunks": true,
+    "protocol_job_done": true,
+    "protocol_vectors_stored": true
+  },
+  "cleanup_2_10": {
+    "ineligible_removed_count": true,
+    "ineligible_message_gone": true,
+    "ineligible_distillation_gone": true,
+    "ineligible_resource_gone": true,
+    "eligible_message_kept": true,
+    "deactivate_drops_all_reps": true,
+    "replacement_switch_ok": true,
+    "old_contract_superseded": true,
+    "old_contract_vectors_dropped": true,
+    "active_index_preserved": true,
+    "drop_active_contract_refused": true
+  },
+  "verdict": {
+    "all_pass": true,
+    "sections": [
+      "triggers_2_7",
+      "concurrency_2_8",
+      "state_machine_2_8",
+      "worker_surface_2_9",
+      "protocol_2_9",
+      "cleanup_2_10"
+    ]
+  }
+}

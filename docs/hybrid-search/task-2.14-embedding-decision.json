@@ -1,0 +1,1784 @@
+{
+  "decision_policy": {
+    "disqualify_on": [
+      "malformed_or_wrong_dimension_vector",
+      "provider_failure_prevented_complete_evaluation",
+      "missing_judged_identity",
+      "duplicate_entity_after_best_chunk_collapse",
+      "projected_spend_above_cap",
+      "projected_full_corpus_storage_above_gate"
+    ],
+    "spend_cap_usd": 25.0,
+    "storage_gate_gb": 12.0,
+    "selection_tiebreak": [
+      "overall_recall_at_10",
+      "mrr",
+      "ndcg_at_10",
+      "workflow_code_recall_at_10",
+      "long_resource_chunk_recall_at_10",
+      "lower_standalone_candidate_cost"
+    ],
+    "note": "capacity-FAIL dimensions are evaluated + reported but not selectable",
+    "selection_tiebreak_note": "the cost axis is the deterministic order-independent standalone candidate cost, NOT the order-dependent incremental cache-miss cost"
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "name": "384-small",
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 384,
+        "canonicalization_version": 1,
+        "chunking_version": 2,
+        "chunk_config_version": 1,
+        "prose": {
+          "target_tokens": 512,
+          "overlap_tokens": 50
+        },
+        "python": {
+          "target_tokens": 512,
+          "overlap_tokens": 50
+        },
+        "chunk_config_identity": "chunk_config\u001fv1\u001fprose#512/50\u001fworkflow_python#512/50",
+        "base_contract_id_dimension_only": "6368594834396668537",
+        "base_contract_id_dimension_only_note": "historical dimension-only ContractSpec id; NOT sufficient to distinguish small vs large chunk configurations",
+        "eval_contract_id": "12e19cdb566b8744"
+      },
+      "capacity": {
+        "dimension": 384,
+        "full_corpus_storage_gb": 4.59,
+        "verdict": "PASS"
+      },
+      "status": "evaluated",
+      "disqualify_reasons": [],
+      "capacity_fail": false,
+      "eligible_for_selection": true,
+      "overall": {
+        "recall@1": 0.25,
+        "recall@5": 0.3125,
+        "recall@10": 0.403846,
+        "mrr": 0.315858,
+        "ndcg@10": 0.32707,
+        "map": 0.284938,
+        "n": 104
+      },
+      "by_category": {
+        "exact_name": {
+          "recall@1": 0.02,
+          "recall@5": 0.02,
+          "recall@10": 0.1,
+          "mrr": 0.051429,
+          "ndcg@10": 0.058153,
+          "map": 0.031429,
+          "n": 25
+        },
+        "best_is_resource": {
+          "recall@1": 0.5,
+          "recall@5": 0.625,
+          "recall@10": 0.6875,
+          "mrr": 0.540625,
+          "ndcg@10": 0.579397,
+          "map": 0.532813,
+          "n": 8
+        },
+        "spelling_variant": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "ndcg@10": 0.0,
+          "map": 0.0,
+          "n": 8
+        },
+        "code_fragment": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "ndcg@10": 0.0,
+          "map": 0.0,
+          "n": 6
+        },
+        "best_is_distillation": {
+          "recall@1": 0.441176,
+          "recall@5": 0.441176,
+          "recall@10": 0.588235,
+          "mrr": 0.554972,
+          "ndcg@10": 0.554166,
+          "map": 0.461835,
+          "n": 17
+        },
+        "cross_source": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.416667,
+          "mrr": 0.548611,
+          "ndcg@10": 0.50339,
+          "map": 0.274306,
+          "n": 6
+        },
+        "workflow_code": {
+          "recall@1": 0.28125,
+          "recall@5": 0.3125,
+          "recall@10": 0.359375,
+          "mrr": 0.298996,
+          "ndcg@10": 0.306245,
+          "map": 0.295945,
+          "n": 32
+        },
+        "timeout_prone": {
+          "recall@1": 0.0,
+          "recall@5": 0.166667,
+          "recall@10": 0.166667,
+          "mrr": 0.111111,
+          "ndcg@10": 0.131192,
+          "map": 0.055556,
+          "n": 3
+        },
+        "workflow_python_evidence": {
+          "recall@1": 0.75,
+          "recall@5": 0.75,
+          "recall@10": 0.75,
+          "mrr": 0.75,
+          "ndcg@10": 0.75,
+          "map": 0.75,
+          "n": 8
+        },
+        "paraphrase": {
+          "recall@1": 0.35,
+          "recall@5": 0.35,
+          "recall@10": 0.45,
+          "mrr": 0.414286,
+          "ndcg@10": 0.425065,
+          "map": 0.364286,
+          "n": 10
+        },
+        "multi_term": {
+          "recall@1": 0.2,
+          "recall@5": 0.45,
+          "recall@10": 0.55,
+          "mrr": 0.299167,
+          "ndcg@10": 0.352657,
+          "map": 0.2825,
+          "n": 10
+        },
+        "settings": {
+          "recall@1": 0.571429,
+          "recall@5": 0.714286,
+          "recall@10": 0.857143,
+          "mrr": 0.660714,
+          "ndcg@10": 0.706628,
+          "map": 0.660714,
+          "n": 7
+        },
+        "best_is_message": {
+          "recall@1": 0.294118,
+          "recall@5": 0.470588,
+          "recall@10": 0.588235,
+          "mrr": 0.437908,
+          "ndcg@10": 0.445056,
+          "map": 0.390523,
+          "n": 17
+        },
+        "snowflake": {
+          "recall@1": 0.305556,
+          "recall@5": 0.472222,
+          "recall@10": 0.583333,
+          "mrr": 0.469136,
+          "ndcg@10": 0.464061,
+          "map": 0.396605,
+          "n": 18
+        },
+        "named_author": {
+          "recall@1": 0.375,
+          "recall@5": 0.75,
+          "recall@10": 0.75,
+          "mrr": 0.583333,
+          "ndcg@10": 0.54409,
+          "map": 0.520833,
+          "n": 4
+        },
+        "selective_filter": {
+          "recall@1": 0.272727,
+          "recall@5": 0.454545,
+          "recall@10": 0.636364,
+          "mrr": 0.449495,
+          "ndcg@10": 0.448638,
+          "map": 0.376263,
+          "n": 11
+        },
+        "channel_scoped": {
+          "recall@1": 0.125,
+          "recall@5": 0.125,
+          "recall@10": 0.625,
+          "mrr": 0.319444,
+          "ndcg@10": 0.341271,
+          "map": 0.222222,
+          "n": 4
+        },
+        "time_scoped": {
+          "recall@1": 0.333333,
+          "recall@5": 0.5,
+          "recall@10": 0.5,
+          "mrr": 0.444444,
+          "ndcg@10": 0.464526,
+          "map": 0.388889,
+          "n": 3
+        },
+        "long_resource_chunk": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.25,
+          "ndcg@10": 0.25,
+          "map": 0.25,
+          "n": 4
+        },
+        "workflow_only": {
+          "recall@1": 0.1,
+          "recall@5": 0.1,
+          "recall@10": 0.3,
+          "mrr": 0.242857,
+          "ndcg@10": 0.224098,
+          "map": 0.133333,
+          "n": 5
+        },
+        "single_workflow": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 6
+        },
+        "pending_status": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 2
+        }
+      },
+      "by_entity_kind": {
+        "resource": {
+          "recall@1": 0.198529,
+          "recall@5": 0.242647,
+          "recall@10": 0.308824,
+          "mrr": 0.228116,
+          "ndcg@10": 0.24098,
+          "map": 0.219328,
+          "n": 68
+        },
+        "distillation": {
+          "recall@1": 0.461538,
+          "recall@5": 0.461538,
+          "recall@10": 0.615385,
+          "mrr": 0.482143,
+          "ndcg@10": 0.511446,
+          "map": 0.482143,
+          "n": 13
+        },
+        "mixed": {
+          "recall@1": 0.25,
+          "recall@5": 0.333333,
+          "recall@10": 0.5,
+          "mrr": 0.604167,
+          "ndcg@10": 0.568986,
+          "map": 0.302083,
+          "n": 6
+        },
+        "message": {
+          "recall@1": 0.294118,
+          "recall@5": 0.470588,
+          "recall@10": 0.588235,
+          "mrr": 0.437908,
+          "ndcg@10": 0.445056,
+          "map": 0.390523,
+          "n": 17
+        }
+      },
+      "workflow_code_recall_at_10": 0.359375,
+      "long_resource_chunk_recall_at_10": 0.25,
+      "counts": {
+        "n_total": 112,
+        "n_judged": 104,
+        "n_no_hit": 8,
+        "zero_result": 1,
+        "timeouts": 0,
+        "errors": 0,
+        "failures": 0,
+        "zero_result_rate": 0.008928571428571428,
+        "no_hit_satisfied_rate": 0.125,
+        "timeout_rate": 0.0,
+        "error_rate": 0.0,
+        "failure_rate": 0.0
+      },
+      "cohort_counts": {
+        "n_entities": 7769,
+        "n_chunks": 23138,
+        "n_unique_embeddable_texts": 22850,
+        "n_duplicate_chunks_collapsed": 288,
+        "chunks_by_representation": {
+          "prose": 7873,
+          "workflow_python": 15265
+        },
+        "max_chunk_index": 692,
+        "multi_chunk_entities": 785
+      },
+      "provider_account": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 384,
+        "api_requests": 103,
+        "embedded_inputs": 22951,
+        "input_tokens_from_usage": 7911142,
+        "cache_hits": 0,
+        "cache_misses": 22951,
+        "price_per_1m_tokens_usd": 0.02,
+        "cost_usd": 0.158223
+      },
+      "latency": {
+        "p50_ms": 11.777,
+        "p95_ms": 22.172,
+        "mean_ms": 19.498,
+        "n": 112,
+        "method": "local exact cosine (numpy); NOT HNSW/SQL/Edge latency",
+        "full_eval_wall_ms": 2187.055
+      },
+      "later_chunk_diagnostic": {
+        "available": false,
+        "reason": "raw_eval3_ranking_provenance_not_persisted",
+        "later_chunk_hit_rate": null,
+        "note": "eval3 per-case rankings persist only entity keys, not matched_chunk_index, so later_chunk_hit_rate is not recomputable; long_resource_chunk_recall_at_10 is the frozen selection signal"
+      },
+      "selection_cost_usd": 0.190498,
+      "selection_state": {
+        "selected": true,
+        "active": false,
+        "evaluation_only": false,
+        "production_activated": false,
+        "non_selection_reason": null
+      }
+    },
+    {
+      "candidate": {
+        "name": "384-large",
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 384,
+        "canonicalization_version": 1,
+        "chunking_version": 2,
+        "chunk_config_version": 1,
+        "prose": {
+          "target_tokens": 1024,
+          "overlap_tokens": 100
+        },
+        "python": {
+          "target_tokens": 2048,
+          "overlap_tokens": 100
+        },
+        "chunk_config_identity": "chunk_config\u001fv1\u001fprose#1024/100\u001fworkflow_python#2048/100",
+        "base_contract_id_dimension_only": "6368594834396668537",
+        "base_contract_id_dimension_only_note": "historical dimension-only ContractSpec id; NOT sufficient to distinguish small vs large chunk configurations",
+        "eval_contract_id": "bf088d46c28e9ed9"
+      },
+      "capacity": {
+        "dimension": 384,
+        "full_corpus_storage_gb": 4.59,
+        "verdict": "PASS"
+      },
+      "status": "evaluated",
+      "disqualify_reasons": [],
+      "capacity_fail": false,
+      "eligible_for_selection": true,
+      "overall": {
+        "recall@1": 0.235577,
+        "recall@5": 0.293269,
+        "recall@10": 0.403846,
+        "mrr": 0.298224,
+        "ndcg@10": 0.314581,
+        "map": 0.272546,
+        "n": 104
+      },
+      "by_category": {
+        "exact_name": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.12,
+          "mrr": 0.018651,
+          "ndcg@10": 0.039285,
+          "map": 0.019645,
+          "n": 25
+        },
+        "best_is_resource": {
+          "recall@1": 0.5,
+          "recall@5": 0.625,
+          "recall@10": 0.6875,
+          "mrr": 0.540625,
+          "ndcg@10": 0.579397,
+          "map": 0.532813,
+          "n": 8
+        },
+        "spelling_variant": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.008929,
+          "ndcg@10": 0.0,
+          "map": 0.004464,
+          "n": 8
+        },
+        "code_fragment": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "ndcg@10": 0.0,
+          "map": 0.0,
+          "n": 6
+        },
+        "best_is_distillation": {
+          "recall@1": 0.441176,
+          "recall@5": 0.470588,
+          "recall@10": 0.588235,
+          "mrr": 0.561275,
+          "ndcg@10": 0.558959,
+          "map": 0.465686,
+          "n": 17
+        },
+        "cross_source": {
+          "recall@1": 0.25,
+          "recall@5": 0.333333,
+          "recall@10": 0.416667,
+          "mrr": 0.5625,
+          "ndcg@10": 0.51316,
+          "map": 0.28125,
+          "n": 6
+        },
+        "workflow_code": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.3125,
+          "mrr": 0.261627,
+          "ndcg@10": 0.269265,
+          "map": 0.261627,
+          "n": 32
+        },
+        "timeout_prone": {
+          "recall@1": 0.0,
+          "recall@5": 0.166667,
+          "recall@10": 0.166667,
+          "mrr": 0.111111,
+          "ndcg@10": 0.131192,
+          "map": 0.055556,
+          "n": 3
+        },
+        "workflow_python_evidence": {
+          "recall@1": 0.625,
+          "recall@5": 0.625,
+          "recall@10": 0.625,
+          "mrr": 0.631579,
+          "ndcg@10": 0.625,
+          "map": 0.631579,
+          "n": 8
+        },
+        "paraphrase": {
+          "recall@1": 0.35,
+          "recall@5": 0.35,
+          "recall@10": 0.45,
+          "mrr": 0.416667,
+          "ndcg@10": 0.427353,
+          "map": 0.366667,
+          "n": 10
+        },
+        "multi_term": {
+          "recall@1": 0.2,
+          "recall@5": 0.45,
+          "recall@10": 0.65,
+          "mrr": 0.299444,
+          "ndcg@10": 0.38012,
+          "map": 0.282778,
+          "n": 10
+        },
+        "settings": {
+          "recall@1": 0.571429,
+          "recall@5": 0.714286,
+          "recall@10": 0.857143,
+          "mrr": 0.660714,
+          "ndcg@10": 0.706628,
+          "map": 0.660714,
+          "n": 7
+        },
+        "best_is_message": {
+          "recall@1": 0.294118,
+          "recall@5": 0.470588,
+          "recall@10": 0.588235,
+          "mrr": 0.437908,
+          "ndcg@10": 0.445056,
+          "map": 0.390523,
+          "n": 17
+        },
+        "snowflake": {
+          "recall@1": 0.305556,
+          "recall@5": 0.472222,
+          "recall@10": 0.583333,
+          "mrr": 0.469136,
+          "ndcg@10": 0.464061,
+          "map": 0.396605,
+          "n": 18
+        },
+        "named_author": {
+          "recall@1": 0.375,
+          "recall@5": 0.75,
+          "recall@10": 0.75,
+          "mrr": 0.583333,
+          "ndcg@10": 0.54409,
+          "map": 0.520833,
+          "n": 4
+        },
+        "selective_filter": {
+          "recall@1": 0.272727,
+          "recall@5": 0.454545,
+          "recall@10": 0.636364,
+          "mrr": 0.449495,
+          "ndcg@10": 0.448638,
+          "map": 0.376263,
+          "n": 11
+        },
+        "channel_scoped": {
+          "recall@1": 0.125,
+          "recall@5": 0.125,
+          "recall@10": 0.625,
+          "mrr": 0.319444,
+          "ndcg@10": 0.341271,
+          "map": 0.222222,
+          "n": 4
+        },
+        "time_scoped": {
+          "recall@1": 0.333333,
+          "recall@5": 0.5,
+          "recall@10": 0.5,
+          "mrr": 0.444444,
+          "ndcg@10": 0.464526,
+          "map": 0.388889,
+          "n": 3
+        },
+        "long_resource_chunk": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.25,
+          "ndcg@10": 0.25,
+          "map": 0.25,
+          "n": 4
+        },
+        "workflow_only": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.2,
+          "mrr": 0.039683,
+          "ndcg@10": 0.066667,
+          "map": 0.044653,
+          "n": 5
+        },
+        "single_workflow": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 6
+        },
+        "pending_status": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 2
+        }
+      },
+      "by_entity_kind": {
+        "resource": {
+          "recall@1": 0.176471,
+          "recall@5": 0.205882,
+          "recall@10": 0.308824,
+          "mrr": 0.199572,
+          "ndcg@10": 0.22068,
+          "map": 0.199412,
+          "n": 68
+        },
+        "distillation": {
+          "recall@1": 0.461538,
+          "recall@5": 0.461538,
+          "recall@10": 0.615385,
+          "mrr": 0.483974,
+          "ndcg@10": 0.513206,
+          "map": 0.483974,
+          "n": 13
+        },
+        "mixed": {
+          "recall@1": 0.25,
+          "recall@5": 0.416667,
+          "recall@10": 0.5,
+          "mrr": 0.618056,
+          "ndcg@10": 0.578756,
+          "map": 0.309028,
+          "n": 6
+        },
+        "message": {
+          "recall@1": 0.294118,
+          "recall@5": 0.470588,
+          "recall@10": 0.588235,
+          "mrr": 0.437908,
+          "ndcg@10": 0.445056,
+          "map": 0.390523,
+          "n": 17
+        }
+      },
+      "workflow_code_recall_at_10": 0.3125,
+      "long_resource_chunk_recall_at_10": 0.25,
+      "counts": {
+        "n_total": 112,
+        "n_judged": 104,
+        "n_no_hit": 8,
+        "zero_result": 1,
+        "timeouts": 0,
+        "errors": 0,
+        "failures": 0,
+        "zero_result_rate": 0.008928571428571428,
+        "no_hit_satisfied_rate": 0.125,
+        "timeout_rate": 0.0,
+        "error_rate": 0.0,
+        "failure_rate": 0.0
+      },
+      "cohort_counts": {
+        "n_entities": 7769,
+        "n_chunks": 11349,
+        "n_unique_embeddable_texts": 11248,
+        "n_duplicate_chunks_collapsed": 101,
+        "chunks_by_representation": {
+          "prose": 7273,
+          "workflow_python": 4076
+        },
+        "max_chunk_index": 174,
+        "multi_chunk_entities": 238
+      },
+      "provider_account": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 384,
+        "api_requests": 85,
+        "embedded_inputs": 4513,
+        "input_tokens_from_usage": 6402213,
+        "cache_hits": 6836,
+        "cache_misses": 4513,
+        "price_per_1m_tokens_usd": 0.02,
+        "cost_usd": 0.128044
+      },
+      "latency": {
+        "p50_ms": 7.29,
+        "p95_ms": 10.63,
+        "mean_ms": 13.365,
+        "n": 112,
+        "method": "local exact cosine (numpy); NOT HNSW/SQL/Edge latency",
+        "full_eval_wall_ms": 1499.507
+      },
+      "later_chunk_diagnostic": {
+        "available": false,
+        "reason": "raw_eval3_ranking_provenance_not_persisted",
+        "later_chunk_hit_rate": null,
+        "note": "eval3 per-case rankings persist only entity keys, not matched_chunk_index, so later_chunk_hit_rate is not recomputable; long_resource_chunk_recall_at_10 is the frozen selection signal"
+      },
+      "selection_cost_usd": 0.184974,
+      "selection_state": {
+        "selected": false,
+        "active": false,
+        "evaluation_only": true,
+        "production_activated": false,
+        "non_selection_reason": "lower priority on frozen tiebreak (mrr 0.298224 < 0.315858; ndcg@10 0.314581 < 0.32707; lower workflow_code_recall@10) [384-large]"
+      }
+    },
+    {
+      "candidate": {
+        "name": "1536-small",
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 1536,
+        "canonicalization_version": 1,
+        "chunking_version": 2,
+        "chunk_config_version": 1,
+        "prose": {
+          "target_tokens": 512,
+          "overlap_tokens": 50
+        },
+        "python": {
+          "target_tokens": 512,
+          "overlap_tokens": 50
+        },
+        "chunk_config_identity": "chunk_config\u001fv1\u001fprose#512/50\u001fworkflow_python#512/50",
+        "base_contract_id_dimension_only": "201336985699651598",
+        "base_contract_id_dimension_only_note": "historical dimension-only ContractSpec id; NOT sufficient to distinguish small vs large chunk configurations",
+        "eval_contract_id": "b9e84f90ca358ecd"
+      },
+      "capacity": {
+        "dimension": 1536,
+        "full_corpus_storage_gb": 16.4,
+        "verdict": "FAIL"
+      },
+      "status": "evaluated",
+      "disqualify_reasons": [
+        "projected_full_corpus_storage_above_gate"
+      ],
+      "capacity_fail": true,
+      "eligible_for_selection": false,
+      "overall": {
+        "recall@1": 0.254808,
+        "recall@5": 0.346154,
+        "recall@10": 0.442308,
+        "mrr": 0.341499,
+        "ndcg@10": 0.354239,
+        "map": 0.307686,
+        "n": 104
+      },
+      "by_category": {
+        "exact_name": {
+          "recall@1": 0.02,
+          "recall@5": 0.02,
+          "recall@10": 0.14,
+          "mrr": 0.061587,
+          "ndcg@10": 0.07271,
+          "map": 0.039008,
+          "n": 25
+        },
+        "best_is_resource": {
+          "recall@1": 0.5,
+          "recall@5": 0.75,
+          "recall@10": 0.8125,
+          "mrr": 0.616667,
+          "ndcg@10": 0.669809,
+          "map": 0.610417,
+          "n": 8
+        },
+        "spelling_variant": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0625,
+          "mrr": 0.017857,
+          "ndcg@10": 0.032798,
+          "map": 0.008929,
+          "n": 8
+        },
+        "code_fragment": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.008333,
+          "ndcg@10": 0.0,
+          "map": 0.008333,
+          "n": 6
+        },
+        "best_is_distillation": {
+          "recall@1": 0.382353,
+          "recall@5": 0.529412,
+          "recall@10": 0.647059,
+          "mrr": 0.567227,
+          "ndcg@10": 0.576985,
+          "map": 0.464286,
+          "n": 17
+        },
+        "cross_source": {
+          "recall@1": 0.25,
+          "recall@5": 0.333333,
+          "recall@10": 0.416667,
+          "mrr": 0.6,
+          "ndcg@10": 0.535968,
+          "map": 0.3,
+          "n": 6
+        },
+        "workflow_code": {
+          "recall@1": 0.28125,
+          "recall@5": 0.28125,
+          "recall@10": 0.359375,
+          "mrr": 0.296484,
+          "ndcg@10": 0.304292,
+          "map": 0.293229,
+          "n": 32
+        },
+        "timeout_prone": {
+          "recall@1": 0.0,
+          "recall@5": 0.166667,
+          "recall@10": 0.166667,
+          "mrr": 0.111111,
+          "ndcg@10": 0.131192,
+          "map": 0.055556,
+          "n": 3
+        },
+        "workflow_python_evidence": {
+          "recall@1": 0.75,
+          "recall@5": 0.75,
+          "recall@10": 0.75,
+          "mrr": 0.75,
+          "ndcg@10": 0.75,
+          "map": 0.75,
+          "n": 8
+        },
+        "paraphrase": {
+          "recall@1": 0.35,
+          "recall@5": 0.45,
+          "recall@10": 0.55,
+          "mrr": 0.447619,
+          "ndcg@10": 0.475065,
+          "map": 0.397619,
+          "n": 10
+        },
+        "multi_term": {
+          "recall@1": 0.3,
+          "recall@5": 0.55,
+          "recall@10": 0.65,
+          "mrr": 0.429167,
+          "ndcg@10": 0.483997,
+          "map": 0.4125,
+          "n": 10
+        },
+        "settings": {
+          "recall@1": 0.428571,
+          "recall@5": 0.714286,
+          "recall@10": 0.857143,
+          "mrr": 0.571429,
+          "ndcg@10": 0.64102,
+          "map": 0.571429,
+          "n": 7
+        },
+        "best_is_message": {
+          "recall@1": 0.323529,
+          "recall@5": 0.529412,
+          "recall@10": 0.588235,
+          "mrr": 0.477696,
+          "ndcg@10": 0.465264,
+          "map": 0.425858,
+          "n": 17
+        },
+        "snowflake": {
+          "recall@1": 0.333333,
+          "recall@5": 0.527778,
+          "recall@10": 0.583333,
+          "mrr": 0.506713,
+          "ndcg@10": 0.483147,
+          "map": 0.429977,
+          "n": 18
+        },
+        "named_author": {
+          "recall@1": 0.375,
+          "recall@5": 0.75,
+          "recall@10": 0.75,
+          "mrr": 0.583333,
+          "ndcg@10": 0.54409,
+          "map": 0.520833,
+          "n": 4
+        },
+        "selective_filter": {
+          "recall@1": 0.318182,
+          "recall@5": 0.545455,
+          "recall@10": 0.636364,
+          "mrr": 0.526136,
+          "ndcg@10": 0.491771,
+          "map": 0.446023,
+          "n": 11
+        },
+        "channel_scoped": {
+          "recall@1": 0.125,
+          "recall@5": 0.375,
+          "recall@10": 0.625,
+          "mrr": 0.347917,
+          "ndcg@10": 0.361493,
+          "map": 0.322917,
+          "n": 4
+        },
+        "time_scoped": {
+          "recall@1": 0.5,
+          "recall@5": 0.5,
+          "recall@10": 0.5,
+          "mrr": 0.6875,
+          "ndcg@10": 0.595718,
+          "map": 0.510417,
+          "n": 3
+        },
+        "long_resource_chunk": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.2625,
+          "ndcg@10": 0.25,
+          "map": 0.2625,
+          "n": 4
+        },
+        "workflow_only": {
+          "recall@1": 0.1,
+          "recall@5": 0.1,
+          "recall@10": 0.3,
+          "mrr": 0.241071,
+          "ndcg@10": 0.224098,
+          "map": 0.145238,
+          "n": 5
+        },
+        "single_workflow": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 6
+        },
+        "pending_status": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 2
+        }
+      },
+      "by_entity_kind": {
+        "resource": {
+          "recall@1": 0.213235,
+          "recall@5": 0.257353,
+          "recall@10": 0.352941,
+          "mrr": 0.254689,
+          "ndcg@10": 0.272081,
+          "map": 0.244856,
+          "n": 68
+        },
+        "distillation": {
+          "recall@1": 0.384615,
+          "recall@5": 0.538462,
+          "recall@10": 0.692308,
+          "mrr": 0.472527,
+          "ndcg@10": 0.524652,
+          "map": 0.472527,
+          "n": 13
+        },
+        "mixed": {
+          "recall@1": 0.25,
+          "recall@5": 0.416667,
+          "recall@10": 0.5,
+          "mrr": 0.655556,
+          "ndcg@10": 0.601564,
+          "map": 0.327778,
+          "n": 6
+        },
+        "message": {
+          "recall@1": 0.323529,
+          "recall@5": 0.529412,
+          "recall@10": 0.588235,
+          "mrr": 0.477696,
+          "ndcg@10": 0.465264,
+          "map": 0.425858,
+          "n": 17
+        }
+      },
+      "workflow_code_recall_at_10": 0.359375,
+      "long_resource_chunk_recall_at_10": 0.25,
+      "counts": {
+        "n_total": 112,
+        "n_judged": 104,
+        "n_no_hit": 8,
+        "zero_result": 1,
+        "timeouts": 0,
+        "errors": 0,
+        "failures": 0,
+        "zero_result_rate": 0.008928571428571428,
+        "no_hit_satisfied_rate": 0.125,
+        "timeout_rate": 0.0,
+        "error_rate": 0.0,
+        "failure_rate": 0.0
+      },
+      "cohort_counts": {
+        "n_entities": 7769,
+        "n_chunks": 23138,
+        "n_unique_embeddable_texts": 22850,
+        "n_duplicate_chunks_collapsed": 288,
+        "chunks_by_representation": {
+          "prose": 7873,
+          "workflow_python": 15265
+        },
+        "max_chunk_index": 692,
+        "multi_chunk_entities": 785
+      },
+      "provider_account": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 1536,
+        "api_requests": 99,
+        "embedded_inputs": 22951,
+        "input_tokens_from_usage": 7911142,
+        "cache_hits": 0,
+        "cache_misses": 22951,
+        "price_per_1m_tokens_usd": 0.02,
+        "cost_usd": 0.158223
+      },
+      "latency": {
+        "p50_ms": 13.913,
+        "p95_ms": 24.851,
+        "mean_ms": 27.108,
+        "n": 112,
+        "method": "local exact cosine (numpy); NOT HNSW/SQL/Edge latency",
+        "full_eval_wall_ms": 3040.536
+      },
+      "later_chunk_diagnostic": {
+        "available": false,
+        "reason": "raw_eval3_ranking_provenance_not_persisted",
+        "later_chunk_hit_rate": null,
+        "note": "eval3 per-case rankings persist only entity keys, not matched_chunk_index, so later_chunk_hit_rate is not recomputable; long_resource_chunk_recall_at_10 is the frozen selection signal"
+      },
+      "selection_cost_usd": 0.190498,
+      "selection_state": {
+        "selected": false,
+        "active": false,
+        "evaluation_only": true,
+        "production_activated": false,
+        "non_selection_reason": "capacity-disqualified (projected_full_corpus_storage_above_gate)"
+      }
+    },
+    {
+      "candidate": {
+        "name": "1536-large",
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 1536,
+        "canonicalization_version": 1,
+        "chunking_version": 2,
+        "chunk_config_version": 1,
+        "prose": {
+          "target_tokens": 1024,
+          "overlap_tokens": 100
+        },
+        "python": {
+          "target_tokens": 2048,
+          "overlap_tokens": 100
+        },
+        "chunk_config_identity": "chunk_config\u001fv1\u001fprose#1024/100\u001fworkflow_python#2048/100",
+        "base_contract_id_dimension_only": "201336985699651598",
+        "base_contract_id_dimension_only_note": "historical dimension-only ContractSpec id; NOT sufficient to distinguish small vs large chunk configurations",
+        "eval_contract_id": "e3282feed275e212"
+      },
+      "capacity": {
+        "dimension": 1536,
+        "full_corpus_storage_gb": 16.4,
+        "verdict": "FAIL"
+      },
+      "status": "evaluated",
+      "disqualify_reasons": [
+        "projected_full_corpus_storage_above_gate"
+      ],
+      "capacity_fail": true,
+      "eligible_for_selection": false,
+      "overall": {
+        "recall@1": 0.240385,
+        "recall@5": 0.322115,
+        "recall@10": 0.413462,
+        "mrr": 0.318875,
+        "ndcg@10": 0.331019,
+        "map": 0.291435,
+        "n": 104
+      },
+      "by_category": {
+        "exact_name": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.12,
+          "mrr": 0.021915,
+          "ndcg@10": 0.04,
+          "map": 0.021678,
+          "n": 25
+        },
+        "best_is_resource": {
+          "recall@1": 0.5,
+          "recall@5": 0.625,
+          "recall@10": 0.6875,
+          "mrr": 0.588523,
+          "ndcg@10": 0.607309,
+          "map": 0.577887,
+          "n": 8
+        },
+        "spelling_variant": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "ndcg@10": 0.0,
+          "map": 0.0,
+          "n": 8
+        },
+        "code_fragment": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.0,
+          "mrr": 0.0,
+          "ndcg@10": 0.0,
+          "map": 0.0,
+          "n": 6
+        },
+        "best_is_distillation": {
+          "recall@1": 0.382353,
+          "recall@5": 0.529412,
+          "recall@10": 0.647059,
+          "mrr": 0.567227,
+          "ndcg@10": 0.576985,
+          "map": 0.464286,
+          "n": 17
+        },
+        "cross_source": {
+          "recall@1": 0.25,
+          "recall@5": 0.333333,
+          "recall@10": 0.416667,
+          "mrr": 0.6,
+          "ndcg@10": 0.535968,
+          "map": 0.3,
+          "n": 6
+        },
+        "workflow_code": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.3125,
+          "mrr": 0.262075,
+          "ndcg@10": 0.26945,
+          "map": 0.262075,
+          "n": 32
+        },
+        "timeout_prone": {
+          "recall@1": 0.0,
+          "recall@5": 0.166667,
+          "recall@10": 0.166667,
+          "mrr": 0.111111,
+          "ndcg@10": 0.131192,
+          "map": 0.055556,
+          "n": 3
+        },
+        "workflow_python_evidence": {
+          "recall@1": 0.625,
+          "recall@5": 0.625,
+          "recall@10": 0.625,
+          "mrr": 0.636364,
+          "ndcg@10": 0.625,
+          "map": 0.636364,
+          "n": 8
+        },
+        "paraphrase": {
+          "recall@1": 0.35,
+          "recall@5": 0.45,
+          "recall@10": 0.55,
+          "mrr": 0.447619,
+          "ndcg@10": 0.475065,
+          "map": 0.397619,
+          "n": 10
+        },
+        "multi_term": {
+          "recall@1": 0.3,
+          "recall@5": 0.55,
+          "recall@10": 0.65,
+          "mrr": 0.430952,
+          "ndcg@10": 0.485784,
+          "map": 0.414286,
+          "n": 10
+        },
+        "settings": {
+          "recall@1": 0.428571,
+          "recall@5": 0.714286,
+          "recall@10": 0.857143,
+          "mrr": 0.571429,
+          "ndcg@10": 0.64102,
+          "map": 0.571429,
+          "n": 7
+        },
+        "best_is_message": {
+          "recall@1": 0.323529,
+          "recall@5": 0.529412,
+          "recall@10": 0.588235,
+          "mrr": 0.477696,
+          "ndcg@10": 0.465264,
+          "map": 0.425858,
+          "n": 17
+        },
+        "snowflake": {
+          "recall@1": 0.333333,
+          "recall@5": 0.527778,
+          "recall@10": 0.583333,
+          "mrr": 0.506713,
+          "ndcg@10": 0.483147,
+          "map": 0.429977,
+          "n": 18
+        },
+        "named_author": {
+          "recall@1": 0.375,
+          "recall@5": 0.75,
+          "recall@10": 0.75,
+          "mrr": 0.583333,
+          "ndcg@10": 0.54409,
+          "map": 0.520833,
+          "n": 4
+        },
+        "selective_filter": {
+          "recall@1": 0.318182,
+          "recall@5": 0.545455,
+          "recall@10": 0.636364,
+          "mrr": 0.526136,
+          "ndcg@10": 0.491771,
+          "map": 0.446023,
+          "n": 11
+        },
+        "channel_scoped": {
+          "recall@1": 0.125,
+          "recall@5": 0.375,
+          "recall@10": 0.625,
+          "mrr": 0.347917,
+          "ndcg@10": 0.361493,
+          "map": 0.322917,
+          "n": 4
+        },
+        "time_scoped": {
+          "recall@1": 0.5,
+          "recall@5": 0.5,
+          "recall@10": 0.5,
+          "mrr": 0.6875,
+          "ndcg@10": 0.595718,
+          "map": 0.510417,
+          "n": 3
+        },
+        "long_resource_chunk": {
+          "recall@1": 0.25,
+          "recall@5": 0.25,
+          "recall@10": 0.25,
+          "mrr": 0.25,
+          "ndcg@10": 0.25,
+          "map": 0.25,
+          "n": 4
+        },
+        "workflow_only": {
+          "recall@1": 0.0,
+          "recall@5": 0.0,
+          "recall@10": 0.2,
+          "mrr": 0.041905,
+          "ndcg@10": 0.066667,
+          "map": 0.047738,
+          "n": 5
+        },
+        "single_workflow": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 6
+        },
+        "pending_status": {
+          "recall@1": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "mrr": 1.0,
+          "ndcg@10": 1.0,
+          "map": 1.0,
+          "n": 2
+        }
+      },
+      "by_entity_kind": {
+        "resource": {
+          "recall@1": 0.191176,
+          "recall@5": 0.220588,
+          "recall@10": 0.308824,
+          "mrr": 0.220088,
+          "ndcg@10": 0.236569,
+          "map": 0.220001,
+          "n": 68
+        },
+        "distillation": {
+          "recall@1": 0.384615,
+          "recall@5": 0.538462,
+          "recall@10": 0.692308,
+          "mrr": 0.472527,
+          "ndcg@10": 0.524652,
+          "map": 0.472527,
+          "n": 13
+        },
+        "mixed": {
+          "recall@1": 0.25,
+          "recall@5": 0.416667,
+          "recall@10": 0.5,
+          "mrr": 0.655556,
+          "ndcg@10": 0.601564,
+          "map": 0.327778,
+          "n": 6
+        },
+        "message": {
+          "recall@1": 0.323529,
+          "recall@5": 0.529412,
+          "recall@10": 0.588235,
+          "mrr": 0.477696,
+          "ndcg@10": 0.465264,
+          "map": 0.425858,
+          "n": 17
+        }
+      },
+      "workflow_code_recall_at_10": 0.3125,
+      "long_resource_chunk_recall_at_10": 0.25,
+      "counts": {
+        "n_total": 112,
+        "n_judged": 104,
+        "n_no_hit": 8,
+        "zero_result": 1,
+        "timeouts": 0,
+        "errors": 0,
+        "failures": 0,
+        "zero_result_rate": 0.008928571428571428,
+        "no_hit_satisfied_rate": 0.125,
+        "timeout_rate": 0.0,
+        "error_rate": 0.0,
+        "failure_rate": 0.0
+      },
+      "cohort_counts": {
+        "n_entities": 7769,
+        "n_chunks": 11349,
+        "n_unique_embeddable_texts": 11248,
+        "n_duplicate_chunks_collapsed": 101,
+        "chunks_by_representation": {
+          "prose": 7273,
+          "workflow_python": 4076
+        },
+        "max_chunk_index": 174,
+        "multi_chunk_entities": 238
+      },
+      "provider_account": {
+        "provider": "openai",
+        "model": "text-embedding-3-small",
+        "dimension": 1536,
+        "api_requests": 84,
+        "embedded_inputs": 4513,
+        "input_tokens_from_usage": 6402213,
+        "cache_hits": 6836,
+        "cache_misses": 4513,
+        "price_per_1m_tokens_usd": 0.02,
+        "cost_usd": 0.128044
+      },
+      "latency": {
+        "p50_ms": 8.28,
+        "p95_ms": 12.181,
+        "mean_ms": 16.759,
+        "n": 112,
+        "method": "local exact cosine (numpy); NOT HNSW/SQL/Edge latency",
+        "full_eval_wall_ms": 1880.342
+      },
+      "later_chunk_diagnostic": {
+        "available": false,
+        "reason": "raw_eval3_ranking_provenance_not_persisted",
+        "later_chunk_hit_rate": null,
+        "note": "eval3 per-case rankings persist only entity keys, not matched_chunk_index, so later_chunk_hit_rate is not recomputable; long_resource_chunk_recall_at_10 is the frozen selection signal"
+      },
+      "selection_cost_usd": 0.184974,
+      "selection_state": {
+        "selected": false,
+        "active": false,
+        "evaluation_only": true,
+        "production_activated": false,
+        "non_selection_reason": "capacity-disqualified (projected_full_corpus_storage_above_gate)"
+      }
+    }
+  ],
+  "winner": {
+    "name": "384-small",
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "dimension": 384,
+    "canonicalization_version": 1,
+    "chunking_version": 2,
+    "chunk_config_version": 1,
+    "prose": {
+      "target_tokens": 512,
+      "overlap_tokens": 50
+    },
+    "python": {
+      "target_tokens": 512,
+      "overlap_tokens": 50
+    },
+    "chunk_config_identity": "chunk_config\u001fv1\u001fprose#512/50\u001fworkflow_python#512/50",
+    "base_contract_id_dimension_only": "6368594834396668537",
+    "base_contract_id_dimension_only_note": "historical dimension-only ContractSpec id; NOT sufficient to distinguish small vs large chunk configurations",
+    "eval_contract_id": "12e19cdb566b8744"
+  },
+  "winner_rationale": {
+    "eligible": true,
+    "selected": "384-small",
+    "eligible_ranking": [
+      "384-small",
+      "384-large"
+    ],
+    "selection_key_used": "recall@10, mrr, ndcg@10, workflow_code_recall@10, long_resource_chunk_recall@10, lower standalone candidate cost",
+    "capacity_note": "1536-d candidates are evaluated for quality but capacity-disqualified (full-corpus storage 16.4 GB > 12 GB gate) and cannot be the winner"
+  },
+  "mode": "real-provider",
+  "generated_at": "2026-07-29T19:16:00+00:00",
+  "golden_version": "golden/2026-07-28/v1",
+  "cohort_counts": {
+    "sources": {
+      "distillations": {
+        "rows": 11,
+        "by_status": {
+          "pending": 11
+        }
+      },
+      "external_resources": {
+        "rows": 2759,
+        "by_kind": {
+          "transcript": 1,
+          "workflow": 2757,
+          "n": 1
+        },
+        "malformed_kind_skipped": 1
+      },
+      "messages": {
+        "sample_size": 5000,
+        "golden_message_ids_required": 16,
+        "golden_message_ids_present": 16,
+        "deterministic_rule": "top-N by message_id desc from frozen high-water, unioned with every golden message identity, lowest non-golden ids dropped to hold N"
+      }
+    },
+    "high_water": {
+      "message_id": "1532071167588958368",
+      "message_sample_size_target": 5000
+    },
+    "integrity": {
+      "judged_identities_required": 52,
+      "judged_identities_present": 52,
+      "missing_judged_identities": 0
+    }
+  },
+  "preflight": {
+    "per_candidate": {
+      "384-small": {
+        "dimension": 384,
+        "n_unique_embeddable_texts": 22850,
+        "projected_input_tokens": 9524482,
+        "projected_cost_usd": 0.19049,
+        "full_corpus_storage_gb": 4.59,
+        "capacity_verdict": "PASS"
+      },
+      "384-large": {
+        "dimension": 384,
+        "n_unique_embeddable_texts": 11248,
+        "projected_input_tokens": 9248264,
+        "projected_cost_usd": 0.184965,
+        "full_corpus_storage_gb": 4.59,
+        "capacity_verdict": "PASS"
+      },
+      "1536-small": {
+        "dimension": 1536,
+        "n_unique_embeddable_texts": 22850,
+        "projected_input_tokens": 9524482,
+        "projected_cost_usd": 0.19049,
+        "full_corpus_storage_gb": 16.4,
+        "capacity_verdict": "FAIL"
+      },
+      "1536-large": {
+        "dimension": 1536,
+        "n_unique_embeddable_texts": 11248,
+        "projected_input_tokens": 9248264,
+        "projected_cost_usd": 0.184965,
+        "full_corpus_storage_gb": 16.4,
+        "capacity_verdict": "FAIL"
+      }
+    },
+    "aggregate": {
+      "projected_input_tokens_all_candidates": 37545492,
+      "projected_cost_usd_all_candidates": 0.75091,
+      "spend_cap_usd": 25.0,
+      "within_spend_cap": true,
+      "storage_gate_gb": 12.0,
+      "price_assumption": "$0.02/1M input tokens (text-embedding-3-small, any dimension)"
+    }
+  },
+  "accounting": {
+    "price_per_1m_tokens_usd": 0.02,
+    "spend_cap_usd": 25.0,
+    "runtime_spend_gates": {
+      "preflight_estimate": {
+        "scope": "estimated aggregate projected cost over all four candidates, checked ONCE before any provider call; an estimate, not actual",
+        "field": "preflight.aggregate.projected_cost_usd_all_candidates",
+        "separate_from_runtime_actual_gate": true
+      },
+      "aggregate_actual_usage_guard": {
+        "scope": "shared cross-candidate guard created once and bound to every real-path ProviderClient; before every provider request it gates (aggregate actual usage reported across prior + current clients) + (the next conservative estimated batch) and raises BEFORE the transport is invoked",
+        "hard_cap_resets_between_candidates_or_dimensions": false,
+        "records_actual_usage_exactly_once_per_successful_batch": true,
+        "failed_attempt_billing_unavailable_and_not_counted": true,
+        "failed_attempt_billing_note": "the transport records usage ONLY for a response the provider returned (a Mapping); a failed attempt (transport error / HTTP 429 / 5xx) raises before any usage is reported and supplies zero usage, so any tokens a provider may bill for a failed attempt are UNAVAILABLE and are NOT counted in the recorded aggregate. The recorded token total is the sum of successful-response usage only.",
+        "retries_bounded": true,
+        "retries_bounded_max_attempts": 4,
+        "recorded_aggregate_actual_cap_not_proof_against_unreported_billed_failures": true,
+        "offline_fake_embedder_zero_cost_unblocked": true,
+        "separate_from_preflight_estimate": true
+      }
+    },
+    "eval3_actual_incremental_bakeoff": {
+      "scope": "exact provider usage captured by eval3 (the final uninterrupted run) only",
+      "shared_dimension_cache_reuse": "the two candidates sharing a dimension share one cache keyed by content hash, so a later same-dimension candidate reuses identical chunk texts as cache hits; each candidate's input_tokens reflect only its own cache misses actually sent to the provider",
+      "per_candidate": {
+        "384-small": {
+          "dimension": 384,
+          "api_requests": 103,
+          "embedded_inputs": 22951,
+          "input_tokens_from_usage": 7911142,
+          "cache_hits": 0,
+          "cache_misses": 22951,
+          "cost_usd": 0.158223
+        },
+        "384-large": {
+          "dimension": 384,
+          "api_requests": 85,
+          "embedded_inputs": 4513,
+          "input_tokens_from_usage": 6402213,
+          "cache_hits": 6836,
+          "cache_misses": 4513,
+          "cost_usd": 0.128044
+        },
+        "1536-small": {
+          "dimension": 1536,
+          "api_requests": 99,
+          "embedded_inputs": 22951,
+          "input_tokens_from_usage": 7911142,
+          "cache_hits": 0,
+          "cache_misses": 22951,
+          "cost_usd": 0.158223
+        },
+        "1536-large": {
+          "dimension": 1536,
+          "api_requests": 84,
+          "embedded_inputs": 4513,
+          "input_tokens_from_usage": 6402213,
+          "cache_hits": 6836,
+          "cache_misses": 4513,
+          "cost_usd": 0.128044
+        }
+      },
+      "total_input_tokens": 28626710,
+      "total_cost_usd": 0.572534
+    },
+    "standalone_candidate_accounting": {
+      "scope": "deterministic order-independent per-candidate cost used as the cost axis of the frozen tiebreak; does NOT depend on evaluation order or which sibling warmed the dimension cache",
+      "per_candidate": {
+        "384-small": {
+          "dimension": 384,
+          "corpus_unique_texts": 22850,
+          "corpus_estimated_input_tokens": 9524482,
+          "golden_query_count": 101,
+          "golden_query_estimated_tokens": 430,
+          "total_estimated_input_tokens": 9524912,
+          "estimated_cost_usd": 0.190498,
+          "basis": "deterministic wr.estimate_tokens over the candidate's own unique corpus chunk texts + the shared fixed golden queries; order-independent; excludes any sibling warming the shared dimension cache"
+        },
+        "384-large": {
+          "dimension": 384,
+          "corpus_unique_texts": 11248,
+          "corpus_estimated_input_tokens": 9248264,
+          "golden_query_count": 101,
+          "golden_query_estimated_tokens": 430,
+          "total_estimated_input_tokens": 9248694,
+          "estimated_cost_usd": 0.184974,
+          "basis": "deterministic wr.estimate_tokens over the candidate's own unique corpus chunk texts + the shared fixed golden queries; order-independent; excludes any sibling warming the shared dimension cache"
+        },
+        "1536-small": {
+          "dimension": 1536,
+          "corpus_unique_texts": 22850,
+          "corpus_estimated_input_tokens": 9524482,
+          "golden_query_count": 101,
+          "golden_query_estimated_tokens": 430,
+          "total_estimated_input_tokens": 9524912,
+          "estimated_cost_usd": 0.190498,
+          "basis": "deterministic wr.estimate_tokens over the candidate's own unique corpus chunk texts + the shared fixed golden queries; order-independent; excludes any sibling warming the shared dimension cache"
+        },
+        "1536-large": {
+          "dimension": 1536,
+          "corpus_unique_texts": 11248,
+          "corpus_estimated_input_tokens": 9248264,
+          "golden_query_count": 101,
+          "golden_query_estimated_tokens": 430,
+          "total_estimated_input_tokens": 9248694,
+          "estimated_cost_usd": 0.184974,
+          "basis": "deterministic wr.estimate_tokens over the candidate's own unique corpus chunk texts + the shared fixed golden queries; order-independent; excludes any sibling warming the shared dimension cache"
+        }
+      }
+    },
+    "historical_duplicate_attempts": {
+      "exact_spend": "unavailable",
+      "exact_spend_reason": "the first implementation did not persist per-attempt provider usage; two interrupted/destructive resets make exact earlier spend unrecoverable",
+      "destructive_cache_resets_disclosed": 2,
+      "duplicate_provider_work_disclosed": "the earlier partial/duplicate attempts re-embedded texts already embedded in the same run before being reset",
+      "evaluation_attempts": 3,
+      "per_full_bakeoff_projected_cost_usd": 0.75091,
+      "conservative_reconstructed_estimate_usd": 2.25273,
+      "estimate_label": "CONSERVATIVE RECONSTRUCTED ESTIMATE, not a guaranteed upper bound and not exact: it scales the frozen preflight projection by the 3 attempts. The true spend is NOT guaranteed to be lower — responses can be billed before cache persistence/retry, and the frozen preflight OMITTED golden-query tokens, so actual spend could exceed this figure. No bounded in-flight/retry + golden-token margin has been added or justified.",
+      "not_a_guaranteed_upper_bound": true,
+      "within_spend_cap": true,
+      "within_spend_cap_note": "the ESTIMATE is under the cap; this is NOT proof that true spend was under the cap, because the estimate omits in-flight/retry billing and golden-query tokens"
+    }
+  },
+  "selection": {
+    "selected_production_dimension": 384,
+    "selected_prose_chunk_contract": {
+      "target_tokens": 512,
+      "overlap_tokens": 50
+    },
+    "selected_workflow_python_chunk_contract": {
+      "target_tokens": 512,
+      "overlap_tokens": 50
+    },
+    "selected_evaluation_contract_id": "12e19cdb566b8744",
+    "selected_chunk_config_identity": "chunk_config\u001fv1\u001fprose#512/50\u001fworkflow_python#512/50",
+    "selected_base_contract_id_dimension_only": "6368594834396668537",
+    "production_chunking_version_handoff": {
+      "canonicalization_version": 1,
+      "chunking_version": 2,
+      "chunk_config_version": 1
+    },
+    "production_activated": false,
+    "note": "selection recorded by task 2.14; task 2.17 is a propagation/verification/acceptance-test handoff only — actual activation is a later, separate rollout decision"
+  },
+  "task_2_17_handoff": {
+    "scope": "propagation / verification / acceptance-test handoff for the selected 384 / prose 512-50 / workflow_python 512-50 contract into production. This task does NOT activate production; actual activation is a later, separate rollout decision.",
+    "kind": "propagation-verification-acceptance-handoff (NOT production activation)",
+    "dimension_surfaces_hardcoded_384": [
+      "executors/embedding_contract.py: PILOT_DIMENSION_384 (=384) is the default in DeterministicFakeEmbedder and OpenAIEmbedder and the two pilot ContractSpec identities",
+      "executors/embedding_backfill.py: backfill dimension default is 384",
+      "schema/022_content_embeddings.sql: physical embedding vector(384) column + dimension trigger (rejects v_dimension <> 384)",
+      "schema/027_embedding_worker_surface.sql: worker insert path assumes vector(384)"
+    ],
+    "chunk_config_surfaces_hardcoded_512_50": [
+      "executors/chunking.py: DEFAULT_PROSE_CONFIG (target 512 / overlap 50) and the workflow_python default (target 512 / overlap 50)",
+      "schema/027_embedding_worker_surface.sql: hivemind_chunk_text defaults p_target_tokens=512, p_overlap_tokens=50"
+    ],
+    "known_production_gaps_to_close": [
+      "worker payload python_public_state: the embedding worker does not yet persist/propagate a workflow_python representation 'public_state' on its payload; production must add it so the selected workflow_python chunk stream is the one actually indexed",
+      "quarantine handling: the production ingest/worker path must apply the same secret-quarantine the evaluator's canonical_representations applies, or quarantined python could be indexed in production",
+      "stale-vector cleanup / re-embedding: production has no automated path to re-embed or clean stale vectors when content changes (the evaluator assumes immutable content); a cleanup/re-embedding job is required",
+      "production/evaluator chunker parity: the production chunker (schema/027 + executors/chunking defaults) MUST be byte-identical to the evaluator's frozen chunker (target/overlap/normalization), or production rankings will diverge from this decision",
+      "contract identity/version surface: dimension-only production ContractSpec ids are INSUFFICIENT — production must expose a contract identity/version surface that distinguishes the selected 512/50 small configuration from the large (1024/100, 2048/100) candidate, mirroring Candidate.eval_contract_id + chunk_config_version"
+    ],
+    "propagation_verification_gaps": [
+      "later-chunk / workflow_python provenance: eval3's workflow_code Recall proves ENTITY recall (the right workflow was retrieved) but CANNOT prove that the workflow_python REPRESENTATION won best-chunk collapse, because eval3 per-case rankings persisted only entity keys, not matched_chunk_index / matched_representation (raw_eval3_ranking_provenance_not_persisted). Production acceptance tests must persist and assert matched_representation == workflow_python for the workflow_code cases; do not fabricate this provenance for eval3."
+    ],
+    "dimension_mismatch_fixtures": [
+      "schema/022_content_embeddings.sql: vector(384) column + trigger are the physical + data dimension-mismatch guard",
+      "schema/023_embedding_contract_switch.sql: the active-contract switch must resolve to a 384-d contract",
+      "eval/retrieval/semantic.py: EmbeddingCache validates cached-vector dimension on load and on store"
+    ],
+    "contract_version_fixtures": [
+      "schema/024_identity_and_canonical_representations.sql: canonicalization/chunking version identity",
+      "executors/embedding_contract.py: ContractSpec.contract_identity_input (provider+model+dimension+canonicalization_version+chunking_version)",
+      "eval/retrieval/semantic.py: Candidate.eval_contract_id extends the production identity with chunk_config_version"
+    ],
+    "must_verify": [
+      "production vector column + worker enforce dimension == 384 (any mismatch rejected)",
+      "production chunker defaults == 512/50 for both prose and workflow_python (byte-parity with the evaluator)",
+      "the active embedding contract id resolves to the selected 384 / 512-50 identity (with the chunk-config-version surface, not dimension-only)",
+      "no 1536-d path is activated (capacity-disqualified at 16.4 GB > 12 GB gate)"
+    ]
+  },
+  "historical_defect_disclosure": {
+    "exact_spend": "unavailable",
+    "exact_spend_reason": "the first implementation did not persist per-attempt provider usage; two interrupted/destructive resets make exact earlier spend unrecoverable",
+    "destructive_cache_resets_disclosed": 2,
+    "duplicate_provider_work_disclosed": "the earlier partial/duplicate attempts re-embedded texts already embedded in the same run before being reset",
+    "evaluation_attempts": 3,
+    "per_full_bakeoff_projected_cost_usd": 0.75091,
+    "conservative_reconstructed_estimate_usd": 2.25273,
+    "estimate_label": "CONSERVATIVE RECONSTRUCTED ESTIMATE, not a guaranteed upper bound and not exact: it scales the frozen preflight projection by the 3 attempts. The true spend is NOT guaranteed to be lower — responses can be billed before cache persistence/retry, and the frozen preflight OMITTED golden-query tokens, so actual spend could exceed this figure. No bounded in-flight/retry + golden-token margin has been added or justified.",
+    "not_a_guaranteed_upper_bound": true,
+    "within_spend_cap": true,
+    "within_spend_cap_note": "the ESTIMATE is under the cap; this is NOT proof that true spend was under the cap, because the estimate omits in-flight/retry billing and golden-query tokens"
+  },
+  "evidence_replay": {
+    "mode": "strict-offline-evidence-cache-replay",
+    "evidence_pair_id": "task-2.14-evidence-05caa124d4b47d58",
+    "replay_bundle": {
+      "version": 1,
+      "path": ".cache/hivemind-semantic-eval/replay-bundle.json",
+      "file_sha256": "09dbce078cd896775f48168efb504c42c66bdb08572baeb5873c3073e75799cd",
+      "canonical_sha256": "b0894a98b536f0c9a6b3b8fe7a1d40f2deb3708692169ba209657400fc08cf9c"
+    },
+    "frozen_manifest_path": "docs/hybrid-search/task-2.14-frozen-manifest.json",
+    "strict_offline_replay": {
+      "provider_calls_attempted": 0,
+      "network_calls": 0,
+      "zero_provider_calls": true,
+      "zero_network_calls": true,
+      "fail_closed_on_miss": true,
+      "winner_reproduced": "384-small",
+      "eligible_ranking_reproduced": [
+        "384-small",
+        "384-large"
+      ],
+      "checks_passed": [
+        "decision_deterministic_core_hash_matches_bundle",
+        "decision_core_hash_matches_manifest",
+        "grid_hash_matches_manifest",
+        "candidate_grid_hash_recomputed_matches",
+        "policy_hash_recomputed_matches",
+        "cohort_manifest_hash_recomputed_matches",
+        "bundle_winner_matches_decision",
+        "bundle_carries_accounting",
+        "decision_accounting_object_matches_bundle_accounting",
+        "manifest_carries_accounting_sha256",
+        "decision_accounting_hash_matches_bundle",
+        "decision_accounting_hash_matches_manifest",
+        "bundle_accounting_hash_matches_manifest",
+        "bundle_golden_facts_match_manifest",
+        "bundle_policy_hash_matches_manifest",
+        "bundle_cohort_hash_matches_manifest",
+        "bundle_grid_hash_matches_manifest",
+        "bundle_caches_match_manifest",
+        "bundle_record_count_matches_manifest",
+        "bundle_canonical_hash_matches_manifest",
+        "bundle_version_matches_manifest",
+        "golden_sha256_matches",
+        "golden_version_matches",
+        "golden_case_count_matches",
+        "golden_sha256_matches_fixed_literal",
+        "bundle_golden_matches_fixed_literal",
+        "manifest_golden_matches_fixed_literal",
+        "cache.384_sha256_unchanged",
+        "cache.384_byte_size_unchanged",
+        "cache.384_record_count_unchanged",
+        "cache.384_record_count_is_eval3_frozen",
+        "cache.384_dimension_consistent",
+        "cache.384_mode_is_0600",
+        "cache.1536_sha256_unchanged",
+        "cache.1536_byte_size_unchanged",
+        "cache.1536_record_count_unchanged",
+        "cache.1536_record_count_is_eval3_frozen",
+        "cache.1536_dimension_consistent",
+        "cache.1536_mode_is_0600",
+        "cache_dir_mode_is_0700",
+        "bundle_file_mode_is_0600",
+        "bundle_file_sha256_matches_manifest",
+        "winner_reproduced_from_frozen_policy",
+        "eligible_ranking_reproduced"
+      ],
+      "n_checks": 44,
+      "note": "pure offline evidence/cache replay; no transport was instantiated and neither cache file was opened for write or compacted"
+    },
+    "limitation": " cryptographic evidence/cache replay, NOT a recomputation of exact-cosine retrieval from raw text: the first implementation did not persist the raw eval3 texts or identity-to-chunk mapping. The winner/metrics are re-derived from the recorded decision via the frozen policy; the immutable caches are verified by hash/count/dim/mode. No raw queries, bodies, Python, credentials, URLs, or vectors."
+  },
+  "evidence_pair_id": "task-2.14-evidence-05caa124d4b47d58",
+  "identity_refresh": {
+    "chunking_version": 2,
+    "chunk_config_identity_version": 1,
+    "candidate_grid_hash": "1aa27a54e9f3edd340dfbab7b2847c302a5ebf13909f4202175b873f5e701074",
+    "note": "candidate/winner identity blocks re-derived from the frozen candidate grid under the current chunking version (CHUNKING v2, bounded oversized workflow-Python fallback). eval3 quality metrics, cohort counts, and provider usage are the frozen eval3 results, unchanged: the v2 chunker is cohort-no-op, proven by the zero-call equivalence proof (docs/hybrid-search/task-2.14-v2-chunking-equivalence.json)."
+  }
+}

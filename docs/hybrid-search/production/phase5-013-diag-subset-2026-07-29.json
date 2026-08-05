@@ -1,0 +1,136 @@
+{
+  "mode": "latency",
+  "golden_path": "/<token>.json",
+  "n_cases": 9,
+  "n_measured": 7,
+  "missing_case_ids": [
+    "G059",
+    "G063"
+  ],
+  "last_started_case_id": "G105",
+  "python_timeout_fired": false,
+  "psql_rc": 0,
+  "elapsed_s": 17.8,
+  "host_family": "pooler",
+  "port": "5432",
+  "methodology": "single persistent psql session (one auth); per-case EXPLAIN (ANALYZE) Execution Time on candidate fn WITH case filters; primed 0; 1 timed; statement_timeout=5000ms; no bodies/snippets/query-strings logged.",
+  "p50_ms": 261.7,
+  "p95_ms": 4067.7,
+  "p99_ms": 4067.7,
+  "max_ms": 4067.7,
+  "gate_warm_p95_le_750ms": false,
+  "gate_all_measured": false,
+  "cases_over_750ms": 2,
+  "over_750ms_case_ids": [
+    "G006",
+    "G018"
+  ],
+  "per_case": [
+    {
+      "id": "G001",
+      "categories": [
+        "exact_name",
+        "best_is_resource"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 462.2
+    },
+    {
+      "id": "G006",
+      "categories": [
+        "exact_name",
+        "code_fragment"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 1473.6
+    },
+    {
+      "id": "G018",
+      "categories": [
+        "workflow_code",
+        "exact_name",
+        "timeout_prone"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 4067.7
+    },
+    {
+      "id": "G037",
+      "categories": [
+        "workflow_python_evidence",
+        "multi_term",
+        "best_is_resource"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 251.0
+    },
+    {
+      "id": "G053",
+      "categories": [
+        "paraphrase",
+        "settings",
+        "best_is_distillation"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 261.7
+    },
+    {
+      "id": "G057",
+      "categories": [
+        "settings",
+        "best_is_message",
+        "snowflake"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 96.0
+    },
+    {
+      "id": "G059",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "filters": {
+        "authors": [
+          "QuintForms"
+        ]
+      },
+      "status": "started_not_measured",
+      "time_ms": null
+    },
+    {
+      "id": "G063",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "filters": {
+        "channels": [
+          "wan_chatter"
+        ]
+      },
+      "status": "started_not_measured",
+      "time_ms": null
+    },
+    {
+      "id": "G105",
+      "categories": [
+        "no_hit"
+      ],
+      "filters": {},
+      "status": "measured",
+      "time_ms": 93.7
+    }
+  ],
+  "stderr_tail_redacted": "arms.matched_snippet,\n           arms.lexical_rank, arms.lexical_source, arms.created_at\n      from arms\n     order by arms.entity_type, arms.item_id,\n              arms.lexical_rank desc nulls last,\n              case when arms.representation_type = 'workflow_python' then 0 else 1 end,\n              arms.created_at desc nulls last,\n              arms.item_id\n  )\n  select collapsed.entity_type, collapsed.item_id, collapsed.representation_type,\n         collapsed.matched_snippet, collapsed.lexical_rank, collapsed.lexical_source,\n         collapsed.created_at\n    from collapsed\n   order by collapsed.lexical_rank desc nulls last,\n            collapsed.created_at desc nulls last,\n            collapsed.entity_type asc,\n            collapsed.item_id asc\n   limit v_limit\"\nPL/pgSQL function hivemind_lexical_candidates(text,integer,text[],text[],text[],timestamp with time zone,text[],text[],boolean,boolean) line 76 at RETURN QUERY\npsql:/<token>.sql:21: NOTICE:  text-search query doesn't contain lexemes: \"\"\npsql:/<token>.sql:21: NOTICE:  text-search query doesn't contain lexemes: \"\"\npsql:/<token>.sql:21: NOTICE:  text-search query doesn't contain lexemes: \"\"\npsql:/<token>.sql:21: NOTICE:  text-search query doesn't contain lexemes: \"\"\n"
+}

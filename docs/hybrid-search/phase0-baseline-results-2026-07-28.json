@@ -1,0 +1,1878 @@
+{
+  "meta": {
+    "tool_version": "baseline-search/0.4.0",
+    "manifest_version": "legacy-ilike/2026-07-28",
+    "captured_at_utc": "2026-07-28T19:01:24Z",
+    "python_version": "3.14.3",
+    "platform": "macOS-15.4-arm64-arm-64bit-Mach-O",
+    "endpoint_ref": "ujlwuvkrxlvoswwkerdf",
+    "anon_key_masked": "sb_publishable…(46 chars, last4=…lFsx)",
+    "config": {
+      "default_limit": 20,
+      "default_timeout_s": 30.0,
+      "sleep_s": 0.5,
+      "body_truncation_limit": 700,
+      "per_request_default_timeout_s": 30.0
+    },
+    "behavior_replicated": "Two PostgREST GET passes against unified_feed (kind=eq.distillation, then kind=neq.distillation / in.(...)), each capped independently at the requested limit; results merged distillations-first; no global limit; no relevance ranking.",
+    "secret_policy": "Read-only GETs only. No full bodies, no anon key, no token is written; all human-facing text is routed through verify_access.redact."
+  },
+  "summary": {
+    "queries": 11,
+    "categories": {
+      "hit": 2,
+      "exact_identifier": 3,
+      "workflow": 1,
+      "rare_no_hit": 1,
+      "filter": 2,
+      "doubled_limit": 1,
+      "timeout_prone": 1
+    },
+    "outcomes": {
+      "success": 7,
+      "http_error": 1,
+      "timeout": 3
+    },
+    "zero_result_queries": 5,
+    "queries_exceeding_requested_limit": 3,
+    "total_duplicate_items": 0,
+    "all_snowflakes_strings": true,
+    "end_to_end_latency": {
+      "n": 11,
+      "min_ms": 54.53,
+      "p50_ms": 1235.8,
+      "p95_ms": 30577.95,
+      "max_ms": 30592.68
+    },
+    "per_pass_latency": {
+      "n": 21,
+      "min_ms": 25.81,
+      "p50_ms": 477.52,
+      "p95_ms": 30038.65,
+      "max_ms": 30043.14
+    }
+  },
+  "results": [
+    {
+      "id": "hit_common",
+      "category": "hit",
+      "query": "upscale",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "Common term expected to match many messages; baseline latency/relevance reference.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*upscale*,body.ilike.*upscale*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 119.49,
+          "fetched": 1,
+          "rows": [
+            {
+              "kind": "distillation",
+              "source": "hivemind",
+              "item_id": "1",
+              "item_id_is_string": true,
+              "title": "What do people use to upscale AI-generated video?",
+              "body_length": 208,
+              "body_would_truncate": false,
+              "created_at": "2026-06-04T15:22:12.137234+00:00"
+            }
+          ]
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*upscale*,body.ilike.*upscale*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 141.19,
+          "fetched": 20,
+          "rows": [
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493650241046450297",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 303,
+              "body_would_truncate": false,
+              "created_at": "2026-04-14T16:32:48.145+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1387226072109682758",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 63,
+              "body_would_truncate": false,
+              "created_at": "2025-06-25T00:21:09.005+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493766800490364949",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 256,
+              "body_would_truncate": false,
+              "created_at": "2026-04-15T00:15:58.082+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493721279658721300",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 191,
+              "body_would_truncate": false,
+              "created_at": "2026-04-14T21:15:05.07+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493779065294028860",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 459,
+              "body_would_truncate": false,
+              "created_at": "2026-04-15T01:04:42.239+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1387362766284783656",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 190,
+              "body_would_truncate": false,
+              "created_at": "2025-06-25T09:24:19.436+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493854895718010941",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 207,
+              "body_would_truncate": false,
+              "created_at": "2026-04-15T06:06:01.621+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1387459779290726492",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 38,
+              "body_would_truncate": false,
+              "created_at": "2025-06-25T15:49:49.139+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493857272080896020",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 146,
+              "body_would_truncate": false,
+              "created_at": "2026-04-15T06:15:28.19+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1387529515751702708",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 120,
+              "body_would_truncate": false,
+              "created_at": "2025-06-25T20:26:55.607+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493868924226244668",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 264,
+              "body_would_truncate": false,
+              "created_at": "2026-04-15T07:01:46.278+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1493860309142863922",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 97,
+              "body_would_truncate": false,
+              "created_at": "2026-04-15T06:27:32.282+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1494515124843577425",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 212,
+              "body_would_truncate": false,
+              "created_at": "2026-04-17T01:49:32.511+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1494515541862514808",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 124,
+              "body_would_truncate": false,
+              "created_at": "2026-04-17T01:51:11.936+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1389344541202710652",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 224,
+              "body_would_truncate": false,
+              "created_at": "2025-06-30T20:39:11.396+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1494492540324544642",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 71,
+              "body_would_truncate": false,
+              "created_at": "2026-04-17T00:19:47.942+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1494493445471867020",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 103,
+              "body_would_truncate": false,
+              "created_at": "2026-04-17T00:23:23.746+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1495099338794340403",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 575,
+              "body_would_truncate": false,
+              "created_at": "2026-04-18T16:30:59.971+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1503658803009294400",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 464,
+              "body_would_truncate": false,
+              "created_at": "2026-05-12T07:23:15.267+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1498358519525670942",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 35,
+              "body_would_truncate": false,
+              "created_at": "2026-04-27T16:21:49.21+00:00"
+            }
+          ]
+        }
+      ],
+      "e2e_latency_ms": 260.81,
+      "total_fetched": 21,
+      "total_returned": 21,
+      "exceeds_requested_limit": true,
+      "kind_distribution": {
+        "distillation": 1,
+        "message": 20
+      },
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": false,
+      "truncated_rows": 0,
+      "created_at_order": [
+        "2026-06-04T15:22:12.137234+00:00",
+        "2026-04-14T16:32:48.145+00:00",
+        "2025-06-25T00:21:09.005+00:00",
+        "2026-04-15T00:15:58.082+00:00",
+        "2026-04-14T21:15:05.07+00:00",
+        "2026-04-15T01:04:42.239+00:00",
+        "2025-06-25T09:24:19.436+00:00",
+        "2026-04-15T06:06:01.621+00:00",
+        "2025-06-25T15:49:49.139+00:00",
+        "2026-04-15T06:15:28.19+00:00",
+        "2025-06-25T20:26:55.607+00:00",
+        "2026-04-15T07:01:46.278+00:00",
+        "2026-04-15T06:27:32.282+00:00",
+        "2026-04-17T01:49:32.511+00:00",
+        "2026-04-17T01:51:11.936+00:00",
+        "2025-06-30T20:39:11.396+00:00",
+        "2026-04-17T00:19:47.942+00:00",
+        "2026-04-17T00:23:23.746+00:00",
+        "2026-04-18T16:30:59.971+00:00",
+        "2026-05-12T07:23:15.267+00:00",
+        "2026-04-27T16:21:49.21+00:00"
+      ],
+      "outcome": "success"
+    },
+    {
+      "id": "hit_multiword",
+      "category": "hit",
+      "query": "controlnet settings",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "Multi-word contiguous substring; legacy ILIKE matches only the exact phrase.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*controlnet settings*,body.ilike.*controlnet settings*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 477.52,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*controlnet settings*,body.ilike.*controlnet settings*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "http_error",
+          "status": null,
+          "detail": "HTTP 500 Internal Server Error",
+          "latency_ms": 3137.42,
+          "fetched": 0,
+          "rows": []
+        }
+      ],
+      "e2e_latency_ms": 3615.05,
+      "total_fetched": 0,
+      "total_returned": 0,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {},
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 0,
+      "created_at_order": [],
+      "outcome": "http_error"
+    },
+    {
+      "id": "exact_dotted",
+      "category": "exact_identifier",
+      "query": "FLUX.1",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "Dotted model name; punctuation is part of the contiguous ILIKE substring.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*FLUX.1*,body.ilike.*FLUX.1*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 2537.51,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*FLUX.1*,body.ilike.*FLUX.1*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 490.82,
+          "fetched": 20,
+          "rows": [
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1277733333287174195",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 93,
+              "body_would_truncate": false,
+              "created_at": "2024-08-26T20:56:05.793+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1461425224061812797",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 186,
+              "body_would_truncate": false,
+              "created_at": "2026-01-15T18:22:05.384+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1342122061623201852",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 334,
+              "body_would_truncate": false,
+              "created_at": "2025-02-20T13:13:54.913+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1351301128179941447",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 523,
+              "body_would_truncate": false,
+              "created_at": "2025-03-17T21:08:14.919+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1356542779077169263",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 821,
+              "body_would_truncate": true,
+              "created_at": "2025-04-01T08:16:41.878+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1358092261459628326",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 438,
+              "body_would_truncate": false,
+              "created_at": "2025-04-05T14:53:47.266+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1362381216086753301",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 71,
+              "body_would_truncate": false,
+              "created_at": "2025-04-17T10:56:33.734+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1362476284613234900",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 71,
+              "body_would_truncate": false,
+              "created_at": "2025-04-17T17:14:19.837+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1364129600048726038",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 75,
+              "body_would_truncate": false,
+              "created_at": "2025-04-22T06:44:00.954+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1400487615030886430",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 138,
+              "body_would_truncate": false,
+              "created_at": "2025-07-31T14:37:47.225+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1400557820285288469",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 110,
+              "body_would_truncate": false,
+              "created_at": "2025-07-31T19:16:45.462+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1400592124528951326",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 72,
+              "body_would_truncate": false,
+              "created_at": "2025-07-31T21:33:04.231+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1461654883907407936",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 143,
+              "body_would_truncate": false,
+              "created_at": "2026-01-16T09:34:40.558+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1462053049676730368",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 230,
+              "body_would_truncate": false,
+              "created_at": "2026-01-17T11:56:50.675+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1301287136225656923",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 142,
+              "body_would_truncate": false,
+              "created_at": "2024-10-30T20:50:30.022+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1298678081179091046",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 97,
+              "body_would_truncate": false,
+              "created_at": "2024-10-23T16:03:02.825+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1277733139510198322",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 159,
+              "body_would_truncate": false,
+              "created_at": "2024-08-26T20:55:19.593+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1455875652992368642",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 115,
+              "body_would_truncate": false,
+              "created_at": "2025-12-31T10:50:04.535+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1343980474061684817",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 86,
+              "body_would_truncate": false,
+              "created_at": "2025-02-25T16:18:34.966+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1344016488725610637",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 108,
+              "body_would_truncate": false,
+              "created_at": "2025-02-25T18:41:41.531+00:00"
+            }
+          ]
+        }
+      ],
+      "e2e_latency_ms": 3028.43,
+      "total_fetched": 20,
+      "total_returned": 20,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {
+        "message": 20
+      },
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 1,
+      "created_at_order": [
+        "2024-08-26T20:56:05.793+00:00",
+        "2026-01-15T18:22:05.384+00:00",
+        "2025-02-20T13:13:54.913+00:00",
+        "2025-03-17T21:08:14.919+00:00",
+        "2025-04-01T08:16:41.878+00:00",
+        "2025-04-05T14:53:47.266+00:00",
+        "2025-04-17T10:56:33.734+00:00",
+        "2025-04-17T17:14:19.837+00:00",
+        "2025-04-22T06:44:00.954+00:00",
+        "2025-07-31T14:37:47.225+00:00",
+        "2025-07-31T19:16:45.462+00:00",
+        "2025-07-31T21:33:04.231+00:00",
+        "2026-01-16T09:34:40.558+00:00",
+        "2026-01-17T11:56:50.675+00:00",
+        "2024-10-30T20:50:30.022+00:00",
+        "2024-10-23T16:03:02.825+00:00",
+        "2024-08-26T20:55:19.593+00:00",
+        "2025-12-31T10:50:04.535+00:00",
+        "2025-02-25T16:18:34.966+00:00",
+        "2025-02-25T18:41:41.531+00:00"
+      ],
+      "outcome": "success"
+    },
+    {
+      "id": "exact_versioned",
+      "category": "exact_identifier",
+      "query": "Wan 2.2",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "Versioned model name with a space and a dot.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*Wan 2.2*,body.ilike.*Wan 2.2*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 127.96,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*Wan 2.2*,body.ilike.*Wan 2.2*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 909.73,
+          "fetched": 20,
+          "rows": [
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465842338336342108",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 163,
+              "body_would_truncate": false,
+              "created_at": "2026-01-27T22:54:07.493+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465839092943159530",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 77,
+              "body_would_truncate": false,
+              "created_at": "2026-01-27T22:41:13.731+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465243362713145538",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 132,
+              "body_would_truncate": false,
+              "created_at": "2026-01-26T07:14:00.576+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465450109138505780",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 112,
+              "body_would_truncate": false,
+              "created_at": "2026-01-26T20:55:32.765+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465458857856729089",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 116,
+              "body_would_truncate": false,
+              "created_at": "2026-01-26T21:30:18.622+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1470996234952118333",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 38,
+              "body_would_truncate": false,
+              "created_at": "2026-02-11T04:13:52.201+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465446933308113066",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 55,
+              "body_would_truncate": false,
+              "created_at": "2026-01-26T20:42:55.588+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465782713746460876",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 138,
+              "body_would_truncate": false,
+              "created_at": "2026-01-27T18:57:11.883+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1466041058096975942",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 89,
+              "body_would_truncate": false,
+              "created_at": "2026-01-28T12:03:45.976+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1471991638665592985",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 199,
+              "body_would_truncate": false,
+              "created_at": "2026-02-13T22:09:14.94+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1466065608134099121",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 180,
+              "body_would_truncate": false,
+              "created_at": "2026-01-28T13:41:19.161+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1468244931771371542",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 100,
+              "body_would_truncate": false,
+              "created_at": "2026-02-03T14:01:10.406+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1465779035668873408",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 630,
+              "body_would_truncate": false,
+              "created_at": "2026-01-27T18:42:34.961+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1466079687632490619",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 180,
+              "body_would_truncate": false,
+              "created_at": "2026-01-28T14:37:15.975+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1472074416316879059",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 1221,
+              "body_would_truncate": true,
+              "created_at": "2026-02-14T03:38:10.67+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1472074019686846554",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 1221,
+              "body_would_truncate": true,
+              "created_at": "2026-02-14T03:36:36.106+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1478643432384626729",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 82,
+              "body_would_truncate": false,
+              "created_at": "2026-03-04T06:41:06.147+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1479066775995023434",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 74,
+              "body_would_truncate": false,
+              "created_at": "2026-03-05T10:43:19.129+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1479066891417813105",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 113,
+              "body_would_truncate": false,
+              "created_at": "2026-03-05T10:43:46.648+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1466099345572106291",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 54,
+              "body_would_truncate": false,
+              "created_at": "2026-01-28T15:55:22.793+00:00"
+            }
+          ]
+        }
+      ],
+      "e2e_latency_ms": 1037.81,
+      "total_fetched": 20,
+      "total_returned": 20,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {
+        "message": 20
+      },
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 2,
+      "created_at_order": [
+        "2026-01-27T22:54:07.493+00:00",
+        "2026-01-27T22:41:13.731+00:00",
+        "2026-01-26T07:14:00.576+00:00",
+        "2026-01-26T20:55:32.765+00:00",
+        "2026-01-26T21:30:18.622+00:00",
+        "2026-02-11T04:13:52.201+00:00",
+        "2026-01-26T20:42:55.588+00:00",
+        "2026-01-27T18:57:11.883+00:00",
+        "2026-01-28T12:03:45.976+00:00",
+        "2026-02-13T22:09:14.94+00:00",
+        "2026-01-28T13:41:19.161+00:00",
+        "2026-02-03T14:01:10.406+00:00",
+        "2026-01-27T18:42:34.961+00:00",
+        "2026-01-28T14:37:15.975+00:00",
+        "2026-02-14T03:38:10.67+00:00",
+        "2026-02-14T03:36:36.106+00:00",
+        "2026-03-04T06:41:06.147+00:00",
+        "2026-03-05T10:43:19.129+00:00",
+        "2026-03-05T10:43:46.648+00:00",
+        "2026-01-28T15:55:22.793+00:00"
+      ],
+      "outcome": "success"
+    },
+    {
+      "id": "exact_identifier_word",
+      "category": "exact_identifier",
+      "query": "WanVideoSampler",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "CamelCase symbol likely present in workflow Python source.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*WanVideoSampler*,body.ilike.*WanVideoSampler*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 519.54,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*WanVideoSampler*,body.ilike.*WanVideoSampler*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "timeout",
+          "status": null,
+          "detail": "timeout: TimeoutError",
+          "latency_ms": 30043.14,
+          "fetched": 0,
+          "rows": []
+        }
+      ],
+      "e2e_latency_ms": 30563.22,
+      "total_fetched": 0,
+      "total_returned": 0,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {},
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 0,
+      "created_at_order": [],
+      "outcome": "timeout"
+    },
+    {
+      "id": "workflow_kinds",
+      "category": "workflow",
+      "query": "lora",
+      "kinds": "workflow",
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "kinds=workflow; only one pass is made (kind=in.(workflow)).",
+      "passes_planned": [
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "others",
+          "kind_param": "in.(workflow)",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*lora*,body.ilike.*lora*)",
+            "kind": "in.(workflow)"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 188.36,
+          "fetched": 20,
+          "rows": [
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "788",
+              "item_id_is_string": true,
+              "title": "AuraFlow Image Generation with Qwen ControlNet and Upscaling",
+              "body_length": 1729,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:07:13.215073+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "5",
+              "item_id_is_string": true,
+              "title": "Flux Image Inpainting and Compositing with ControlNet",
+              "body_length": 1803,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:51:22.419402+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "7",
+              "item_id_is_string": true,
+              "title": "Image Comparison and Enhancement with Florence2 and Detail Daemon",
+              "body_length": 1667,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:51:25.365822+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "119",
+              "item_id_is_string": true,
+              "title": "Hunyuan Video I2V with Leapfusion Patcher",
+              "body_length": 1696,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:54:10.868768+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "742",
+              "item_id_is_string": true,
+              "title": "Flux Dev Tiled Image Generation with Florence2 Captioning",
+              "body_length": 1474,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:06:35.037604+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "1955",
+              "item_id_is_string": true,
+              "title": "Flux Kontext Image Stitching Workflow",
+              "body_length": 1940,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:32:07.771963+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "16",
+              "item_id_is_string": true,
+              "title": "AnimateDiff Video Upscaling with FILM Interpolation",
+              "body_length": 1648,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:52:40.870834+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "17",
+              "item_id_is_string": true,
+              "title": "LTX Video and Audio Generation with LoRA and Upscaling",
+              "body_length": 2017,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:52:41.69984+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "18",
+              "item_id_is_string": true,
+              "title": "AuraFlow Multi-Save Image Generation with Detail Daemon",
+              "body_length": 1643,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:52:42.507417+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "21",
+              "item_id_is_string": true,
+              "title": "Image to Video with Markdown Notes",
+              "body_length": 1040,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:52:44.882201+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "22",
+              "item_id_is_string": true,
+              "title": "LTX Video Generation with Audio and LoRA",
+              "body_length": 1622,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:52:45.696503+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "750",
+              "item_id_is_string": true,
+              "title": "WanVideo Pose-Guided Image-to-Video Generation",
+              "body_length": 1871,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:06:41.353463+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "2550",
+              "item_id_is_string": true,
+              "title": "Image Processing and Comparison Workflow",
+              "body_length": 81874,
+              "body_would_truncate": true,
+              "created_at": "2026-06-27T18:53:48.251754+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "43",
+              "item_id_is_string": true,
+              "title": "WanVideo Pose-Guided Animation with Reference Embeddings",
+              "body_length": 1721,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:53:03.442348+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "751",
+              "item_id_is_string": true,
+              "title": "Wan Image-to-Video with LoRA and Dual Noise Models",
+              "body_length": 1882,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:06:42.154459+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "28",
+              "item_id_is_string": true,
+              "title": "WanVideo Segmentation and Pose-Driven Video Compositing",
+              "body_length": 1828,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T15:52:50.56468+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "752",
+              "item_id_is_string": true,
+              "title": "LTX Video Workflow with Audio and Image Conditioning",
+              "body_length": 1876,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:06:42.888376+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "1449",
+              "item_id_is_string": true,
+              "title": "WanVideo Text-to-Video Generation with Florence2 and Groq LLM",
+              "body_length": 1523,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:24:44.558037+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "2559",
+              "item_id_is_string": true,
+              "title": "Video Enhancement and Combination Workflow",
+              "body_length": 65450,
+              "body_would_truncate": true,
+              "created_at": "2026-06-27T18:54:40.98563+00:00"
+            },
+            {
+              "kind": "workflow",
+              "source": "vibecomfy-external",
+              "item_id": "1272",
+              "item_id_is_string": true,
+              "title": "Wan2.2 I2V Video Generation with LoRA and Frame Interpolation",
+              "body_length": 2504,
+              "body_would_truncate": true,
+              "created_at": "2026-06-25T16:21:50.630846+00:00"
+            }
+          ]
+        }
+      ],
+      "e2e_latency_ms": 188.57,
+      "total_fetched": 20,
+      "total_returned": 20,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {
+        "workflow": 20
+      },
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 20,
+      "created_at_order": [
+        "2026-06-25T16:07:13.215073+00:00",
+        "2026-06-25T15:51:22.419402+00:00",
+        "2026-06-25T15:51:25.365822+00:00",
+        "2026-06-25T15:54:10.868768+00:00",
+        "2026-06-25T16:06:35.037604+00:00",
+        "2026-06-25T16:32:07.771963+00:00",
+        "2026-06-25T15:52:40.870834+00:00",
+        "2026-06-25T15:52:41.69984+00:00",
+        "2026-06-25T15:52:42.507417+00:00",
+        "2026-06-25T15:52:44.882201+00:00",
+        "2026-06-25T15:52:45.696503+00:00",
+        "2026-06-25T16:06:41.353463+00:00",
+        "2026-06-27T18:53:48.251754+00:00",
+        "2026-06-25T15:53:03.442348+00:00",
+        "2026-06-25T16:06:42.154459+00:00",
+        "2026-06-25T15:52:50.56468+00:00",
+        "2026-06-25T16:06:42.888376+00:00",
+        "2026-06-25T16:24:44.558037+00:00",
+        "2026-06-27T18:54:40.98563+00:00",
+        "2026-06-25T16:21:50.630846+00:00"
+      ],
+      "outcome": "success"
+    },
+    {
+      "id": "rare_nohit",
+      "category": "rare_no_hit",
+      "query": "zzqxnotarealterm-99999",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 30.0,
+      "notes": "Nonsense string expected to return zero rows; exercises zero-result path.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*zzqxnotarealterm-99999*,body.ilike.*zzqxnotarealterm-99999*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 123.03,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*zzqxnotarealterm-99999*,body.ilike.*zzqxnotarealterm-99999*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 1762.44,
+          "fetched": 0,
+          "rows": []
+        }
+      ],
+      "e2e_latency_ms": 1885.56,
+      "total_fetched": 0,
+      "total_returned": 0,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {},
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 0,
+      "created_at_order": [],
+      "outcome": "success"
+    },
+    {
+      "id": "filter_source",
+      "category": "filter",
+      "query": "model",
+      "kinds": null,
+      "sources": "banodoco-discord",
+      "since": null,
+      "requested_limit": 10,
+      "client_timeout_s": 30.0,
+      "notes": "source=in.(banodoco-discord) applied to both passes.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "10",
+            "or": "(title.ilike.*model*,body.ilike.*model*)",
+            "source": "in.(banodoco-discord)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 553.81,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "10",
+            "or": "(title.ilike.*model*,body.ilike.*model*)",
+            "source": "in.(banodoco-discord)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "timeout",
+          "status": null,
+          "detail": "timeout: TimeoutError",
+          "latency_ms": 30038.65,
+          "fetched": 0,
+          "rows": []
+        }
+      ],
+      "e2e_latency_ms": 30592.68,
+      "total_fetched": 0,
+      "total_returned": 0,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {},
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 0,
+      "created_at_order": [],
+      "outcome": "timeout"
+    },
+    {
+      "id": "filter_since",
+      "category": "filter",
+      "query": "model",
+      "kinds": null,
+      "sources": null,
+      "since": "2024-01-01T00:00:00Z",
+      "requested_limit": 10,
+      "client_timeout_s": 30.0,
+      "notes": "created_at=gte.2024-01-01 applied to both passes.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "10",
+            "or": "(title.ilike.*model*,body.ilike.*model*)",
+            "created_at": "gte.2024-01-01T00:00:00Z",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 115.49,
+          "fetched": 2,
+          "rows": [
+            {
+              "kind": "distillation",
+              "source": "hivemind",
+              "item_id": "5",
+              "item_id_is_string": true,
+              "title": "What motion trade-off does LightX2V introduce when applied to a global Wan model?",
+              "body_length": 383,
+              "body_would_truncate": false,
+              "created_at": "2026-07-28T15:10:45.263996+00:00"
+            },
+            {
+              "kind": "distillation",
+              "source": "hivemind",
+              "item_id": "12",
+              "item_id_is_string": true,
+              "title": "Which searchable semantics should a VibeComfy workflow resource preserve?",
+              "body_length": 465,
+              "body_would_truncate": false,
+              "created_at": "2026-07-28T15:10:49.149175+00:00"
+            }
+          ]
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "10",
+            "or": "(title.ilike.*model*,body.ilike.*model*)",
+            "created_at": "gte.2024-01-01T00:00:00Z",
+            "kind": "neq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 1119.89,
+          "fetched": 10,
+          "rows": [
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396930281008664767",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 363,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:02:12.702+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396930568469352488",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 77,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:03:21.238+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396931376007348336",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 40,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:06:33.77+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1364141643799724123",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 114,
+              "body_would_truncate": false,
+              "created_at": "2025-04-22T07:31:52.408+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396933321912615144",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 99,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:14:17.71+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1364238283227267113",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 235,
+              "body_would_truncate": false,
+              "created_at": "2025-04-22T13:55:53.043+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396937423593668770",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 1810,
+              "body_would_truncate": true,
+              "created_at": "2025-07-21T19:30:35.627+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396938688780308552",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 60,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:35:37.271+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396940053846167652",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 275,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:41:02.728+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396941234123051118",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 113,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:45:44.128+00:00"
+            }
+          ]
+        }
+      ],
+      "e2e_latency_ms": 1235.8,
+      "total_fetched": 12,
+      "total_returned": 12,
+      "exceeds_requested_limit": true,
+      "kind_distribution": {
+        "distillation": 2,
+        "message": 10
+      },
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": false,
+      "truncated_rows": 1,
+      "created_at_order": [
+        "2026-07-28T15:10:45.263996+00:00",
+        "2026-07-28T15:10:49.149175+00:00",
+        "2025-07-21T19:02:12.702+00:00",
+        "2025-07-21T19:03:21.238+00:00",
+        "2025-07-21T19:06:33.77+00:00",
+        "2025-04-22T07:31:52.408+00:00",
+        "2025-07-21T19:14:17.71+00:00",
+        "2025-04-22T13:55:53.043+00:00",
+        "2025-07-21T19:30:35.627+00:00",
+        "2025-07-21T19:35:37.271+00:00",
+        "2025-07-21T19:41:02.728+00:00",
+        "2025-07-21T19:45:44.128+00:00"
+      ],
+      "outcome": "success"
+    },
+    {
+      "id": "doubled_limit",
+      "category": "doubled_limit",
+      "query": "model",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 3,
+      "client_timeout_s": 30.0,
+      "notes": "Common term + small limit; each pass capped at 3 independently, so the merged list may exceed the requested limit.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "3",
+            "or": "(title.ilike.*model*,body.ilike.*model*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 116.89,
+          "fetched": 2,
+          "rows": [
+            {
+              "kind": "distillation",
+              "source": "hivemind",
+              "item_id": "5",
+              "item_id_is_string": true,
+              "title": "What motion trade-off does LightX2V introduce when applied to a global Wan model?",
+              "body_length": 383,
+              "body_would_truncate": false,
+              "created_at": "2026-07-28T15:10:45.263996+00:00"
+            },
+            {
+              "kind": "distillation",
+              "source": "hivemind",
+              "item_id": "12",
+              "item_id_is_string": true,
+              "title": "Which searchable semantics should a VibeComfy workflow resource preserve?",
+              "body_length": 465,
+              "body_would_truncate": false,
+              "created_at": "2026-07-28T15:10:49.149175+00:00"
+            }
+          ]
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "3",
+            "or": "(title.ilike.*model*,body.ilike.*model*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "success",
+          "status": 200,
+          "detail": "",
+          "latency_ms": 120.43,
+          "fetched": 3,
+          "rows": [
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396930281008664767",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 363,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:02:12.702+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396930568469352488",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 77,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:03:21.238+00:00"
+            },
+            {
+              "kind": "message",
+              "source": "banodoco-discord",
+              "item_id": "1396931376007348336",
+              "item_id_is_string": true,
+              "title": null,
+              "body_length": 40,
+              "body_would_truncate": false,
+              "created_at": "2025-07-21T19:06:33.77+00:00"
+            }
+          ]
+        }
+      ],
+      "e2e_latency_ms": 237.42,
+      "total_fetched": 5,
+      "total_returned": 5,
+      "exceeds_requested_limit": true,
+      "kind_distribution": {
+        "distillation": 2,
+        "message": 3
+      },
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": false,
+      "truncated_rows": 0,
+      "created_at_order": [
+        "2026-07-28T15:10:45.263996+00:00",
+        "2026-07-28T15:10:49.149175+00:00",
+        "2025-07-21T19:02:12.702+00:00",
+        "2025-07-21T19:03:21.238+00:00",
+        "2025-07-21T19:06:33.77+00:00"
+      ],
+      "outcome": "success"
+    },
+    {
+      "id": "timeout_prone",
+      "category": "timeout_prone",
+      "query": "upscale",
+      "kinds": null,
+      "sources": null,
+      "since": null,
+      "requested_limit": 20,
+      "client_timeout_s": 0.01,
+      "notes": "Client-side 10 ms timeout on an ordinary query. Reproducibly exercises the legacy executor's *unhandled* timeout path without loading the database.",
+      "passes_planned": [
+        "distillation",
+        "others"
+      ],
+      "passes": [
+        {
+          "pass": "distillation",
+          "kind_param": "eq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*upscale*,body.ilike.*upscale*)",
+            "kind": "eq.distillation"
+          },
+          "outcome": "timeout",
+          "status": null,
+          "detail": "timeout: URLError",
+          "latency_ms": 28.63,
+          "fetched": 0,
+          "rows": []
+        },
+        {
+          "pass": "others",
+          "kind_param": "neq.distillation",
+          "params": {
+            "select": "*",
+            "limit": "20",
+            "or": "(title.ilike.*upscale*,body.ilike.*upscale*)",
+            "kind": "neq.distillation"
+          },
+          "outcome": "timeout",
+          "status": null,
+          "detail": "timeout: URLError",
+          "latency_ms": 25.81,
+          "fetched": 0,
+          "rows": []
+        }
+      ],
+      "e2e_latency_ms": 54.53,
+      "total_fetched": 0,
+      "total_returned": 0,
+      "exceeds_requested_limit": false,
+      "kind_distribution": {},
+      "duplicate": {
+        "duplicate_count": 0,
+        "duplicate_keys": []
+      },
+      "snowflake": {
+        "all_item_ids_strings": true,
+        "non_string_item_ids": []
+      },
+      "nudge_present": true,
+      "truncated_rows": 0,
+      "created_at_order": [],
+      "outcome": "timeout"
+    }
+  ]
+}

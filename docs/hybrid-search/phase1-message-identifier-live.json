@@ -1,0 +1,240 @@
+{
+  "preflight": {
+    "parsed": {
+      "source_table_shape": [
+        [
+          "content",
+          "text"
+        ],
+        [
+          "created_at",
+          "timestamp with time zone"
+        ],
+        [
+          "is_deleted",
+          "boolean"
+        ],
+        [
+          "message_id",
+          "bigint"
+        ]
+      ],
+      "prereq_005_present": [
+        [
+          "t"
+        ]
+      ],
+      "target_index_state": [
+        [
+          "true",
+          "true",
+          "200728576"
+        ]
+      ],
+      "est_rows": [
+        [
+          "1252146"
+        ]
+      ],
+      "n_eligible": [
+        [
+          "1165736"
+        ]
+      ],
+      "db_size_bytes": [
+        [
+          "2534757167"
+        ]
+      ],
+      "invalid_indexes": [],
+      "long_txns": [
+        [
+          "0"
+        ]
+      ],
+      "relation_locks": [
+        [
+          "0"
+        ]
+      ]
+    },
+    "raw": {
+      "source_table_shape": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "prereq_005_present": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "target_index_state": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "est_rows": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "n_eligible": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "db_size_bytes": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "invalid_indexes": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "long_txns": {
+        "rc": 0,
+        "stderr_tail": ""
+      },
+      "relation_locks": {
+        "rc": 0,
+        "stderr_tail": ""
+      }
+    },
+    "verdict": {
+      "green": true,
+      "checks": [
+        {
+          "name": "content_is_text",
+          "pass": true,
+          "detail": "content='text'"
+        },
+        {
+          "name": "is_deleted_is_boolean",
+          "pass": true,
+          "detail": "is_deleted='boolean'"
+        },
+        {
+          "name": "schema_005_present",
+          "pass": true,
+          "detail": "normalize fn live"
+        },
+        {
+          "name": "target_index_absent_or_valid",
+          "pass": true,
+          "detail": "indisvalid=true indisready=true"
+        },
+        {
+          "name": "has_eligible_messages",
+          "pass": true,
+          "detail": "eligible=1,165,736 (est_total=1252146)"
+        },
+        {
+          "name": "storage_gate",
+          "pass": true,
+          "detail": "est_index\u22480.10GB vs 12.0GB gate (db\u22482.53GB)"
+        },
+        {
+          "name": "no_invalid_index_remnants",
+          "pass": true,
+          "detail": "0 invalid index(es)"
+        },
+        {
+          "name": "no_blocking_long_txns",
+          "pass": true,
+          "detail": "0 long txn(s)"
+        },
+        {
+          "name": "no_relation_locks",
+          "pass": true,
+          "detail": "0 ungranted lock(s)"
+        },
+        {
+          "name": "session_mode_connection",
+          "pass": true,
+          "detail": "host=aws-0-eu-central-1.pooler.supabase.com port=5432"
+        }
+      ],
+      "reasons": [],
+      "est_rows": 1252146,
+      "n_eligible": 1165736,
+      "est_index_bytes": 95497093,
+      "already_valid": true
+    },
+    "host_family": "pooler",
+    "port": "5432"
+  },
+  "rehearsal_gate": {
+    "available": true,
+    "green": true,
+    "all_pass": true,
+    "checks": {
+      "chosen_storage_gate": true,
+      "chosen_build_valid": true,
+      "query_recall_at_10_gate": true,
+      "query_no_deleted_leak": true,
+      "query_uses_index_not_seqscan": true,
+      "long_token_recovered": true,
+      "write_cost_bounded": true,
+      "chosen_smaller_than_rejected_side_index": true,
+      "rollback_clean": true
+    },
+    "index_size_pretty": "78.2 MB",
+    "storage_gb": 0.078241792,
+    "storage_gate_pass": true,
+    "recall_at_10": 1.0,
+    "latency_ms_p50": 25.6,
+    "latency_ms_p95": 429.81,
+    "write_slowdown": 1.42,
+    "reason": ""
+  },
+  "apply": {
+    "steps": [
+      {
+        "step": "build_identifier_trgm_concurrently",
+        "rc": 0,
+        "stderr_tail": "psql:/<token>.sql:7: NOTICE:  relation \"<token>\" already exists, skipping"
+      }
+    ],
+    "index_state": {
+      "indisvalid": "true",
+      "indisready": "true",
+      "index_bytes": 200671232
+    },
+    "status": "ok"
+  },
+  "evidence": {
+    "sizes": {
+      "identifier_trgm": 200728576,
+      "discord_messages": 1481064448
+    },
+    "index_state": {
+      "indisvalid": "true",
+      "indisready": "true"
+    },
+    "evidence_plans": {
+      "contain_flux1": {
+        "plan": "Limit  (cost=35.76..35.78 rows=10 width=40) (actual time=39.851..39.856 rows=20 loops=1)\n  Buffers: shared hit=632 read=47\n  ->  Sort  (cost=35.76..35.78 rows=10 width=40) (actual time=39.849..39.852 rows=20 loops=1)\n        Sort Key: m.created_at DESC NULLS LAST, ((m.message_id)::text)\n        Sort Method: top-N heapsort  Memory: 28kB\n        Buffers: shared hit=632 read=47\n        ->  Bitmap Heap Scan on discord_messages m  (cost=24.28..35.59 rows=10 width=40) (actual time=13.201..39.609 rows=615 loops=1)\n              Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux1%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n              Heap Blocks: exact=568\n              Buffers: shared hit=626 read=47\n              ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..24.27 rows=10 width=0) (actual time=13.052..13.052 rows=615 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%flux1%'::text)\n                    Buffers: shared hit=9 read=26\nPlanning:\n  Buffers: shared hit=376\nPlanning Time: 15.036 ms\nExecution Time: 40.007 ms\n",
+        "rc": 0,
+        "uses_identifier_index": true,
+        "uses_index_scan": true,
+        "is_seq_scan": false
+      },
+      "contain_wanvideosampler": {
+        "plan": "Limit  (cost=61.65..61.65 rows=1 width=40) (actual time=121.575..121.580 rows=20 loops=1)\n  Buffers: shared hit=486 read=161\n  ->  Sort  (cost=61.65..61.65 rows=1 width=40) (actual time=121.574..121.576 rows=20 loops=1)\n        Sort Key: m.created_at DESC NULLS LAST, ((m.message_id)::text)\n        Sort Method: top-N heapsort  Memory: 26kB\n        Buffers: shared hit=486 read=161\n        ->  Bitmap Heap Scan on discord_messages m  (cost=60.50..61.64 rows=1 width=40) (actual time=105.578..121.439 rows=292 loops=1)\n              Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n              Rows Removed by Index Recheck: 2\n              Heap Blocks: exact=283\n              Buffers: shared hit=480 read=161\n              ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..60.50 rows=1 width=0) (actual time=105.416..105.416 rows=294 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%wanvideosampler%'::text)\n                    Buffers: shared hit=151 read=161\nPlanning:\n  Buffers: shared hit=376\nPlanning Time: 3.941 ms\nExecution Time: 121.703 ms\n",
+        "rc": 0,
+        "uses_identifier_index": true,
+        "uses_index_scan": true,
+        "is_seq_scan": false
+      },
+      "contain_controlnet": {
+        "plan": "Limit  (cost=42.95..42.95 rows=1 width=40) (actual time=327.168..327.175 rows=20 loops=1)\n  Buffers: shared hit=6203 read=590\n  ->  Sort  (cost=42.95..42.95 rows=1 width=40) (actual time=327.167..327.171 rows=20 loops=1)\n        Sort Key: m.created_at DESC NULLS LAST, ((m.message_id)::text)\n        Sort Method: top-N heapsort  Memory: 28kB\n        Buffers: shared hit=6203 read=590\n        ->  Bitmap Heap Scan on discord_messages m  (cost=41.80..42.94 rows=1 width=40) (actual time=61.787..324.932 rows=8510 loops=1)\n              Recheck Cond: (((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%controlnet%'::text) AND (NOT is_deleted) AND (char_length(content) >= 1) AND (char_length(content) <= 8000))\n              Rows Removed by Index Recheck: 5\n              Heap Blocks: exact=6306\n              Buffers: shared hit=6197 read=590\n              ->  Bitmap Index Scan on idx_discord_messages_identifier_trgm  (cost=0.00..41.80 rows=1 width=0) (actual time=60.461..60.461 rows=8515 loops=1)\n                    Index Cond: ((COALESCE(regexp_replace(lower((content)::text), '[]\\s./\\\\,:;(){}[@\"''`_-]'::text, ''::text, 'g'::text), ''::text))::text ~~ '%controlnet%'::text)\n                    Buffers: shared hit=95 read=94\nPlanning:\n  Buffers: shared hit=376\nPlanning Time: 3.903 ms\nExecution Time: 327.366 ms\n",
+        "rc": 0,
+        "uses_identifier_index": true,
+        "uses_index_scan": true,
+        "is_seq_scan": false
+      }
+    },
+    "representative_hit_counts": {
+      "FLUX.1": 615,
+      "Wan2.2": 7136,
+      "WanVideoSampler": 292,
+      "controlnet": 8510
+    }
+  }
+}

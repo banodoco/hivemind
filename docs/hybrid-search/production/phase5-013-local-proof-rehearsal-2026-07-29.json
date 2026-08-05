@@ -1,0 +1,280 @@
+{
+  "task": "1.10/1.11 phase-3 latency fix (schema/013) — LOCAL-PROOF rehearsal",
+  "verdict_path": "/Users/peteromalley/Documents/banodoco-workspace/hivemind/docs/hybrid-search/production/phase5-013-local-proof-rehearsal-2026-07-29.json",
+  "applied_ok": true,
+  "apply_error": "",
+  "functional_assertions": [
+    {
+      "name": "013:workflow_python_fts_finds_20",
+      "ok": true
+    },
+    {
+      "name": "013:workflow_python_representation_20",
+      "ok": true
+    },
+    {
+      "name": "013:workflow_python_finds_64",
+      "ok": true
+    },
+    {
+      "name": "013:message_prose_containment",
+      "ok": true
+    },
+    {
+      "name": "013:quarantined_workflow_python_excluded",
+      "ok": true
+    },
+    {
+      "name": "013:quarantined_resource_has_matching_chunk",
+      "ok": true
+    },
+    {
+      "name": "013:softdeleted_message_excluded",
+      "ok": true
+    },
+    {
+      "name": "013:rejected_distillation_excluded",
+      "ok": true
+    },
+    {
+      "name": "013:approved_distillation_present",
+      "ok": true
+    },
+    {
+      "name": "013:single_workflow_scope",
+      "ok": true
+    },
+    {
+      "name": "013:global_limit_respected",
+      "ok": true
+    },
+    {
+      "name": "013:candidate_limit_default_100",
+      "ok": true
+    },
+    {
+      "name": "013:deterministic_order",
+      "ok": true
+    },
+    {
+      "name": "013:no_hit_zero",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:message_fts",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:message_ident",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:resource_prose_fts",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:resource_title_ident",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:workflow_python_fts",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:workflow_python_fragment",
+      "ok": true
+    },
+    {
+      "name": "013:gin_servable:distillation_fts",
+      "ok": true
+    },
+    {
+      "name": "013:mv_populated",
+      "ok": true
+    },
+    {
+      "name": "013:mv_trgm_index_servable",
+      "ok": true
+    },
+    {
+      "name": "013:channel_filter_direct_predicate",
+      "ok": true
+    },
+    {
+      "name": "013:author_filter_direct_predicate",
+      "ok": true
+    },
+    {
+      "name": "013:author_filter_unknown_returns_no_messages",
+      "ok": true
+    }
+  ],
+  "n_pass": 26,
+  "n_total": 26,
+  "parity": {
+    "q00": {
+      "identical": true,
+      "n_013": 1,
+      "n_012": 1
+    },
+    "q01": {
+      "identical": true,
+      "n_013": 2,
+      "n_012": 2
+    },
+    "q02": {
+      "identical": true,
+      "n_013": 15,
+      "n_012": 15
+    },
+    "q03": {
+      "identical": true,
+      "n_013": 20,
+      "n_012": 20
+    },
+    "q04": {
+      "identical": true,
+      "n_013": 500,
+      "n_012": 500
+    },
+    "q05": {
+      "identical": true,
+      "n_013": 1,
+      "n_012": 1
+    },
+    "q06": {
+      "identical": true,
+      "n_013": 1,
+      "n_012": 1
+    },
+    "q07": {
+      "identical": true,
+      "n_013": 20,
+      "n_012": 20
+    },
+    "q08": {
+      "identical": true,
+      "n_013": 20,
+      "n_012": 20
+    },
+    "q09": {
+      "identical": true,
+      "n_013": 1,
+      "n_012": 1
+    },
+    "q10": {
+      "identical": true,
+      "n_013": 1,
+      "n_012": 1
+    },
+    "q11": {
+      "identical": true,
+      "n_013": 0,
+      "n_012": 0
+    }
+  },
+  "parity_all": true,
+  "cross_boundary": {
+    "absent_013": true,
+    "corrected_direct_match": false,
+    "buggy_renormalize_match": true,
+    "absent_012": true,
+    "cross_ok": true
+  },
+  "cross_ok": true,
+  "anchor": {
+    "newest_matching_anchor_013": true,
+    "full_row_stream_equal": true,
+    "anchor_ok": true
+  },
+  "anchor_ok": true,
+  "fragment_bound": {
+    "oversize_item_excluded_from_mv": true,
+    "stream_equal_013_012": true,
+    "fragment_bound_ok": true
+  },
+  "fragment_bound_ok": true,
+  "security": {
+    "anon_cannot_select_mv": true,
+    "authenticated_cannot_select_mv": true,
+    "public_cannot_select_mv": true,
+    "anon_select_errors": true,
+    "authenticated_select_errors": true,
+    "anon_no_execute_candidates_after_012": true,
+    "authenticated_no_execute_candidates_after_012": true,
+    "service_role_rpc_ok": true,
+    "service_role_rpc_workflow_results": 1,
+    "quarantined_zero_candidates": true,
+    "quarantined_mv_rows_info": "1",
+    "anon_no_execute_candidates": true,
+    "authenticated_no_execute_candidates": true,
+    "security_ok": true
+  },
+  "rollback_streams_equal": true,
+  "rollback_ok": true,
+  "hot_path_plan": {
+    "has_dense_path_marker": true,
+    "has_sparse_path_marker": true,
+    "has_materialized_sparse_set": true,
+    "has_correlated_or_lateral_dense": true,
+    "has_newest_anchor_selection": true,
+    "has_exact_predicates": true,
+    "has_correlated_scalar_anchor": false,
+    "bare_like_probe_is_gate": null,
+    "hot_path_ok": true
+  },
+  "local_timing": {
+    "runs": 9,
+    "warmup": 4,
+    "interleaved": true,
+    "index_scale_decoy_rows": 100000,
+    "dense": {
+      "median_ms_012": 46.137,
+      "median_ms_013": 47.421,
+      "p95_ms_012": 53.457,
+      "p95_ms_013": 51.332,
+      "ratio_013_over_012": 1.028,
+      "gate_max_ratio": 1.25,
+      "corpus_items": 120,
+      "chunks_per_item": 60,
+      "matched_chunks_per_item": "all",
+      "analyzed": true,
+      "body_switch": "function_only",
+      "mv_refresh_per_switch": false,
+      "gate_pass": true
+    },
+    "sparse": {
+      "median_ms_012": 37.396,
+      "median_ms_013": 31.033,
+      "p95_ms_012": 39.166,
+      "p95_ms_013": 42.158,
+      "ratio_013_over_012": 0.83,
+      "trgm_index_in_real_plan": true,
+      "trgm_evidence": {
+        "method": "extracted_exact_inner_statement",
+        "uses_trgm_index": true,
+        "reason": "trgm_index_in_inner_plan",
+        "bare_like_substitute_used": false
+      },
+      "corpus_items": 120,
+      "chunks_per_item": 60,
+      "matched_chunks_per_item": 1,
+      "matching_chunk_position": "oldest",
+      "analyzed": true,
+      "body_switch": "function_only",
+      "mv_refresh_per_switch": false,
+      "gate_pass": true
+    },
+    "local_only_label": true,
+    "claims_production_gate": false,
+    "note": "Local throwaway cluster, tiny vs production. Timings are a relative 012-vs-013 signal on the anchor-rewrite hot path only; NOT the production 750ms gate. Bodies are interleaved; medians are reported. dense: 013 must be <=1.25x 012. sparse: 013 must be faster than 012 AND the real plan must use the trigram GIN."
+  },
+  "idempotent_ok": true,
+  "proacl_after_012": "hivemind_lexical_candidates|{postgres=X/postgres}",
+  "proacl_after_013": "hivemind_lexical_candidates|{postgres=X/postgres}",
+  "proacl_final": "hivemind_lexical_candidates|{postgres=X/postgres}",
+  "grants_preserved": true,
+  "timing_dense_gate": true,
+  "timing_sparse_gate": true,
+  "all_pass": true
+}

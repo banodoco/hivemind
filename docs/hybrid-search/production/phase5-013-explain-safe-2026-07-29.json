@@ -1,0 +1,57 @@
+{
+  "mode": "explain",
+  "n_cases": 4,
+  "golden_path": "/<token>.json",
+  "host_family": "pooler",
+  "port": "5432",
+  "methodology": "single persistent psql session; NON-ANALYZE EXPLAIN (planning only, read-only); node/relation/index names + cost/row only; all Filter/Cond literals redacted.",
+  "python_timeout_fired": false,
+  "psql_rc": 0,
+  "elapsed_s": 0.6,
+  "per_case_plan_shape": [
+    {
+      "id": "G018",
+      "plan": [
+        {
+          "node": "Function Scan",
+          "relation": "hivemind_lexical_candidates",
+          "cost": "0.25..10.25 rows=1000 width=172",
+          "est_rows": 1000
+        }
+      ]
+    },
+    {
+      "id": "G059",
+      "plan": [
+        {
+          "node": "Function Scan",
+          "relation": "hivemind_lexical_candidates",
+          "cost": "0.25..10.25 rows=1000 width=172",
+          "est_rows": 1000
+        }
+      ]
+    },
+    {
+      "id": "G063",
+      "plan": [
+        {
+          "node": "Function Scan",
+          "relation": "hivemind_lexical_candidates",
+          "cost": "0.25..10.25 rows=1000 width=172",
+          "est_rows": 1000
+        }
+      ]
+    },
+    {
+      "id": "G105",
+      "plan": [
+        {
+          "node": "Function Scan",
+          "relation": "hivemind_lexical_candidates",
+          "cost": "0.25..10.25 rows=1000 width=172",
+          "est_rows": 1000
+        }
+      ]
+    }
+  ]
+}

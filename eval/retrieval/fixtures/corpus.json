@@ -1,0 +1,67 @@
+{
+  "items": [
+    {
+      "kind": "message",
+      "source": "banodoco-discord",
+      "item_id": "1111111111111111111",
+      "title": "",
+      "body": "lower the motion amplitude to reduce jitter",
+      "author": "alice",
+      "context": "thread-x",
+      "created_at": "2024-03-01T10:00:00Z"
+    },
+    {
+      "kind": "message",
+      "source": "banodoco-discord",
+      "item_id": "2987654321098765432",
+      "title": "",
+      "body": "CFG scale for sampler steps",
+      "author": "bob",
+      "context": "thread-y",
+      "created_at": "2024-03-03T10:00:00Z"
+    },
+    {
+      "kind": "workflow",
+      "source": "vibecomfy-external",
+      "item_id": "2580",
+      "title": "WanVideo Image-to-Video with Florence2 and LoRA",
+      "body": "from comfy.sd import SAMPLER\nsampler = WanVideoSampler(model, positive, negative)\nblock_swap = 8  # block swap size\n",
+      "metadata": {"has_python_source": true},
+      "created_at": "2024-04-01T00:00:00Z"
+    },
+    {
+      "kind": "workflow",
+      "source": "vibecomfy-external",
+      "item_id": "2581",
+      "title": "FLUX.1 dev txt2img",
+      "body": "from nodes import VAEEncode\nvae = VAEEncode()\n",
+      "metadata": {"has_python_source": true},
+      "created_at": "2024-04-02T00:00:00Z"
+    },
+    {
+      "kind": "article",
+      "source": "hivemind",
+      "item_id": "900",
+      "title": "Guide to upscale models",
+      "body": "upscale model settings and selection",
+      "created_at": "2024-02-01T00:00:00Z"
+    },
+    {
+      "kind": "article",
+      "source": "hivemind",
+      "item_id": "910",
+      "title": "Long guide",
+      "body": "padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding padding rare_token_deep_inside padding padding padding end",
+      "created_at": "2024-01-15T00:00:00Z"
+    },
+    {
+      "kind": "distillation",
+      "source": "hivemind",
+      "item_id": "d1",
+      "title": "How do I reduce motion strength?",
+      "body": "To reduce motion strength, lower the motion amplitude.",
+      "status": "approved",
+      "created_at": "2024-05-01T00:00:00Z"
+    }
+  ]
+}

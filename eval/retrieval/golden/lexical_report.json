@@ -1,0 +1,3923 @@
+{
+  "system": "lexical",
+  "corpus_path": "",
+  "golden_set_path": "",
+  "ks": [
+    1,
+    5,
+    10
+  ],
+  "generated_at": "2026-07-29T00:00:00Z",
+  "overall": {
+    "recall@1": 0.5544871794871795,
+    "recall@5": 0.7644230769230769,
+    "recall@10": 0.7740384615384616,
+    "mrr": 0.7155448717948718,
+    "ndcg@10": 0.7060527597852222,
+    "map": 0.6873244810744811,
+    "n": 104
+  },
+  "by_category": {
+    "exact_name": {
+      "recall@1": 0.37333333333333335,
+      "recall@5": 0.9,
+      "recall@10": 0.92,
+      "mrr": 0.7,
+      "ndcg@10": 0.7144786476950222,
+      "map": 0.6818888888888889,
+      "n": 25
+    },
+    "best_is_resource": {
+      "recall@1": 0.6041666666666666,
+      "recall@5": 0.6875,
+      "recall@10": 0.6875,
+      "mrr": 0.75,
+      "ndcg@10": 0.6868353820667021,
+      "map": 0.6770833333333334,
+      "n": 8
+    },
+    "spelling_variant": {
+      "recall@1": 0.25,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.75,
+      "ndcg@10": 0.7107268290614724,
+      "map": 0.7020833333333333,
+      "n": 8
+    },
+    "code_fragment": {
+      "recall@1": 0.75,
+      "recall@5": 0.9166666666666666,
+      "recall@10": 1.0,
+      "mrr": 0.875,
+      "ndcg@10": 0.882194577458408,
+      "map": 0.8819444444444445,
+      "n": 6
+    },
+    "best_is_distillation": {
+      "recall@1": 0.3235294117647059,
+      "recall@5": 0.3235294117647059,
+      "recall@10": 0.3235294117647059,
+      "mrr": 0.4117647058823529,
+      "ndcg@10": 0.37420375346899504,
+      "map": 0.3235294117647059,
+      "n": 17
+    },
+    "cross_source": {
+      "recall@1": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 0.8333333333333334,
+      "ndcg@10": 0.6914364019939813,
+      "map": 0.5,
+      "n": 6
+    },
+    "workflow_code": {
+      "recall@1": 0.7447916666666666,
+      "recall@5": 0.875,
+      "recall@10": 0.890625,
+      "mrr": 0.8463541666666666,
+      "ndcg@10": 0.8404301002066741,
+      "map": 0.8364955357142857,
+      "n": 32
+    },
+    "timeout_prone": {
+      "recall@1": 0.0,
+      "recall@5": 0.0,
+      "recall@10": 0.0,
+      "mrr": 0.0,
+      "ndcg@10": 0.0,
+      "map": 0.0,
+      "n": 3
+    },
+    "workflow_python_evidence": {
+      "recall@1": 0.625,
+      "recall@5": 0.625,
+      "recall@10": 0.625,
+      "mrr": 0.625,
+      "ndcg@10": 0.625,
+      "map": 0.625,
+      "n": 8
+    },
+    "paraphrase": {
+      "recall@1": 0.1,
+      "recall@5": 0.1,
+      "recall@10": 0.1,
+      "mrr": 0.1,
+      "ndcg@10": 0.1,
+      "map": 0.1,
+      "n": 10
+    },
+    "multi_term": {
+      "recall@1": 0.75,
+      "recall@5": 0.8,
+      "recall@10": 0.8,
+      "mrr": 0.8,
+      "ndcg@10": 0.7676361007798197,
+      "map": 0.775,
+      "n": 10
+    },
+    "settings": {
+      "recall@1": 0.5714285714285714,
+      "recall@5": 0.5714285714285714,
+      "recall@10": 0.5714285714285714,
+      "mrr": 0.5714285714285714,
+      "ndcg@10": 0.5714285714285714,
+      "map": 0.5714285714285714,
+      "n": 7
+    },
+    "best_is_message": {
+      "recall@1": 0.5588235294117647,
+      "recall@5": 0.7647058823529411,
+      "recall@10": 0.7647058823529411,
+      "mrr": 0.6960784313725491,
+      "ndcg@10": 0.7067521745008088,
+      "map": 0.7009803921568627,
+      "n": 17
+    },
+    "snowflake": {
+      "recall@1": 0.5555555555555556,
+      "recall@5": 0.75,
+      "recall@10": 0.75,
+      "mrr": 0.712962962962963,
+      "ndcg@10": 0.7112189760835956,
+      "map": 0.6898148148148148,
+      "n": 18
+    },
+    "named_author": {
+      "recall@1": 0.625,
+      "recall@5": 0.75,
+      "recall@10": 0.75,
+      "mrr": 0.75,
+      "ndcg@10": 0.7084978080995372,
+      "map": 0.75,
+      "n": 4
+    },
+    "selective_filter": {
+      "recall@1": 0.5909090909090909,
+      "recall@5": 0.9090909090909091,
+      "recall@10": 0.9090909090909091,
+      "mrr": 0.8030303030303031,
+      "ndcg@10": 0.8195260878648863,
+      "map": 0.8106060606060606,
+      "n": 11
+    },
+    "channel_scoped": {
+      "recall@1": 0.75,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@10": 1.0,
+      "map": 1.0,
+      "n": 4
+    },
+    "time_scoped": {
+      "recall@1": 0.3333333333333333,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.611111111111111,
+      "ndcg@10": 0.726931911371867,
+      "map": 0.6388888888888888,
+      "n": 3
+    },
+    "long_resource_chunk": {
+      "recall@1": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@10": 1.0,
+      "map": 1.0,
+      "n": 4
+    },
+    "workflow_only": {
+      "recall@1": 0.5666666666666667,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.9,
+      "ndcg@10": 0.9002336873876409,
+      "map": 0.9277777777777778,
+      "n": 5
+    },
+    "single_workflow": {
+      "recall@1": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 1.0,
+      "ndcg@10": 1.0,
+      "map": 1.0,
+      "n": 6
+    },
+    "pending_status": {
+      "recall@1": 0.5,
+      "recall@5": 0.5,
+      "recall@10": 0.5,
+      "mrr": 0.5,
+      "ndcg@10": 0.5,
+      "map": 0.5,
+      "n": 2
+    }
+  },
+  "by_entity_kind": {
+    "resource": {
+      "recall@1": 0.6200980392156863,
+      "recall@5": 0.8897058823529411,
+      "recall@10": 0.9044117647058824,
+      "mrr": 0.8026960784313726,
+      "ndcg@10": 0.7980306123409627,
+      "map": 0.7877217553688142,
+      "n": 68
+    },
+    "distillation": {
+      "recall@1": 0.3076923076923077,
+      "recall@5": 0.3076923076923077,
+      "recall@10": 0.3076923076923077,
+      "mrr": 0.3076923076923077,
+      "ndcg@10": 0.3076923076923077,
+      "map": 0.3076923076923077,
+      "n": 13
+    },
+    "mixed": {
+      "recall@1": 0.3333333333333333,
+      "recall@5": 0.3333333333333333,
+      "recall@10": 0.3333333333333333,
+      "mrr": 0.6666666666666666,
+      "ndcg@10": 0.5247697353273145,
+      "map": 0.3333333333333333,
+      "n": 6
+    },
+    "message": {
+      "recall@1": 0.5588235294117647,
+      "recall@5": 0.7647058823529411,
+      "recall@10": 0.7647058823529411,
+      "mrr": 0.6960784313725491,
+      "ndcg@10": 0.7067521745008088,
+      "map": 0.7009803921568627,
+      "n": 17
+    }
+  },
+  "latency": {
+    "p50_ms": 1.005,
+    "p95_ms": 1.1290999999999998,
+    "p99_ms": 1.20536,
+    "mean_ms": 0.8508125,
+    "n": 112
+  },
+  "counts": {
+    "n_total": 112,
+    "n_judged": 104,
+    "n_no_hit": 8,
+    "zero_result": 28,
+    "timeouts": 0,
+    "errors": 0,
+    "failures": 0,
+    "zero_result_rate": 0.25,
+    "no_hit_satisfied_rate": 1.0,
+    "timeout_rate": 0.0,
+    "error_rate": 0.0,
+    "failure_rate": 0.0
+  },
+  "per_case": [
+    {
+      "case_id": "G001",
+      "query": "FLUX.1",
+      "categories": [
+        "exact_name",
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.067,
+      "expected_count": 3,
+      "retrieved_count": 4,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1764"
+        ],
+        [
+          "resource",
+          "1757"
+        ],
+        [
+          "resource",
+          "240"
+        ],
+        [
+          "resource",
+          "5"
+        ]
+      ],
+      "recall_at_1": 0.3333333333333333,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.7075284535426455,
+      "average_precision": 0.9166666666666666
+    },
+    {
+      "case_id": "G002",
+      "query": "Wan 2.2",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.105,
+      "expected_count": 2,
+      "retrieved_count": 11,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "8"
+        ],
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "1167"
+        ],
+        [
+          "resource",
+          "83"
+        ],
+        [
+          "message",
+          "1531344153131352206"
+        ],
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "resource",
+          "30"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "resource",
+          "9"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G003",
+      "query": "Wan2.2",
+      "categories": [
+        "exact_name",
+        "spelling_variant"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.375,
+      "expected_count": 2,
+      "retrieved_count": 11,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "8"
+        ],
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "1167"
+        ],
+        [
+          "resource",
+          "83"
+        ],
+        [
+          "message",
+          "1531344153131352206"
+        ],
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "resource",
+          "30"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "resource",
+          "9"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.8339912323981488,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G004",
+      "query": "Flux 2",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.176,
+      "expected_count": 1,
+      "retrieved_count": 4,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "8"
+        ],
+        [
+          "resource",
+          "1757"
+        ],
+        [
+          "message",
+          "1531724110558920724"
+        ],
+        [
+          "message",
+          "1531723906308771967"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.6309297535714575,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G005",
+      "query": "LTX-Video",
+      "categories": [
+        "exact_name",
+        "spelling_variant"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.121,
+      "expected_count": 2,
+      "retrieved_count": 6,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "15"
+        ],
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "resource",
+          "4"
+        ],
+        [
+          "message",
+          "1531732489159184569"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.5173583649036767,
+      "average_precision": 0.45
+    },
+    {
+      "case_id": "G006",
+      "query": "lightx2v_I2V_14B",
+      "categories": [
+        "exact_name",
+        "code_fragment"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.026,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "8"
+        ],
+        [
+          "resource",
+          "2539"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G007",
+      "query": "Bernini",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.053,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "10"
+        ],
+        [
+          "resource",
+          "83"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.6309297535714575,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G008",
+      "query": "Qwen Image",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.005,
+      "expected_count": 1,
+      "retrieved_count": 4,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "8"
+        ],
+        [
+          "resource",
+          "13"
+        ],
+        [
+          "resource",
+          "1757"
+        ],
+        [
+          "resource",
+          "7"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.25,
+      "ndcg_at_10": 0.43067655807339306,
+      "average_precision": 0.25
+    },
+    {
+      "case_id": "G009",
+      "query": "VACE",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.085,
+      "expected_count": 2,
+      "retrieved_count": 6,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "7"
+        ],
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "message",
+          "1531344153131352206"
+        ],
+        [
+          "message",
+          "1531284476775370863"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.5518544320968081,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G010",
+      "query": "CogVideoX",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.038,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G011",
+      "query": "Mochi",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.184,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "260"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G012",
+      "query": "Stable Diffusion",
+      "categories": [
+        "exact_name",
+        "spelling_variant"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.036,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "240"
+        ],
+        [
+          "resource",
+          "36"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.6309297535714575,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G013",
+      "query": "SDXL",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.017,
+      "expected_count": 2,
+      "retrieved_count": 3,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "11"
+        ],
+        [
+          "resource",
+          "2757"
+        ],
+        [
+          "resource",
+          "240"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.95583058934618,
+      "average_precision": 0.8333333333333333
+    },
+    {
+      "case_id": "G014",
+      "query": "Hunyuan",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.018,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "8"
+        ],
+        [
+          "distillation",
+          "9"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G015",
+      "query": "Cascade",
+      "categories": [
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.0,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "240"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G016",
+      "query": ".gguf",
+      "categories": [
+        "exact_name",
+        "code_fragment"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.033,
+      "expected_count": 2,
+      "retrieved_count": 6,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "1167"
+        ],
+        [
+          "resource",
+          "260"
+        ],
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "13"
+        ],
+        [
+          "resource",
+          "5"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.5,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.25,
+      "ndcg_at_10": 0.4591762323522996,
+      "average_precision": 0.29166666666666663
+    },
+    {
+      "case_id": "G017",
+      "query": "Seedance 2",
+      "categories": [
+        "exact_name",
+        "best_is_distillation",
+        "cross_source"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.991,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "3"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G018",
+      "query": "WanVideoSampler",
+      "categories": [
+        "workflow_code",
+        "exact_name",
+        "timeout_prone"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.98,
+      "expected_count": 2,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G019",
+      "query": "KSampler",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.1,
+      "expected_count": 2,
+      "retrieved_count": 8,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2758"
+        ],
+        [
+          "resource",
+          "1757"
+        ],
+        [
+          "resource",
+          "83"
+        ],
+        [
+          "resource",
+          "36"
+        ],
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "13"
+        ],
+        [
+          "resource",
+          "11"
+        ],
+        [
+          "resource",
+          "8"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.5,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.25,
+      "ndcg_at_10": 0.40767445412984865,
+      "average_precision": 0.26785714285714285
+    },
+    {
+      "case_id": "G020",
+      "query": "VAEDecode",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.052,
+      "expected_count": 2,
+      "retrieved_count": 3,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1764"
+        ],
+        [
+          "resource",
+          "64"
+        ],
+        [
+          "resource",
+          "30"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.5,
+      "recall_at_10": 0.5,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.4966392596877323,
+      "average_precision": 0.25
+    },
+    {
+      "case_id": "G021",
+      "query": "BerniniConditioning",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.081,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "83"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G022",
+      "query": "BlockifyMask",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.032,
+      "expected_count": 2,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "169"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.8339912323981488,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G023",
+      "query": "MochiDecodeSpatialTiling",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.086,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "260"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G024",
+      "query": "DetailDaemonSamplerNode",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.061,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "7"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G025",
+      "query": "AudioSeparation",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.005,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1167"
+        ],
+        [
+          "resource",
+          "9"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G026",
+      "query": "DepthAnythingV2Preprocessor",
+      "categories": [
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.986,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2539"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G027",
+      "query": "IPAdapterFaceIDKolors",
+      "categories": [
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.033,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2757"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G028",
+      "query": "ClownGuide_Beta",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.052,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "240"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G029",
+      "query": "LoadWanVideoT5TextEncoder",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.02,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "20"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G030",
+      "query": "EmptyHunyuanLatentVideo",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.977,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "8"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G031",
+      "query": "Flux2Scheduler",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.99,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1757"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G032",
+      "query": "ltx-2-19b-ic-lora-detailer",
+      "categories": [
+        "workflow_code",
+        "code_fragment"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.997,
+      "expected_count": 2,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "4"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.8339912323981488,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G033",
+      "query": "wan2.2_animate_14B",
+      "categories": [
+        "workflow_code",
+        "code_fragment"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.989,
+      "expected_count": 1,
+      "retrieved_count": 3,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "2537"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G034",
+      "query": "CreateVideo",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.015,
+      "expected_count": 2,
+      "retrieved_count": 4,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "83"
+        ],
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "15"
+        ],
+        [
+          "resource",
+          "4"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.3333333333333333,
+      "ndcg_at_10": 0.5076850214429881,
+      "average_precision": 0.41666666666666663
+    },
+    {
+      "case_id": "G035",
+      "query": "which workflow wires the ColorMatch node",
+      "categories": [
+        "workflow_python_evidence",
+        "workflow_code",
+        "paraphrase"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.994,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G036",
+      "query": "find the ipadapter weight types workflow",
+      "categories": [
+        "workflow_python_evidence",
+        "workflow_code",
+        "paraphrase"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.985,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G037",
+      "query": "regional ipadapter mask conditioning",
+      "categories": [
+        "workflow_python_evidence",
+        "multi_term",
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.028,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G038",
+      "query": "controlnet inpainting flux",
+      "categories": [
+        "multi_term",
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.03,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "5"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G039",
+      "query": "video upscaling lora",
+      "categories": [
+        "multi_term"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.032,
+      "expected_count": 2,
+      "retrieved_count": 4,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "15"
+        ],
+        [
+          "resource",
+          "4"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.6763610077981964,
+      "average_precision": 0.75
+    },
+    {
+      "case_id": "G040",
+      "query": "pose control animation",
+      "categories": [
+        "multi_term"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.139,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "169"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G041",
+      "query": "audio separation multi talk",
+      "categories": [
+        "multi_term"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.01,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1167"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G042",
+      "query": "face id kolors",
+      "categories": [
+        "multi_term"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.066,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2757"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G043",
+      "query": "image comparison enhancement",
+      "categories": [
+        "multi_term"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.968,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "7"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G044",
+      "query": "noise scheduling lora",
+      "categories": [
+        "multi_term"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.988,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "8"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G045",
+      "query": "svd sdxl turbo",
+      "categories": [
+        "multi_term",
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.994,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "11"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G046",
+      "query": "make the motion less jittery",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.034,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G047",
+      "query": "tighten control using a reference video",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.006,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G048",
+      "query": "localize edits to just one region",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.978,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G049",
+      "query": "keep colors consistent between the input and output character",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.974,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G050",
+      "query": "is there a faster sampler patch",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.0,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G051",
+      "query": "compare two image editors",
+      "categories": [
+        "paraphrase",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.976,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G052",
+      "query": "what searchable info should a workflow keep",
+      "categories": [
+        "paraphrase",
+        "cross_source",
+        "best_is_distillation"
+      ],
+      "entity_kind": "mixed",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.048,
+      "expected_count": 2,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G053",
+      "query": "budget VRAM for training a control lora",
+      "categories": [
+        "paraphrase",
+        "settings",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.058,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "9"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G054",
+      "query": "Bernini OOM fix",
+      "categories": [
+        "settings",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.995,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "10"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G055",
+      "query": "ClownShark crash comfyui",
+      "categories": [
+        "settings",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.024,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G056",
+      "query": "INT8 quantization makes lora weak",
+      "categories": [
+        "settings",
+        "best_is_distillation"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.055,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G057",
+      "query": "looping sampler MSR",
+      "categories": [
+        "settings",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.025,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531487459404419102"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G058",
+      "query": "custom audio workflows",
+      "categories": [
+        "settings",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.104,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G059",
+      "query": "upscale",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.051,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531607167076012122"
+        ],
+        [
+          "message",
+          "1531358712277504222"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G060",
+      "query": "flux.2 dev lora",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.032,
+      "expected_count": 2,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531723906308771967"
+        ],
+        [
+          "message",
+          "1531724110558920724"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.8339912323981488,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G061",
+      "query": "vace t2v weights",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.026,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531284476775370863"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G062",
+      "query": "live update summary",
+      "categories": [
+        "named_author",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.049,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G063",
+      "query": "controlnet",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.045,
+      "expected_count": 2,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531344153131352206"
+        ],
+        [
+          "message",
+          "1531284476775370863"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G064",
+      "query": "sampler",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.049,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531693288141230103"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G065",
+      "query": "vae",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.05,
+      "expected_count": 2,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531732489159184569"
+        ],
+        [
+          "message",
+          "1531722733917048912"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G066",
+      "query": "upscale",
+      "categories": [
+        "channel_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.048,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531607167076012122"
+        ],
+        [
+          "message",
+          "1531358712277504222"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G067",
+      "query": "lora",
+      "categories": [
+        "time_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.301,
+      "expected_count": 2,
+      "retrieved_count": 5,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "11"
+        ],
+        [
+          "distillation",
+          "9"
+        ],
+        [
+          "message",
+          "1531732226474246244"
+        ],
+        [
+          "message",
+          "1531724110558920724"
+        ],
+        [
+          "message",
+          "1531723906308771967"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.3333333333333333,
+      "ndcg_at_10": 0.5388668879616774,
+      "average_precision": 0.41666666666666663
+    },
+    {
+      "case_id": "G068",
+      "query": "controlnet",
+      "categories": [
+        "time_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.328,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531344153131352206"
+        ],
+        [
+          "message",
+          "1531284476775370863"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G069",
+      "query": "mask",
+      "categories": [
+        "time_scoped",
+        "selective_filter",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.296,
+      "expected_count": 2,
+      "retrieved_count": 6,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "7"
+        ],
+        [
+          "message",
+          "1531728869349003414"
+        ],
+        [
+          "message",
+          "1531714016236409054"
+        ],
+        [
+          "message",
+          "1531714005544996966"
+        ],
+        [
+          "message",
+          "1531711322037682237"
+        ],
+        [
+          "distillation",
+          "4"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.6419288461539238,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G070",
+      "query": "upscale ai generated video",
+      "categories": [
+        "cross_source",
+        "best_is_distillation",
+        "snowflake"
+      ],
+      "entity_kind": "mixed",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.998,
+      "expected_count": 2,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "1"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "recall_at_10": 0.5,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.7871546029909718,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G071",
+      "query": "lightx2v motion trade off",
+      "categories": [
+        "cross_source",
+        "best_is_distillation"
+      ],
+      "entity_kind": "mixed",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.017,
+      "expected_count": 2,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "5"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "recall_at_10": 0.5,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.7871546029909718,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G072",
+      "query": "vace inpainting masks",
+      "categories": [
+        "cross_source",
+        "best_is_distillation"
+      ],
+      "entity_kind": "mixed",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.995,
+      "expected_count": 2,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "7"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "recall_at_10": 0.5,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.7871546029909718,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G073",
+      "query": "bernini conditioning video",
+      "categories": [
+        "cross_source",
+        "best_is_resource"
+      ],
+      "entity_kind": "mixed",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.985,
+      "expected_count": 2,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "83"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 0.5,
+      "recall_at_10": 0.5,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.7871546029909718,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G074",
+      "query": "upscale step preserve detail",
+      "categories": [
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.973,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G075",
+      "query": "not seeing many flux.2 dev loras",
+      "categories": [
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.021,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531723906308771967"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G076",
+      "query": "audio vae only super and nano",
+      "categories": [
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.208,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "message",
+          "1531719890136993862"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G077",
+      "query": "flux inpainting compositing",
+      "categories": [
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.142,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "5"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G078",
+      "query": "mochi video input",
+      "categories": [
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.051,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "260"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G079",
+      "query": "faceid kolors chatglm",
+      "categories": [
+        "best_is_resource"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.984,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G080",
+      "query": "taeltx",
+      "categories": [
+        "long_resource_chunk",
+        "workflow_code",
+        "code_fragment"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.015,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "25"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G081",
+      "query": "wan2.2_animate_14B_bf16",
+      "categories": [
+        "long_resource_chunk",
+        "workflow_code",
+        "code_fragment"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.039,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2542"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G082",
+      "query": "wan2.1_vace_14B",
+      "categories": [
+        "long_resource_chunk",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.069,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "resource",
+          "2539"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G083",
+      "query": "Florence2",
+      "categories": [
+        "workflow_only",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.7,
+      "expected_count": 2,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "resource",
+          "7"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G084",
+      "query": "ColorMatch",
+      "categories": [
+        "workflow_only",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.694,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2537"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G085",
+      "query": "IPAdapter",
+      "categories": [
+        "workflow_only",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.705,
+      "expected_count": 3,
+      "retrieved_count": 3,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2758"
+        ],
+        [
+          "resource",
+          "2750"
+        ],
+        [
+          "resource",
+          "2757"
+        ]
+      ],
+      "recall_at_1": 0.3333333333333333,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.8579514172105233,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G086",
+      "query": "LTX",
+      "categories": [
+        "workflow_only",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.717,
+      "expected_count": 3,
+      "retrieved_count": 5,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "15"
+        ],
+        [
+          "resource",
+          "4"
+        ],
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "2538"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.6432170197276813,
+      "average_precision": 0.6388888888888888
+    },
+    {
+      "case_id": "G087",
+      "query": "Mochi",
+      "categories": [
+        "workflow_only",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.714,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "260"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G088",
+      "query": "ColorMatch",
+      "categories": [
+        "single_workflow",
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.086,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2537"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G089",
+      "query": "BerniniConditioning",
+      "categories": [
+        "single_workflow",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.089,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "83"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G090",
+      "query": "BlockifyMask",
+      "categories": [
+        "single_workflow",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.092,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "169"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G091",
+      "query": "ipadapter_weight_types",
+      "categories": [
+        "single_workflow",
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.078,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2758"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G092",
+      "query": "Flux2Scheduler",
+      "categories": [
+        "single_workflow",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.081,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1757"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G093",
+      "query": "taeltx",
+      "categories": [
+        "single_workflow",
+        "long_resource_chunk",
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.091,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2540"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G094",
+      "query": "ltxv",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.016,
+      "expected_count": 2,
+      "retrieved_count": 6,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "15"
+        ],
+        [
+          "resource",
+          "4"
+        ],
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "message",
+          "1531732489159184569"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.606422698504514,
+      "average_precision": 0.5833333333333333
+    },
+    {
+      "case_id": "G095",
+      "query": "wanvideo",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.044,
+      "expected_count": 1,
+      "retrieved_count": 10,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "30"
+        ],
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "resource",
+          "9"
+        ],
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "resource",
+          "1167"
+        ],
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "83"
+        ],
+        [
+          "resource",
+          "8"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_10": 0.6309297535714575,
+      "average_precision": 0.5
+    },
+    {
+      "case_id": "G096",
+      "query": "sd_xl",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.0,
+      "expected_count": 2,
+      "retrieved_count": 3,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "11"
+        ],
+        [
+          "resource",
+          "2757"
+        ],
+        [
+          "resource",
+          "240"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.95583058934618,
+      "average_precision": 0.8333333333333333
+    },
+    {
+      "case_id": "G097",
+      "query": "control net",
+      "categories": [
+        "spelling_variant"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.02,
+      "expected_count": 2,
+      "retrieved_count": 9,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "20"
+        ],
+        [
+          "resource",
+          "5"
+        ],
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "message",
+          "1531344153131352206"
+        ],
+        [
+          "message",
+          "1531284476775370863"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.8339912323981488,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G098",
+      "query": "flux1",
+      "categories": [
+        "spelling_variant",
+        "exact_name"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.999,
+      "expected_count": 2,
+      "retrieved_count": 4,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "1764"
+        ],
+        [
+          "resource",
+          "1757"
+        ],
+        [
+          "resource",
+          "240"
+        ],
+        [
+          "resource",
+          "5"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.6763610077981964,
+      "average_precision": 0.75
+    },
+    {
+      "case_id": "G099",
+      "query": "CFGGuider",
+      "categories": [
+        "workflow_code"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.012,
+      "expected_count": 2,
+      "retrieved_count": 3,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "resource",
+          "25"
+        ],
+        [
+          "resource",
+          "15"
+        ]
+      ],
+      "recall_at_1": 0.5,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 0.95583058934618,
+      "average_precision": 0.8333333333333333
+    },
+    {
+      "case_id": "G100",
+      "query": "DownloadAndLoadFlorence2Model",
+      "categories": [
+        "workflow_code",
+        "workflow_python_evidence"
+      ],
+      "entity_kind": "resource",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.037,
+      "expected_count": 1,
+      "retrieved_count": 2,
+      "zero_result": false,
+      "ranked": [
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "resource",
+          "7"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G101",
+      "query": "model",
+      "categories": [
+        "timeout_prone",
+        "best_is_message",
+        "snowflake"
+      ],
+      "entity_kind": "message",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.104,
+      "expected_count": 2,
+      "retrieved_count": 20,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "5"
+        ],
+        [
+          "resource",
+          "240"
+        ],
+        [
+          "resource",
+          "2758"
+        ],
+        [
+          "resource",
+          "2757"
+        ],
+        [
+          "resource",
+          "2750"
+        ],
+        [
+          "resource",
+          "2542"
+        ],
+        [
+          "resource",
+          "2540"
+        ],
+        [
+          "resource",
+          "2539"
+        ],
+        [
+          "resource",
+          "2538"
+        ],
+        [
+          "resource",
+          "2537"
+        ],
+        [
+          "resource",
+          "1764"
+        ],
+        [
+          "resource",
+          "1757"
+        ],
+        [
+          "resource",
+          "1167"
+        ],
+        [
+          "resource",
+          "260"
+        ],
+        [
+          "resource",
+          "169"
+        ],
+        [
+          "resource",
+          "83"
+        ],
+        [
+          "resource",
+          "64"
+        ],
+        [
+          "resource",
+          "36"
+        ],
+        [
+          "resource",
+          "30"
+        ],
+        [
+          "resource",
+          "25"
+        ]
+      ],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G102",
+      "query": "controlnet settings",
+      "categories": [
+        "timeout_prone",
+        "multi_term"
+      ],
+      "entity_kind": "mixed",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.98,
+      "expected_count": 2,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G103",
+      "query": "best distillation for upscaling video",
+      "categories": [
+        "best_is_distillation",
+        "pending_status"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.992,
+      "expected_count": 1,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "recall_at_1": 0.0,
+      "recall_at_5": 0.0,
+      "recall_at_10": 0.0,
+      "reciprocal_rank": 0.0,
+      "ndcg_at_10": 0.0,
+      "average_precision": 0.0
+    },
+    {
+      "case_id": "G104",
+      "query": "attention tuner patch speed",
+      "categories": [
+        "best_is_distillation",
+        "pending_status",
+        "settings"
+      ],
+      "entity_kind": "distillation",
+      "expect_no_hit": false,
+      "is_judged": true,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.995,
+      "expected_count": 1,
+      "retrieved_count": 1,
+      "zero_result": false,
+      "ranked": [
+        [
+          "distillation",
+          "6"
+        ]
+      ],
+      "recall_at_1": 1.0,
+      "recall_at_5": 1.0,
+      "recall_at_10": 1.0,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_10": 1.0,
+      "average_precision": 1.0
+    },
+    {
+      "case_id": "G105",
+      "query": "zzqxnotarealmodel-99999",
+      "categories": [
+        "no_hit"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.035,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G106",
+      "query": "qwertyuiopasdfgh-nonexistent-term",
+      "categories": [
+        "no_hit"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.028,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G107",
+      "query": "DEFINITELY_NOT_A_REAL_NODE_CLASS_XYZ",
+      "categories": [
+        "no_hit",
+        "workflow_only"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.741,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G108",
+      "query": "BerniniConditioning",
+      "categories": [
+        "no_hit",
+        "single_workflow"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.081,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G109",
+      "query": "ColorMatch",
+      "categories": [
+        "no_hit",
+        "single_workflow"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.079,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G110",
+      "query": "upscale",
+      "categories": [
+        "no_hit",
+        "time_scoped"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.012,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G111",
+      "query": "DROP TABLE unified_feed",
+      "categories": [
+        "no_hit"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 1.025,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    },
+    {
+      "case_id": "G112",
+      "query": "🛑🦄 imaginary-emoji-workflow-🦄🛑",
+      "categories": [
+        "no_hit"
+      ],
+      "entity_kind": null,
+      "expect_no_hit": true,
+      "is_judged": false,
+      "outcome": "ok",
+      "error": null,
+      "latency_ms": 0.975,
+      "expected_count": 0,
+      "retrieved_count": 0,
+      "zero_result": true,
+      "ranked": [],
+      "no_hit_satisfied": true
+    }
+  ]
+}

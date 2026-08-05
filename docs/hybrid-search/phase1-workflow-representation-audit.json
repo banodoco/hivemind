@@ -1,0 +1,48 @@
+{
+  "class_counts": {
+    "coverage_failed": 0,
+    "invalid_source": 0,
+    "parser_fallback": 0,
+    "secret_quarantined": 1,
+    "syntactically_valid": 221
+  },
+  "cohort_counts": {
+    "payload_python": 222
+  },
+  "disagreements": {
+    "by_code": {},
+    "ids_by_code": {},
+    "total_rows_with_any_disagreement": 0
+  },
+  "ids_by_failure_class": {
+    "coverage_failed": [],
+    "invalid_source": [],
+    "parser_fallback": [],
+    "secret_quarantined": [
+      "2625"
+    ]
+  },
+  "mutated_production": false,
+  "notes": [
+    "secret_quarantined counts include any row whose fresh scan_secrets hits, regardless of parse status.",
+    "parser_fallback = ast.parse raises SyntaxError but the frozen chunk_python ast_fallback path still achieves full coverage (recoverable huge literal / unparseable block).",
+    "coverage_failed = parses (or fallbacks) but coverage_ok is False (fail-closed; would raise CoverageError in the refresh path; zero chunks indexed).",
+    "invalid_source = cannot be parsed AND no recoverable fallback (genuinely broken authoritative source).",
+    "ids are opaque numeric resource ids; no source/snippet/secret value is emitted by this audit."
+  ],
+  "population": {
+    "authoritative_payload_python_rows": 222,
+    "parse_errors_at_fetch": 0,
+    "total_workflow_resources": 2757
+  },
+  "read_only": true,
+  "requirement": "F",
+  "secret_reason_counts": {
+    "from_fresh_scan": {
+      "provider_token_prefix": 1
+    },
+    "from_live_state": {
+      "provider_token_prefix": 1
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "cache_misses": 0,
+  "chunk_config_identity_version": 1,
+  "chunking_version": 2,
+  "cohort_noop_all": true,
+  "cohort_noop_detail": {
+    "1536-large": {
+      "cohort_chunk_map_identical_to_v1": true,
+      "n_chunks": 11349,
+      "n_unique_embeddable_texts": 11248,
+      "unique_text_keys_identical_to_v1": true,
+      "unique_text_mapping_identical_to_v1": true
+    },
+    "1536-small": {
+      "cohort_chunk_map_identical_to_v1": true,
+      "n_chunks": 23138,
+      "n_unique_embeddable_texts": 22850,
+      "unique_text_keys_identical_to_v1": true,
+      "unique_text_mapping_identical_to_v1": true
+    },
+    "384-large": {
+      "cohort_chunk_map_identical_to_v1": true,
+      "n_chunks": 11349,
+      "n_unique_embeddable_texts": 11248,
+      "unique_text_keys_identical_to_v1": true,
+      "unique_text_mapping_identical_to_v1": true
+    },
+    "384-small": {
+      "cohort_chunk_map_identical_to_v1": true,
+      "n_chunks": 23138,
+      "n_unique_embeddable_texts": 22850,
+      "unique_text_keys_identical_to_v1": true,
+      "unique_text_mapping_identical_to_v1": true
+    }
+  },
+  "historical_chunking_v1_selected_contract_id": "4663917141483337699",
+  "invalid_double_bump_note": "the prior double-bump contract (chunk_config identity v2) is invalid and rejected by this correction; chunking behavior is v2 but the chunk-config identity scheme is v1.",
+  "invalid_double_bump_selected_contract_id": "8308923303736049826",
+  "kind": "task-2.14-v2-chunking-equivalence-summary",
+  "limitation": "This proves exact cache-only metrics over the persisted cache-equivalent reconstruction under CHUNKING v2; it cannot retroactively prove equality to Task-2.14's original per-entity mapping because that original mapping was never persisted. Cohort no-op is proven directly: the v2 chunk map (recomputed from raw entities with the bounded _line_window fix) is byte-identical to the v1 chunk map the paid caches were built from, so the v2 evaluation is zero-call.",
+  "metrics_all_equal_to_eval3": true,
+  "network_calls": 0,
+  "paid_cache_sha256": {
+    "1536": "67640ef966cd72d47ed01ced1d51389cd53b1d9a0f0fa5d97fa5a6359b795284",
+    "384": "70a9fc7454c3374f89464f86022952b62862badd10f9c79becb0ebc95926a2b5"
+  },
+  "paid_caches_unchanged": true,
+  "private_evidence": [
+    ".cache/hivemind-task-2.14-reconstruction/v2-reconstruction-binding.json",
+    ".cache/hivemind-task-2.14-reconstruction/v2-cache-only-reconstruction-proof.json"
+  ],
+  "provider_calls": 0,
+  "selected_contract_id": "1360541028304258884",
+  "selected_contract_identity_note": "the CORRECT selected literal: chunking_version=2 (bounded oversized workflow-Python fallback) + chunk_config identity v1 (identity scheme unchanged). CHUNKING_VERSION=2; CHUNK_CONFIG_IDENTITY_VERSION=1.",
+  "verdict": true,
+  "winner": "384-small",
+  "winner_matches_eval3": true
+}

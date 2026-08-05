@@ -1,0 +1,1373 @@
+{
+  "version": "identifier-normalization/2026-07-28/v1",
+  "task": "1.4",
+  "date": "2026-07-28",
+  "plan": "docs/architecture/hivemind-hybrid-search-plan.md",
+  "post_hoc_locked": true,
+  "normalization_version": 1,
+  "alias_version": 1,
+  "casefold_policy": "NFC + str.lower() (not str.casefold())",
+  "python_module": "executors.identifier_normalization",
+  "sql_migration": "schema/005_identifier_normalization.sql",
+  "summary": {
+    "n_fixtures": 86,
+    "n_accept": 77,
+    "n_distinct": 9,
+    "forms_covered": [
+      "adversarial",
+      "alias",
+      "cjk",
+      "class",
+      "code_fragment",
+      "confusable",
+      "diacritic",
+      "distinct",
+      "dotted",
+      "empty",
+      "exact_name",
+      "filename",
+      "function",
+      "hyphenated",
+      "import",
+      "keyword_argument",
+      "length_bound",
+      "malformed",
+      "no_hit",
+      "none",
+      "path",
+      "python_symbol",
+      "spelling_variant",
+      "versioned",
+      "whitespace",
+      "workflow_code"
+    ]
+  },
+  "distinct_chars_documented": {
+    "ß": "German eszett stays 'ß' (not folded to 'ss'); 'groß' != 'gross'.",
+    "İ": "Turkish dotted capital I -> 'i' + U+0307 under lower(); not folded to plain 'i'. (Both Python lower() and ICU lower(value COLLATE und) agree on this.)",
+    "ﬁﬂﬀﬃﬄ": "Latin ligatures stay composed (not expanded to fi/fl/ff); 'ﬁle' != 'file'. NFC (not NFKC) is the frozen policy, so compatibility decompositions are not applied.",
+    "Ａ-Ｚａ-ｚ０-９": "Fullwidth Latin/digits stay fullwidth; 'ＡＢＣ' != 'ABC'. NFC does not compatibility-fold fullwidth forms (NFKC would).",
+    "⁰¹²³": "Superscript digits stay distinct; '²' != '2'. (NFC, not NFKC.)",
+    "a/а/α": "Homoglyphs are NOT folded: Latin 'a' (U+0061), Cyrillic 'а' (U+0430), and Greek 'α' (U+03B1) remain three distinct compact keys. Confusable folding is a separate, riskier transform that would merge unrelated identities; it is deliberately absent."
+  },
+  "fixtures": [
+    {
+      "id": "N001",
+      "input": "FLUX.1",
+      "input_repr": "'FLUX.1'",
+      "expected_compact": "flux1",
+      "expected_preserve": "flux.1",
+      "forms": [
+        "dotted",
+        "versioned",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G001"
+      ],
+      "notes": "Dotted versioned model name."
+    },
+    {
+      "id": "N002",
+      "input": "flux.1",
+      "input_repr": "'flux.1'",
+      "expected_compact": "flux1",
+      "expected_preserve": "flux.1",
+      "forms": [
+        "dotted",
+        "versioned",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G098"
+      ],
+      "notes": "Lowercase dotted variant; collapses with FLUX.1."
+    },
+    {
+      "id": "N003",
+      "input": "flux1",
+      "input_repr": "'flux1'",
+      "expected_compact": "flux1",
+      "expected_preserve": "flux1",
+      "forms": [
+        "dotted",
+        "versioned",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G098"
+      ],
+      "notes": "No-separator variant; collapses with FLUX.1."
+    },
+    {
+      "id": "N004",
+      "input": "Wan 2.2",
+      "input_repr": "'Wan 2.2'",
+      "expected_compact": "wan22",
+      "expected_preserve": "wan 2.2",
+      "forms": [
+        "versioned",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G002"
+      ],
+      "notes": "Spaced version name."
+    },
+    {
+      "id": "N005",
+      "input": "Wan2.2",
+      "input_repr": "'Wan2.2'",
+      "expected_compact": "wan22",
+      "expected_preserve": "wan2.2",
+      "forms": [
+        "versioned",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G003"
+      ],
+      "notes": "No-space variant; collapses with 'Wan 2.2'."
+    },
+    {
+      "id": "N006",
+      "input": "wan_2.2",
+      "input_repr": "'wan_2.2'",
+      "expected_compact": "wan22",
+      "expected_preserve": "wan_2.2",
+      "forms": [
+        "versioned",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G003"
+      ],
+      "notes": "Underscore variant; collapses with 'Wan 2.2'."
+    },
+    {
+      "id": "N007",
+      "input": "WAN 2.2",
+      "input_repr": "'WAN 2.2'",
+      "expected_compact": "wan22",
+      "expected_preserve": "wan 2.2",
+      "forms": [
+        "versioned",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G003"
+      ],
+      "notes": "Uppercase spaced variant; casefolded."
+    },
+    {
+      "id": "N008",
+      "input": "wan2.2",
+      "input_repr": "'wan2.2'",
+      "expected_compact": "wan22",
+      "expected_preserve": "wan2.2",
+      "forms": [
+        "versioned",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G003"
+      ],
+      "notes": "Lowercase no-space variant."
+    },
+    {
+      "id": "N009",
+      "input": "Flux 2",
+      "input_repr": "'Flux 2'",
+      "expected_compact": "flux2",
+      "expected_preserve": "flux 2",
+      "forms": [
+        "versioned",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G004"
+      ],
+      "notes": "Spaced version."
+    },
+    {
+      "id": "N010",
+      "input": "Seedance 2",
+      "input_repr": "'Seedance 2'",
+      "expected_compact": "seedance2",
+      "expected_preserve": "seedance 2",
+      "forms": [
+        "versioned",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G017"
+      ],
+      "notes": "Spaced version (present as distillation topic)."
+    },
+    {
+      "id": "N011",
+      "input": "LTX-Video",
+      "input_repr": "'LTX-Video'",
+      "expected_compact": "ltxvideo",
+      "expected_preserve": "ltx-video",
+      "forms": [
+        "hyphenated",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G005"
+      ],
+      "notes": "Hyphenated node/model family."
+    },
+    {
+      "id": "N012",
+      "input": "ltx-2-19b-ic-lora-detailer",
+      "input_repr": "'ltx-2-19b-ic-lora-detailer'",
+      "expected_compact": "ltx219bicloradetailer",
+      "expected_preserve": "ltx-2-19b-ic-lora-detailer",
+      "forms": [
+        "hyphenated",
+        "filename",
+        "code_fragment",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G032"
+      ],
+      "notes": "Hyphenated LoRA slug filename."
+    },
+    {
+      "id": "N013",
+      "input": "ClownGuide_Beta",
+      "input_repr": "'ClownGuide_Beta'",
+      "expected_compact": "clownguidebeta",
+      "expected_preserve": "clownguide_beta",
+      "forms": [
+        "hyphenated",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G028"
+      ],
+      "notes": "Node class; underscore kept in preserve."
+    },
+    {
+      "id": "N014",
+      "input": ".safetensors",
+      "input_repr": "'.safetensors'",
+      "expected_compact": "safetensors",
+      "expected_preserve": ".safetensors",
+      "forms": [
+        "filename",
+        "exact_name",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G016"
+      ],
+      "notes": "Leading-dot extension."
+    },
+    {
+      "id": "N015",
+      "input": ".gguf",
+      "input_repr": "'.gguf'",
+      "expected_compact": "gguf",
+      "expected_preserve": ".gguf",
+      "forms": [
+        "filename",
+        "exact_name",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G016"
+      ],
+      "notes": "Leading-dot extension."
+    },
+    {
+      "id": "N016",
+      "input": "model.safetensors",
+      "input_repr": "'model.safetensors'",
+      "expected_compact": "modelsafetensors",
+      "expected_preserve": "model.safetensors",
+      "forms": [
+        "filename",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Filename with extension."
+    },
+    {
+      "id": "N017",
+      "input": "lightx2v_I2V_14B.safetensors",
+      "input_repr": "'lightx2v_I2V_14B.safetensors'",
+      "expected_compact": "lightx2vi2v14bsafetensors",
+      "expected_preserve": "lightx2v_i2v_14b.safetensors",
+      "forms": [
+        "filename",
+        "code_fragment",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G006"
+      ],
+      "notes": "Underscore+dot filename; compact drops _ and ."
+    },
+    {
+      "id": "N018",
+      "input": "wan2.2_animate_14B_bf16",
+      "input_repr": "'wan2.2_animate_14B_bf16'",
+      "expected_compact": "wan22animate14bbf16",
+      "expected_preserve": "wan2.2_animate_14b_bf16",
+      "forms": [
+        "filename",
+        "code_fragment",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G081"
+      ],
+      "notes": "Mixed-separator model filename."
+    },
+    {
+      "id": "N019",
+      "input": "wan2.1_vace_14B",
+      "input_repr": "'wan2.1_vace_14B'",
+      "expected_compact": "wan21vace14b",
+      "expected_preserve": "wan2.1_vace_14b",
+      "forms": [
+        "filename",
+        "code_fragment",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G082"
+      ],
+      "notes": "Model filename."
+    },
+    {
+      "id": "N020",
+      "input": "taeltx",
+      "input_repr": "'taeltx'",
+      "expected_compact": "taeltx",
+      "expected_preserve": "taeltx",
+      "forms": [
+        "filename",
+        "code_fragment",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G080"
+      ],
+      "notes": "Compact code fragment token."
+    },
+    {
+      "id": "N021",
+      "input": "ltxv",
+      "input_repr": "'ltxv'",
+      "expected_compact": "ltxv",
+      "expected_preserve": "ltxv",
+      "forms": [
+        "filename",
+        "exact_name",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G094"
+      ],
+      "notes": "Short alias of LTX-Video."
+    },
+    {
+      "id": "N022",
+      "input": "WanVideoSampler",
+      "input_repr": "'WanVideoSampler'",
+      "expected_compact": "wanvideosampler",
+      "expected_preserve": "wanvideosampler",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G018"
+      ],
+      "notes": "ComfyUI node class (legacy ILIKE timeout-prone)."
+    },
+    {
+      "id": "N023",
+      "input": "KSampler",
+      "input_repr": "'KSampler'",
+      "expected_compact": "ksampler",
+      "expected_preserve": "ksampler",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G019"
+      ],
+      "notes": "Core sampler node class."
+    },
+    {
+      "id": "N024",
+      "input": "VAEDecode",
+      "input_repr": "'VAEDecode'",
+      "expected_compact": "vaedecode",
+      "expected_preserve": "vaedecode",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G020"
+      ],
+      "notes": "VAE decode node class."
+    },
+    {
+      "id": "N025",
+      "input": "BerniniConditioning",
+      "input_repr": "'BerniniConditioning'",
+      "expected_compact": "berniniconditioning",
+      "expected_preserve": "berniniconditioning",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G021"
+      ],
+      "notes": "Node class."
+    },
+    {
+      "id": "N026",
+      "input": "BlockifyMask",
+      "input_repr": "'BlockifyMask'",
+      "expected_compact": "blockifymask",
+      "expected_preserve": "blockifymask",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G022"
+      ],
+      "notes": "Node class."
+    },
+    {
+      "id": "N027",
+      "input": "IPAdapterFaceIDKolors",
+      "input_repr": "'IPAdapterFaceIDKolors'",
+      "expected_compact": "ipadapterfaceidkolors",
+      "expected_preserve": "ipadapterfaceidkolors",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G027"
+      ],
+      "notes": "CamelCase node class."
+    },
+    {
+      "id": "N028",
+      "input": "Flux2Scheduler",
+      "input_repr": "'Flux2Scheduler'",
+      "expected_compact": "flux2scheduler",
+      "expected_preserve": "flux2scheduler",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G031"
+      ],
+      "notes": "Node class."
+    },
+    {
+      "id": "N029",
+      "input": "CFGGuider",
+      "input_repr": "'CFGGuider'",
+      "expected_compact": "cfgguider",
+      "expected_preserve": "cfgguider",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G099"
+      ],
+      "notes": "Node class (both-cohort row)."
+    },
+    {
+      "id": "N030",
+      "input": "DownloadAndLoadFlorence2Model",
+      "input_repr": "'DownloadAndLoadFlorence2Model'",
+      "expected_compact": "downloadandloadflorence2model",
+      "expected_preserve": "downloadandloadflorence2model",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G100"
+      ],
+      "notes": "Long CamelCase node class (both-cohort row)."
+    },
+    {
+      "id": "N031",
+      "input": "ipadapter_weight_types",
+      "input_repr": "'ipadapter_weight_types'",
+      "expected_compact": "ipadapterweighttypes",
+      "expected_preserve": "ipadapter_weight_types",
+      "forms": [
+        "python_symbol",
+        "workflow_code",
+        "keyword_argument"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G091"
+      ],
+      "notes": "snake_case Python symbol / arg."
+    },
+    {
+      "id": "N032",
+      "input": "ColorMatch",
+      "input_repr": "'ColorMatch'",
+      "expected_compact": "colormatch",
+      "expected_preserve": "colormatch",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G084"
+      ],
+      "notes": "Node class."
+    },
+    {
+      "id": "N033",
+      "input": "EmptyHunyuanLatentVideo",
+      "input_repr": "'EmptyHunyuanLatentVideo'",
+      "expected_compact": "emptyhunyuanlatentvideo",
+      "expected_preserve": "emptyhunyuanlatentvideo",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G030"
+      ],
+      "notes": "Node class."
+    },
+    {
+      "id": "N034",
+      "input": "MochiDecodeSpatialTiling",
+      "input_repr": "'MochiDecodeSpatialTiling'",
+      "expected_compact": "mochidecodespatialtiling",
+      "expected_preserve": "mochidecodespatialtiling",
+      "forms": [
+        "python_symbol",
+        "workflow_code"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G023"
+      ],
+      "notes": "Node class."
+    },
+    {
+      "id": "N035",
+      "input": "from wanmodules import WanVideoSampler",
+      "input_repr": "'from wanmodules import WanVideoSampler'",
+      "expected_compact": "fromwanmodulesimportwanvideosampler",
+      "expected_preserve": "from wanmodules import wanvideosampler",
+      "forms": [
+        "import",
+        "python_symbol",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Python import line."
+    },
+    {
+      "id": "N036",
+      "input": "import torch",
+      "input_repr": "'import torch'",
+      "expected_compact": "importtorch",
+      "expected_preserve": "import torch",
+      "forms": [
+        "import",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Python import line."
+    },
+    {
+      "id": "N037",
+      "input": "class WanVideoSamplerBlockSwap",
+      "input_repr": "'class WanVideoSamplerBlockSwap'",
+      "expected_compact": "classwanvideosamplerblockswap",
+      "expected_preserve": "class wanvideosamplerblockswap",
+      "forms": [
+        "class",
+        "python_symbol",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Python class statement."
+    },
+    {
+      "id": "N038",
+      "input": "def load_model",
+      "input_repr": "'def load_model'",
+      "expected_compact": "defloadmodel",
+      "expected_preserve": "def load_model",
+      "forms": [
+        "function",
+        "python_symbol",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Python function statement."
+    },
+    {
+      "id": "N039",
+      "input": "force_clip_output=False",
+      "input_repr": "'force_clip_output=False'",
+      "expected_compact": "forceclipoutput=false",
+      "expected_preserve": "force_clip_output=false",
+      "forms": [
+        "keyword_argument",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "KW arg; '=' preserved, '_' compacted."
+    },
+    {
+      "id": "N040",
+      "input": "steps=20",
+      "input_repr": "'steps=20'",
+      "expected_compact": "steps=20",
+      "expected_preserve": "steps=20",
+      "forms": [
+        "keyword_argument",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Numeric KW arg."
+    },
+    {
+      "id": "N041",
+      "input": "seed=12345",
+      "input_repr": "'seed=12345'",
+      "expected_compact": "seed=12345",
+      "expected_preserve": "seed=12345",
+      "forms": [
+        "keyword_argument",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Numeric KW arg."
+    },
+    {
+      "id": "N042",
+      "input": "models/checkpoints/flux1-dev.safetensors",
+      "input_repr": "'models/checkpoints/flux1-dev.safetensors'",
+      "expected_compact": "modelscheckpointsflux1devsafetensors",
+      "expected_preserve": "models/checkpoints/flux1-dev.safetensors",
+      "forms": [
+        "path",
+        "filename"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Repo/model path."
+    },
+    {
+      "id": "N043",
+      "input": "./workflows/wan.json",
+      "input_repr": "'./workflows/wan.json'",
+      "expected_compact": "workflowswanjson",
+      "expected_preserve": "./workflows/wan.json",
+      "forms": [
+        "path"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Relative path."
+    },
+    {
+      "id": "N044",
+      "input": "C:\\Users\\flux",
+      "input_repr": "'C:\\\\Users\\\\flux'",
+      "expected_compact": "cusersflux",
+      "expected_preserve": "c:\\users\\flux",
+      "forms": [
+        "path"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Windows-style path; backslash is a separator."
+    },
+    {
+      "id": "N045",
+      "input": "ControlNet",
+      "input_repr": "'ControlNet'",
+      "expected_compact": "controlnet",
+      "expected_preserve": "controlnet",
+      "forms": [
+        "alias",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Canonical display name."
+    },
+    {
+      "id": "N046",
+      "input": "control net",
+      "input_repr": "'control net'",
+      "expected_compact": "controlnet",
+      "expected_preserve": "control net",
+      "forms": [
+        "alias",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G097"
+      ],
+      "notes": "Spaced alias; collapses with controlnet."
+    },
+    {
+      "id": "N047",
+      "input": "controlnet",
+      "input_repr": "'controlnet'",
+      "expected_compact": "controlnet",
+      "expected_preserve": "controlnet",
+      "forms": [
+        "alias",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G097"
+      ],
+      "notes": "Compact alias; collapses with 'control net'."
+    },
+    {
+      "id": "N048",
+      "input": "wanvideo",
+      "input_repr": "'wanvideo'",
+      "expected_compact": "wanvideo",
+      "expected_preserve": "wanvideo",
+      "forms": [
+        "alias",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G095"
+      ],
+      "notes": "Alias of WanVideo family."
+    },
+    {
+      "id": "N049",
+      "input": "sd_xl",
+      "input_repr": "'sd_xl'",
+      "expected_compact": "sdxl",
+      "expected_preserve": "sd_xl",
+      "forms": [
+        "alias",
+        "spelling_variant"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G096"
+      ],
+      "notes": "Alias of Stable Diffusion XL."
+    },
+    {
+      "id": "N050",
+      "input": "Stable Diffusion",
+      "input_repr": "'Stable Diffusion'",
+      "expected_compact": "stablediffusion",
+      "expected_preserve": "stable diffusion",
+      "forms": [
+        "alias",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G012"
+      ],
+      "notes": "Canonical spaced name."
+    },
+    {
+      "id": "N051",
+      "input": "动漫视频",
+      "input_repr": "'动漫视频'",
+      "expected_compact": "动漫视频",
+      "expected_preserve": "动漫视频",
+      "forms": [
+        "cjk"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "CJK model/topic term; caseless, preserved."
+    },
+    {
+      "id": "N052",
+      "input": "动漫 Video",
+      "input_repr": "'动漫 Video'",
+      "expected_compact": "动漫video",
+      "expected_preserve": "动漫 video",
+      "forms": [
+        "cjk"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Mixed CJK + ASCII."
+    },
+    {
+      "id": "N053",
+      "input": "café",
+      "input_repr": "'café'",
+      "expected_compact": "café",
+      "expected_preserve": "café",
+      "forms": [
+        "diacritic"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Precomposed NFC Latin diacritic."
+    },
+    {
+      "id": "N054",
+      "input": "naïve",
+      "input_repr": "'naïve'",
+      "expected_compact": "naïve",
+      "expected_preserve": "naïve",
+      "forms": [
+        "diacritic"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Precomposed NFC Latin diacritic."
+    },
+    {
+      "id": "N055",
+      "input": "résumé",
+      "input_repr": "'résumé'",
+      "expected_compact": "résumé",
+      "expected_preserve": "résumé",
+      "forms": [
+        "diacritic"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Precomposed NFC Latin diacritic."
+    },
+    {
+      "id": "N056",
+      "input": "Über",
+      "input_repr": "'Über'",
+      "expected_compact": "über",
+      "expected_preserve": "über",
+      "forms": [
+        "diacritic"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "German capital umlaut; ICU lowers to 'über' regardless of locale."
+    },
+    {
+      "id": "N057",
+      "input": "İstanbul",
+      "input_repr": "'İstanbul'",
+      "expected_compact": "i̇stanbul",
+      "expected_preserve": "i̇stanbul",
+      "forms": [
+        "diacritic"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Turkish dotted I; lower() -> i + U+0307 (matches ICU und)."
+    },
+    {
+      "id": "N058",
+      "input": "key=value",
+      "input_repr": "'key=value'",
+      "expected_compact": "key=value",
+      "expected_preserve": "key=value",
+      "forms": [
+        "keyword_argument",
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "'=' is NOT a separator; kept."
+    },
+    {
+      "id": "N059",
+      "input": "a+b",
+      "input_repr": "'a+b'",
+      "expected_compact": "a+b",
+      "expected_preserve": "a+b",
+      "forms": [
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "'+' kept."
+    },
+    {
+      "id": "N060",
+      "input": "#flux",
+      "input_repr": "'#flux'",
+      "expected_compact": "#flux",
+      "expected_preserve": "#flux",
+      "forms": [
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "'#' kept."
+    },
+    {
+      "id": "N061",
+      "input": "100%",
+      "input_repr": "'100%'",
+      "expected_compact": "100%",
+      "expected_preserve": "100%",
+      "forms": [
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "'%' kept."
+    },
+    {
+      "id": "N062",
+      "input": "arr[0]",
+      "input_repr": "'arr[0]'",
+      "expected_compact": "arr0",
+      "expected_preserve": "arr[0]",
+      "forms": [
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Brackets are separators; digits/letters kept."
+    },
+    {
+      "id": "N063",
+      "input": "(grouped)",
+      "input_repr": "'(grouped)'",
+      "expected_compact": "grouped",
+      "expected_preserve": "(grouped)",
+      "forms": [
+        "code_fragment"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Parens are separators."
+    },
+    {
+      "id": "N064",
+      "input": "'; DROP TABLE unified_feed; --",
+      "input_repr": "\"'; DROP TABLE unified_feed; --\"",
+      "expected_compact": "droptableunifiedfeed",
+      "expected_preserve": "'; drop table unified_feed; --",
+      "forms": [
+        "adversarial"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [
+        "G(no_hit)"
+      ],
+      "notes": "SQL-injection-shaped string; normalized to inert compact key."
+    },
+    {
+      "id": "N065",
+      "input": "a' OR '1'='1",
+      "input_repr": "\"a' OR '1'='1\"",
+      "expected_compact": "aor1=1",
+      "expected_preserve": "a' or '1'='1",
+      "forms": [
+        "adversarial"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Injection-shaped string."
+    },
+    {
+      "id": "N066",
+      "input": "UNION SELECT * FROM x",
+      "input_repr": "'UNION SELECT * FROM x'",
+      "expected_compact": "unionselect*fromx",
+      "expected_preserve": "union select * from x",
+      "forms": [
+        "adversarial"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Injection-shaped string."
+    },
+    {
+      "id": "N067",
+      "input": "%_",
+      "input_repr": "'%_'",
+      "expected_compact": "%",
+      "expected_preserve": "%_",
+      "forms": [
+        "adversarial"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "LIKE-wildcard-shaped string."
+    },
+    {
+      "id": "N068",
+      "input": "DROP TABLE unified_feed",
+      "input_repr": "'DROP TABLE unified_feed'",
+      "expected_compact": "droptableunifiedfeed",
+      "expected_preserve": "drop table unified_feed",
+      "forms": [
+        "adversarial",
+        "no_hit"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Golden no-hit injection case."
+    },
+    {
+      "id": "N069",
+      "input": null,
+      "input_repr": "None",
+      "expected_compact": "",
+      "expected_preserve": "",
+      "forms": [
+        "malformed",
+        "none"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "None -> '' (NULL-safe)."
+    },
+    {
+      "id": "N070",
+      "input": "",
+      "input_repr": "''",
+      "expected_compact": "",
+      "expected_preserve": "",
+      "forms": [
+        "malformed",
+        "empty"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Empty -> ''."
+    },
+    {
+      "id": "N071",
+      "input": "   ",
+      "input_repr": "'   '",
+      "expected_compact": "",
+      "expected_preserve": "",
+      "forms": [
+        "malformed",
+        "whitespace"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Whitespace-only -> '' compact, '' preserve."
+    },
+    {
+      "id": "N072",
+      "input": ".",
+      "input_repr": "'.'",
+      "expected_compact": "",
+      "expected_preserve": ".",
+      "forms": [
+        "malformed"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Single separator -> '' compact, '.' preserve."
+    },
+    {
+      "id": "N073",
+      "input": "._-/",
+      "input_repr": "'._-/'",
+      "expected_compact": "",
+      "expected_preserve": "._-/",
+      "forms": [
+        "malformed"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "All-separators -> '' compact."
+    },
+    {
+      "id": "N074",
+      "input": "  Wan   2.2  ",
+      "input_repr": "'  Wan   2.2  '",
+      "expected_compact": "wan22",
+      "expected_preserve": "wan 2.2",
+      "forms": [
+        "malformed",
+        "versioned",
+        "exact_name"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Edge whitespace + internal run collapse."
+    },
+    {
+      "id": "N075",
+      "input": "\tWan\tVideo\n",
+      "input_repr": "'\\tWan\\tVideo\\n'",
+      "expected_compact": "wanvideo",
+      "expected_preserve": "wan video",
+      "forms": [
+        "malformed",
+        "whitespace"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Tab/newline whitespace collapse."
+    },
+    {
+      "id": "N076",
+      "input": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "input_repr": "'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'",
+      "expected_compact": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "expected_preserve": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "forms": [
+        "length_bound"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "4096-char single token (compact == preserve == lowercased)."
+    },
+    {
+      "id": "N077",
+      "input": "A1",
+      "input_repr": "'A1'",
+      "expected_compact": "a1",
+      "expected_preserve": "a1",
+      "forms": [
+        "length_bound"
+      ],
+      "parity_class": "accept",
+      "golden_refs": [],
+      "notes": "Minimal non-empty token."
+    },
+    {
+      "id": "N078",
+      "input": "ß",
+      "input_repr": "'ß'",
+      "expected_compact": "ß",
+      "expected_preserve": "ß",
+      "forms": [
+        "distinct"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "German eszett stays 'ß' (NOT folded to 'ss')."
+    },
+    {
+      "id": "N079",
+      "input": "gross",
+      "input_repr": "'gross'",
+      "expected_compact": "gross",
+      "expected_preserve": "gross",
+      "forms": [
+        "distinct"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Contrast: 'gross' != 'groß'."
+    },
+    {
+      "id": "N080",
+      "input": "ﬁle",
+      "input_repr": "'ﬁle'",
+      "expected_compact": "ﬁle",
+      "expected_preserve": "ﬁle",
+      "forms": [
+        "distinct"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Latin fi-ligature 'ﬁ' NOT expanded to 'fi'; 'ﬁle' != 'file'."
+    },
+    {
+      "id": "N081",
+      "input": "file",
+      "input_repr": "'file'",
+      "expected_compact": "file",
+      "expected_preserve": "file",
+      "forms": [
+        "distinct"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Contrast: 'file' != 'ﬁle'."
+    },
+    {
+      "id": "N082",
+      "input": "ＡＢＣ",
+      "input_repr": "'ＡＢＣ'",
+      "expected_compact": "ａｂｃ",
+      "expected_preserve": "ａｂｃ",
+      "forms": [
+        "distinct"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Fullwidth 'ＡＢＣ' NOT folded to 'ABC' (NFC, not NFKC)."
+    },
+    {
+      "id": "N083",
+      "input": "ABC",
+      "input_repr": "'ABC'",
+      "expected_compact": "abc",
+      "expected_preserve": "abc",
+      "forms": [
+        "distinct"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Contrast: ASCII 'ABC' != fullwidth 'ＡＢＣ'."
+    },
+    {
+      "id": "N084",
+      "input": "a",
+      "input_repr": "'a'",
+      "expected_compact": "a",
+      "expected_preserve": "a",
+      "forms": [
+        "distinct",
+        "confusable"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Latin 'a' (U+0061)."
+    },
+    {
+      "id": "N085",
+      "input": "а",
+      "input_repr": "'а'",
+      "expected_compact": "а",
+      "expected_preserve": "а",
+      "forms": [
+        "distinct",
+        "confusable"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Cyrillic 'а' (U+0430) — homoglyph, NOT folded with Latin 'a'."
+    },
+    {
+      "id": "N086",
+      "input": "α",
+      "input_repr": "'α'",
+      "expected_compact": "α",
+      "expected_preserve": "α",
+      "forms": [
+        "distinct",
+        "confusable"
+      ],
+      "parity_class": "distinct",
+      "golden_refs": [],
+      "notes": "Greek 'α' (U+03B1) — homoglyph, NOT folded."
+    }
+  ],
+  "alias_examples": [
+    {
+      "name": "controlnet family (no collision)",
+      "canonical_kind": "resource",
+      "canonical_id": "2537",
+      "canonical_name": "ControlNet",
+      "aliases": [
+        {
+          "alias_text": "control net",
+          "provenance": "workflow_semantics.searchable_aliases"
+        },
+        {
+          "alias_text": "controlnet",
+          "provenance": "curated"
+        }
+      ],
+      "expect_collision": false,
+      "notes": "Two alias forms of one identity resolve to compact 'controlnet'."
+    },
+    {
+      "name": "ambiguous controlnet across two identities (collision reported)",
+      "identities": [
+        {
+          "canonical_id": "2537",
+          "canonical_name": "ControlNet",
+          "alias_text": "controlnet",
+          "provenance": "curated"
+        },
+        {
+          "canonical_id": "9999",
+          "canonical_name": "Control Mesh",
+          "alias_text": "controlnet",
+          "provenance": "curated"
+        }
+      ],
+      "expect_collision": true,
+      "expect_n_distinct_canonical": 2,
+      "notes": "Two distinct identities share compact 'controlnet'; collision is REPORTED, not silently merged. Both remain candidates, ordered by deterministic priority then identity."
+    }
+  ]
+}
