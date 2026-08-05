@@ -383,7 +383,7 @@ begin
         ) mm on true
        where t.entity_type = 'message'
          and m.message_id::text = t.item_id
-         and coalesce(d.is_deleted, false) = false
+         and d.is_deleted = false
        limit 1)
       union all
       -- RESOURCE branch (concrete kind preserved; e.g. 'workflow')

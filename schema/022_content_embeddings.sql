@@ -105,7 +105,17 @@ comment on table content_embeddings is
 -- deleted messages until the async cleanup drains), so it must NOT be publicly
 -- readable. service_role (worker/backfill/search) is untouched. Schema/035's
 -- guarded revoke covers DBs where this table already existed before 035.
-revoke all on table content_embeddings from anon, authenticated;
+-- Roles guarded so this also applies cleanly in rehearsals that don't create
+-- anon/authenticated.
+do $$
+begin
+  if exists (select 1 from pg_roles where rolname = 'anon') then
+    revoke all on table content_embeddings from anon;
+  end if;
+  if exists (select 1 from pg_roles where rolname = 'authenticated') then
+    revoke all on table content_embeddings from authenticated;
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------------
 -- Dimension-mixing guard (data layer). The vector(384) column already rejects a
