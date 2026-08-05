@@ -14,284 +14,190 @@ description: >
   edge function.
 ---
 
-# hivemind v2
+# hivemind
 
-A read-only PostgREST endpoint exposes the Banodoco knowledge corpus —
-community knowledge about video/image generation that you can't get
-from official docs: workflow tips, model comparisons, settings tweaks,
-gotchas, links to Kijai/Ablejones/community workflows.
+A read-only public endpoint exposing the Banodoco knowledge corpus —
+community knowledge about video/image generation you can't get from official
+docs: workflow tips, model comparisons, settings tweaks, gotchas, and links
+to Kijai/Ablejones/community workflows. It layers three things into one
+searchable feed: **messages** (raw Discord), **resources** (articles,
+transcripts, workflows), and **distillations** (curated Q&A with cited
+sources). Distillations make the corpus self-improving — every researched
+answer you submit becomes permanently searchable.
 
-**v2** adds a unified feed combining messages, external resources
-(articles, transcripts, workflows), and curated distillations
-(question/answer pairs with cited sources). Distillations make the
-corpus self-improving — every researched answer you submit becomes
-permanently searchable.
-
-## Two ways to use this corpus
-
-1. **Astrid pack executors** (if this repo is installed as an Astrid pack —
-   `python3 -m astrid packs install https://github.com/banodoco/hivemind.git`):
-   - `hivemind.search` — `--input query=… [kinds, sources, since, limit]`;
-     distillations-first merge, truncated bodies, miss-nudge
-   - `hivemind.get_item` — `--input kind=… id=…`; full body + cites both ways
-   - `hivemind.refresh_media` — `--input message_id=…`; refresh expiring
-     Discord CDN attachment URLs for a raw Discord message
-   - `hivemind.contribute` — `--input type=resource|distillation …`; `dry_run=true` supported
-   - `hivemind.ingest_article` / `hivemind.ingest_workflow` / `hivemind.ingest_youtube`
-     — fetch + render + submit (YouTube is captions-only; no Whisper)
-
-   The executors also run standalone from a clone:
-   `python3 executors/search/run.py --query "wan animate"`.
-
-2. **Raw HTTP** (works everywhere, no install): everything below.
-
-## Astrid's shared knowledge layer
-
-Hivemind is Astrid's default shared knowledge pack. Use it alongside Astrid's
-local, file-based evidence rather than as a replacement for project artifacts:
-
-- Search Hivemind before researching community practice or repeating a prior
-  investigation.
-- Keep raw runs, reviews, and `conclusions.json` in the Astrid project.
-- Promote only evidence-backed, generalizable learnings to Hivemind.
-- For an Astrid experiment, contribute a concise experiment report as a
-  resource first, then submit the reusable learning as a distillation that
-  cites that resource.
-- Treat contribution as public publication. Preview or dry-run the payload,
-  remove private paths, prompts, media, and URLs, and obtain explicit user
-  confirmation before sending.
-- Record returned Hivemind item IDs beside the local experiment so later work
-  can retrieve, supersede, or audit the published learning.
-
-Do not copy this skill into a separate agent-specific skill directory. Astrid
-installs this canonical pack skill into Claude Code, Codex, and Hermes with
-`python3 -m astrid skills install hivemind --harness all`.
-
-## Full Dataset on Huggingface
-
-This skill is for querying the live corpus from an agent. If the user wants to
-train on the full archive or download the whole dataset, point them to:
-
-https://huggingface.co/datasets/Banodoco/discord-archive
-
-That dataset contains the exported Discord archive with opted-out authors
-excluded.
-
-## Endpoint
+## Quick start
 
 ```
-https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1
+Endpoint: https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1
+Key (anon publishable, safe to commit):
+  apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx
 ```
 
-Header (anon publishable key, safe to commit):
+Smoke test:
 
+```bash
+curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed?select=kind,title,body&limit=3" \
+  -H "apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx"
 ```
-apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx
-```
 
-## unified_feed — the one searchable surface
+### Surfaces at a glance — pick by what you want
 
-The `unified_feed` view combines three layers into a common shape:
+| You want to… | Use | Why |
+|---|---|---|
+| Search curated Q&A (distillations) | `unified_feed?kind=eq.distillation` | flywheel, highest signal |
+| Search resources (workflows, articles) | `unified_feed?kind=eq.<resource-kind>` | kind-scoped, fast |
+| **Search message content** (free text) | `message_feed` (channel-scoped `ilike`) | `unified_feed` ilike on messages **times out** (57014) |
+| Filter messages by a field (pinned, thread, reply, attachment, channel) | `message_filters` | index-backed, ~0.1–0.25s |
+| Fetch a full row by id | `get_item` (executor) or `unified_feed?item_id=eq.<id>` | complete body + metadata + cites |
+| Refresh an expiring media URL | `refresh-media-urls` edge function | fresh Discord CDN URL |
+
+More on each below. The golden rule: **match the surface to the question**
+(gotchas in the next section).
+
+## The surfaces
+
+### unified_feed — the results feed (distillations + resources; NOT message-content search)
+
+`unified_feed` is a UNION of three layers with one common shape. Use it
+**kind-scoped** for distillations and resources; do NOT use it for broad
+message-content `ilike` searches (the UNION scan times out).
 
 | kind | source | what it is |
 |---|---|---|
-| `message` | `banodoco-discord` | Raw Discord messages from message_feed |
-| `article`, `transcript`, `workflow`, … | varies (`youtube`, `web`, `comfyui`, …) | External resources — the `kind` column carries each resource's concrete kind |
+| `message` | `banodoco-discord` | Raw Discord messages (use `message_feed`/`message_filters` to query) |
+| `article`, `transcript`, `workflow`, … | varies | External resources — `kind` carries the concrete kind |
 | `distillation` | `hivemind` | Curated Q&A pairs with cited sources (pending or approved) |
 
-Common columns across all kinds:
+Common columns: `kind, source, item_id, title, body, author, context, url,
+metadata, created_at`. Distillations have a lifecycle `pending → approved`;
+prefer approved, then pending, then raw items.
 
-| field | type | notes |
-|---|---|---|
-| `kind` | text | `message`, `distillation`, or a concrete resource kind |
-| `source` | text | origin system |
-| `item_id` | text | id in the source table |
-| `title` | text | message → null, resource → title, distillation → question |
-| `body` | text | message → content, resource → body, distillation → answer |
-| `author` | text | display name (null for distillations — resolved via get-item) |
-| `context` | text | message → channel_name, distillation → conditions, resource → null |
-| `url` | text | Discord link or resource URL (null for distillations) |
-| `metadata` | jsonb | kind-specific: distillations → `{status, confidence}`; messages → full Discord envelope (see below) |
-| `created_at` | timestamptz | ISO 8601 |
+### Message metadata (the Discord envelope)
 
-Distillations have a lifecycle: `pending` → `approved` (curator action).
-Prefer approved distillations, then pending, then raw items.
-
-### Message metadata (schema/035 exposure)
-
-Message rows carry the full Discord envelope in `metadata` (in addition to the
-original `channel_id` + `reactions`):
+`unified_feed` message rows carry the full Discord envelope in `metadata`:
 
 | key | type | notes |
 |---|---|---|
-| `channel_id` | number | channel the message is in (legacy numeric; pre-dates the stringification rule) |
-| `guild_id` | string | server id — Discord ids are **strings** here (snowflakes exceed 2⁵³, JS would round them as numbers) |
-| `reactions` | json | reaction list (frequently null — do not rank by it) |
-| `author_id` | string | author's `members.member_id` (string, snowflake-safe) |
-| `avatar_url` | text | author's avatar, when known |
-| `reference_id` | string | the message this one replies to (Discord reply/cite), if any |
-| `thread_id` | string | thread/forum id the message belongs to, if any |
-| `message_type` | text | Discord message type (e.g. `DEFAULT`) |
-| `edited_at` | timestamptz | last edit time, when edited |
+| `channel_id` | number | legacy numeric (pre-dates the stringification rule) |
+| `guild_id` | string | Discord ids are **strings** (snowflakes exceed 2⁵³) |
+| `reactions` | json | **active** reactions only (removed filtered) — sparse (~7%) |
+| `author_id` | string | author's `members.member_id` |
+| `avatar_url` | text | author's avatar, when known (~75% of authors) |
+| `reference_id` | string | the message this one **replies to** (Discord reply/cite) |
+| `thread_id` | string | thread/forum id the message belongs to |
+| `message_type` | text | e.g. `DEFAULT`, `reply` |
+| `edited_at` | timestamptz | last edit |
 | `is_pinned` | bool | pinned/curated |
-| `reaction_count` | int | total reactions (more reliable than `reactions`) |
-| `embeds` | jsonb | Discord embed objects (link previews — title/description/source URL of shared content) |
-| `attachments` | jsonb | Discord attachment objects — **the resource-detection signal** (non-empty = message contains a file/media). Each has `filename` (always — infer type from extension) + `url`; `content_type` (MIME) only where the archive captured it (~4%) |
-| `channel_type` | text | channel kind (`text`, `forum`, `news`, `thread`, …) — null for only 1 message (the ambiguous `events` channel, awaiting confirmation) |
+| `reaction_count` | int | **historical total** incl. removed — the reliable popularity signal |
+| `embeds` | jsonb | Discord link previews (title/description/source URL) |
+| `attachments` | jsonb | **the resource signal** — non-empty = contains a file/media |
+| `channel_type` | text | `text`, `forum`, `news`, `thread`, … (now ~100% populated) |
 
-> **Scope + semantics (verified against live, 2026-08-05):**
-> - The message envelope keys above (`channel_type`, `reactions`, `attachments`,
->   `reference_id`, `thread_id`, `author_id`, …) appear **only on `kind=message`
->   rows** in `unified_feed`. Resource/workflow/distillation rows carry their own
->   `metadata` (tags, flags, status) — they do not have these keys.
-> - `reactions` shows **active** reactions only (`removed_at IS NULL`, ~7% of
->   messages). `reaction_count` is the **historical total** (includes removed
->   reactions, ~16% of messages) — use `reaction_count` as the popularity signal.
-> - `channel_type` is populated on every channel except `events` (1 message,
->   ambiguous name collision) — the 2026-08-05 backfill typed the previously
->   unclassified channels (incl. `minimax_h3_resources` → forum).
-
-Deleted messages (`is_deleted = true`) are filtered out of `unified_feed`,
-`message_feed`, search results, and direct `discord_messages` reads (RLS)
-entirely — they never appear.
+Scope + semantics:
+- These envelope keys appear **only on `kind=message` rows**. Resource and
+  distillation rows carry their own `metadata` (tags/status) — they do NOT
+  have these keys.
+- Deleted messages are filtered out of **every** surface (view, `message_feed`,
+  search, and direct `discord_messages` reads via RLS) — they never appear.
 
 ### The two resource signals (attachments + citations)
 
-These are the two high-value levers on message rows. Both are **exposed and
-readable on every message row** — but note the scale caveat below about
-server-side filtering.
-
-**1. Attachments → skip the noise, find the resources.**
-Every message's `metadata.attachments` is the Discord attachment array. A
-message that actually contains/shows something (an image, a video, a workflow
-`.json`, a PDF) has a **non-empty** array; prose-only messages have `[]` or no
-`attachments` key. ~188k messages in the corpus carry attachments — the
-"resource-bearing" signal is reliable. Each element looks like:
+**Attachments → skip the noise, find the resources.** A message that actually
+contains/shows something (image, video, workflow `.json`, PDF) has a
+**non-empty** `attachments` array; prose-only messages have `[]`. ~188k
+messages carry attachments. Each element:
 
 ```json
 { "filename": "image.png", "url": "https://cdn.discordapp.com/attachments/..." }
 ```
 
-`filename` is **always** present — infer the type from its extension (`image/*`,
-`video/*`, `.json`, `.pdf`, …). `content_type` (MIME) is additionally present on
-a minority of stored attachments (the archive captures it only ~4% of the
-time), so treat it as a bonus when it appears, not a guarantee. Use the
-`refresh_media` executor / `refresh-media-urls` edge function to get fresh CDN
-URLs for the attachment by message id.
+`filename` is **always** present — infer the type from its extension
+(`image/*`, `video/*`, `.json`, `.pdf`). `content_type` (MIME) is present on
+only ~3–5% of attachments, so treat it as a bonus, not a guarantee. Use
+`refresh-media-urls` for a fresh CDN URL before using one.
 
-**2. `reference_id` → build chains.**
-`reference_id` is the snowflake (a string) of the message this one **replies to**
-(Discord's reply/cite). A message with a `reference_id` is a
-response/correction/elaboration of another; without one it's a root. To
-reconstruct a chain, walk it message-by-message: read the reply's
-`reference_id`, then `get_item` the parent, read *its* `reference_id`, and so
-on, both directions.
+**`reference_id` → build chains.** It is the snowflake of the message this one
+replies to. Walk it both directions to reconstruct threads of thoughts:
+read a reply's `reference_id`, `get_item` the parent, repeat. A message with a
+`reference_id` is a response/correction/elaboration; without one it's a root.
 
-> **Filtering caveat (corpus scale).** PostgREST **jsonb-path filters on
-> `unified_feed.metadata` time out** — `unified_feed` is a 1.2M-message view with
-> no index on the derived `metadata`, so `metadata->reference_id=eq.X` /
-> `metadata->attachments` / `metadata->>is_pinned=eq.true` scans and hits the
-> **anon role's 3s statement_timeout**. **How to recognize it:** HTTP 500 with
-> body `{"code":"57014","message":"canceling statement due to statement
-> timeout"}` — `code: 57014` is a statement-timeout, **NOT a data error**
-> (verified: `jsonb_typeof(metadata)` is `object` on every row). It fails on big
-> channels even at `limit=5` because a LIMIT can't skip the scan when matches
-> are scarce. **Do NOT filter on `unified_feed.metadata`.** Use the fast
-> `message_filters` surface instead (below).
+### message_feed — raw message content search (the fast text surface)
 
-### Fast filtering — `message_filters` (schema/036)
+Each row: `message_id, content, author_name, channel_name, channel_id,
+guild_id, reactions, created_at` (deleted already filtered). This is the
+surface for **message content `ilike`** — it's index-backed and fast, where
+`unified_feed` ilike is not. Scope by channel for speed.
 
-`schema/036` adds a simple, index-backed view for server-side filtering:
+### message_filters — structured filtering (schema/036)
+
+A simple, index-backed view over `discord_messages` with the hot filter
+columns exposed top-level (not buried in jsonb metadata), so PostgREST
+filters push to indexes:
 
 ```
-GET /rest/v1/message_filters?is_pinned=eq.true&limit=20          # pinned messages
-GET /rest/v1/message_filters?channel_name=eq.minimax_h3_resources # messages in a channel (zero-hop)
-GET /rest/v1/message_filters?thread_id=eq.X                      # forum/thread posts
-GET /rest/v1/message_filters?reference_id=eq.X                   # replies to X (btree)
-GET /rest/v1/message_filters?attachments=cs.[{"content_type":"video/mp4"}]   # has attachment of type (GIN)
-GET /rest/v1/message_filters?attachments=cs.[{"filename":"x.png"}]           # exact file
+GET /rest/v1/message_filters?is_pinned=eq.true&limit=20            # pinned canon
+GET /rest/v1/message_filters?channel_name=eq.minimax_h3_resources  # by channel (note: channel_name is NOT unique — use channel_id for exactly one)
+GET /rest/v1/message_filters?thread_id=eq.<tid>                    # whole thread
+GET /rest/v1/message_filters?reference_id=eq.<id>                  # replies TO a message (chains)
+GET /rest/v1/message_filters?attachments=cs.[{"content_type":"video/mp4"}]  # has typed attachment (GIN)
+GET /rest/v1/message_filters?attachments=cs.[{"filename":"x.png"}]          # exact file
 ```
 
-Columns: `message_id, channel_id, guild_id, author_id, thread_id, reference_id,
-is_pinned, reaction_count, attachments, embeds, content, created_at,
-channel_name` (deleted messages already filtered). All filters are index-backed
-(verified: is_pinned ~0.1s, channel_name ~0.16s, reference_id ~0.1s, attachments
-containment ~0.1–0.6s). **`channel_name` is not unique** — multiple channels can
-share a name, so `channel_name=eq.X` matches messages from ALL channels with
-that name; use `channel_id` when you need exactly one. For the full enriched
-row, `get_item` the `message_id` from `unified_feed`. Attachments containment
-uses PostgREST's `cs` operator (jsonb `@>`); `content_type` is only present on
-~5% of attachments (video) / ~3% (image), so prefer `filename` for type
-detection (filtering by `content_type` only finds attachments the archive typed).
+Columns: `message_id, channel_id, guild_id, author_id, thread_id,
+reference_id, is_pinned, reaction_count, attachments, embeds, content,
+created_at, channel_name`. All filters index-backed (is_pinned ~0.1s,
+reference_id ~0.1s, attachments containment ~0.1–0.6s). Attachments uses
+PostgREST's `cs` operator (jsonb `@>`). Note: `attachments=cs.[{"filename":"wan"}]`
+substring does NOT work — it's exact match; and filtering by `content_type`
+only finds attachments the archive typed (~5% of videos, ~3% of images).
 
-### Search query pattern
-
-Always query distillations first, then everything else. Merge distillations-first
-in results.
-
-**Timeout trap (verified by agent tests, 2026-08-05):** a broad
-`unified_feed?or=(title.ilike.*X*,body.ilike.*X*)` **times out** (HTTP 500
-`57014`) on message-content queries — the UNION view's resource/distillation
-branches have no trigram index, so the scan exceeds the anon role's 3s limit
-(even at `limit=10`). It's fine for distillation/resource-targeted searches
-(scoped by `kind`), but **for message content searches use `message_feed`
-(scoped by channel) instead** — its content `ilike` uses the trigram index.
-The `message_filters` surface is for structured fields (`is_pinned`, `thread_id`,
-`reference_id`, attachments), not free-text.
-
-For message-only searches (raw Discord), use the original `message_feed` table
-with the channel map below. `message_feed` now filters out deleted messages
-(`is_deleted = true`) — like every other public surface. For the enriched
-envelope (embeds, reference_id, reaction_count, avatar, …), use `unified_feed`
-instead (see "Message metadata" above).
-
-### Get single item
+### get_item — full rows
 
 ```
-GET /unified_feed?kind=eq.KIND&item_id=eq.ID
+python3 executors/get_item/run.py --kind message|resource|distillation --id <id>
+# or: unified_feed?item_id=eq.<id>
 ```
 
-`KIND` is `message`, `distillation`, or the concrete resource kind. To match
-"any resource" without knowing the kind, use
-`kind=not.in.(message,distillation)`.
+Returns the full row + metadata + (for distillations) cites / cited-by.
 
-For distillations, also fetch `distillation_cites`:
-```
-GET /distillation_cites?distillation_id=eq.ID
-```
+## How to answer a question (the workflow)
 
-For messages/resources, fetch distillations that cite them
-(cite vocabulary is `message` | `resource` | `distillation`):
-```
-GET /distillation_cites?item_kind=eq.KIND&item_id=eq.ID
-```
+1. **Distillations first** — `unified_feed?kind=eq.distillation&or=(title.ilike.*Q*,body.ilike.*Q*)`. Hit → relay the answer + its cites.
+2. **Then the pinned canon** — `message_filters?is_pinned=eq.true` (~72 pins, mostly in `wan_resources`/`ltx_resources`; the community's highest-signal artifacts).
+3. **Then channel-scoped message search** — `message_feed?channel_name=in.(…)&content=ilike.*term*`, starting from the channel map.
+4. **Verify + deepen** — `get_item` promising ids; walk reply chains (`message_filters?reference_id=eq.<id>`); pull a whole thread (`thread_id=eq.<tid>`).
+5. **Assemble a cited answer** — name authors, include Discord/permalink + source links, prefer concrete settings over abstractions.
 
-## Schema (message_feed — raw Discord)
+**Let channel flavor guide you** — `wan_chatter` = chat/experience,
+`wan_comfyui` = technical/errors, `*_gens`/`*_resources` = showcases/files,
+`training_*` = training, `updates` = announcements/essays, `daily_summaries` =
+orientation (starts 2024-12-20; before that use topic channels).
 
-Each row in the original `message_feed`:
+## Gotchas (the traps)
 
-| field          | type    | notes                                                      |
-|----------------|---------|------------------------------------------------------------|
-| `message_id`   | bigint  | discord snowflake                                          |
-| `content`      | text    | message body — what you search                             |
-| `author_name`  | text    | display name; `null` for some bot/system messages          |
-| `channel_name` | text    | scope your search by channel (see list below)              |
-| `channel_id`   | bigint  | rarely needed                                              |
-| `guild_id`     | bigint  | always Banodoco                                            |
-| `reactions`    | json    | usually `null` — don't rely on it for ranking              |
-| `created_at`   | timestamptz | ISO 8601                                              |
+- **`unified_feed` message-content `ilike` times out** (HTTP 500 `code 57014`).
+  `57014` = statement timeout — **NOT bad data** (`jsonb_typeof(metadata)` is
+  `object` on every row). It fails even at `limit=5` on big channels because a
+  LIMIT can't skip a scarce-match scan. Use `message_feed`/`message_filters`.
+- **Do NOT filter on `unified_feed.metadata` jsonb paths** — same timeout. Read
+  the fields from result rows instead, or filter the source columns.
+- **Rank with `reaction_count`, not `reactions`** — `reactions` is active-only
+  (~7% of messages); `reaction_count` is the historical total (~16%) and the
+  reliable popularity signal.
+- **Snowflakes are strings** at the JSON boundary (`author_id`,
+  `reference_id`, `thread_id`, `guild_id`). `item_id` and cite `item_id` too —
+  never send them as JSON numbers.
+- **`content_type` on attachments is sparse (~3–5%)** — infer type from the
+  `filename` extension; `cs` filters by `content_type` only find typed ones.
+- **`channel_name` is not unique** — multiple channels can share a name; use
+  `channel_id` for exactly one.
 
-> Deleted messages are already filtered out of `message_feed` (schema/035).
-> This table is the raw 8-column surface; for the enriched envelope — embeds,
-> reply (`reference_id`), reaction counts, and author/channel details — read
-> `unified_feed`'s `metadata` instead. (Attachments are NOT in metadata; use
-> the `refresh_media` executor / `refresh-media-urls` edge function for CDN
-> attachment URLs.)
+## Reference
 
-## Channel map
+### Channel map
 
 | topic | channels |
-|-------|----------|
+|---|---|
 | Summaries / orientation | `daily_summaries` |
 | Wan / Wan Animate / VACE / SCAIL / InfiniteTalk / lightx2v | `wan_chatter`, `wan_comfyui`, `wan_gens`, `wan_resources`, `resources` |
 | LTX / LTXV / LTX training | `ltx_chatter`, `ltx_resources`, `ltx_gens`, `ltx_training`, `resources` |
@@ -300,358 +206,161 @@ Each row in the original `message_feed`:
 | Coding / tools | `vibecoding`, `resources` |
 | General fallback | `chatter`, `nsfw` |
 
-Other narrower channels: `hunyuanvideo`, `qwen-image`, `chroma`, `flux`,
-`z-image`, `magi`, `ace-step`, `kandinsky-5`, `seedance`, `top_gens`,
-`art_sharing`, `introductions`, `music`, `off-topic`, `res4lyf`,
-`become-a-speaker`, `welcome`.
+Narrower: `hunyuanvideo`, `qwen-image`, `chroma`, `flux`, `z-image`, `magi`,
+`ace-step`, `kandinsky-5`, `seedance`, `top_gens`, `art_sharing`,
+`introductions`, `music`, `off-topic`, `res4lyf`, `become-a-speaker`, `welcome`.
+(No cheap `distinct channel_name` API — a full inventory is a maintenance task.)
 
-For broader searches, use this map first. The API does not expose a cheap
-`distinct channel_name` query; refreshing a full channel inventory should be a
-maintenance task, not part of a normal user answer. With DB access, use:
+### Power users to watch
 
-```
-select channel_name, count(*)
-from message_feed
-group by channel_name
-order by count(*) desc;
-```
-
-If only the public API is available, fetch `select=channel_name` in pages and
-dedupe offline, or add a read-only `message_feed_channels` view upstream.
-
-## Power users to watch
-
-- **Kijai** — author of WanVideoWrapper / many Wan and LTX ComfyUI nodes.
-- **Ablejones** — context windows, color matching, native Comfy integrations.
+- **Kijai** — WanVideoWrapper / many Wan + LTX ComfyUI nodes (~115k messages, the corpus's dominant expert).
+- **Ablejones** — context windows, color matching, native Comfy integrations; many pinned workflow revisions.
 - **djbfilmz** — heavy Wan Animate user, mocap / reskinning experiments.
-- **42hub** — curates the [wanx-troopers.github.io](https://wanx-troopers.github.io/) knowledge base.
+- **42hub** — curates [wanx-troopers.github.io](https://wanx-troopers.github.io/).
 - **BNDC** — the daily-summary bot.
 
-## Search playbook
+A handful of authors produce most durable knowledge — `author_id` +
+`reaction_count` surfaces them.
 
-Default to scoped `ilike` searches. Broad all-channel searches are fast for
-common recent terms, but rare phrases and no-hit searches can hit Supabase's
-statement timeout.
+### Query snippets
 
-1. For normal "what does Banodoco say about X?" questions, search
-   `daily_summaries` first, then the relevant channel group, then trusted
-   authors.
-2. For ambiguous prompts, run cheap count probes across channel groups using the
-   most distinctive term, then follow the densest relevant group.
-3. For trend or landscape questions, compare scoped counts across time windows,
-   then sample representative messages. Treat volume as "discussion intensity",
-   not endorsement.
-
-`daily_summaries` starts on **2024-12-20**. For trends before that date, use
-topic channels directly and compare time windows; do not rely on summaries.
-
-## Using the data well (hints, verified by 14 agent missions 2026-08-05)
-
-**Start with the curated layers, not the firehose:**
-1. **Distillations first** (`kind=eq.distillation`) — the curated Q&A flywheel.
-2. **Then the pinned canon** — `message_filters?is_pinned=eq.true` (~72 pins, mostly
-   in `wan_resources`/`ltx_resources`; the community's highest-signal artifacts).
-3. Then search message content, then filter.
-
-**Match the surface to the question:**
-- Message content → `message_feed` (channel-scoped `ilike`) — **never** a broad
-  `unified_feed` ilike (times out, 57014).
-- Structured filter (pinned / thread / reply / attachments / channel) →
-  `message_filters` (index-backed, ~0.1–0.25s).
-- Distillations / workflows → kind-scoped `unified_feed`
-  (`kind=eq.distillation` / `kind=eq.workflow`).
-- Full enriched row → `get_item` by id.
-
-**Reconstruct conversations, don't scrape:** a reply's `reference_id` + `get_item`
-walks a chain both directions; find a message's children with
-`message_filters?reference_id=eq.<id>`; get a whole thread with
-`message_filters?thread_id=eq.<tid>`.
-
-**Rank with `reaction_count`, not `reactions`** — `reactions` is active-only
-(~7% of messages); `reaction_count` is the historical total (~16%) and the
-reliable popularity signal.
-
-**Detect resources by filename extension, not `content_type`** — `content_type`
-is only ~3–5% of attachments, and `attachments=cs.[{"content_type":...}]` finds
-only the typed ones. Use `attachments=cs.[{"filename":"x.png"}]` for exact
-files, and `refresh-media-urls` to get a fresh CDN URL before using one.
-
-**Let channel flavor guide you** — `wan_chatter` = chat/experience,
-`wan_comfyui` = technical/errors, `wan_gens`/`*_resources` = showcases/files,
-`training_*` = training, `updates` = announcements/essays. Pick the channel
-whose flavor matches what you need.
-
-**Follow the few signal-carriers** — a small set of authors (Kijai, Ablejones,
-…) produce most durable knowledge; `author_id` + `reaction_count` surfaces them
-(see "Power users to watch").
-
-**A 500 with `code: 57014` is a timeout, not bad data** — switch to the scoped
-surface (`message_feed` / `message_filters`).
-
-## Query snippets
-
-Always URL-encode spaces (`%20`). Use `order=created_at.desc&limit=30` for
-message retrieval.
-
-Basic scoped search:
+Always URL-encode spaces (`%20`); use `order=created_at.desc&limit=30`.
 
 ```
+# scoped message search
 ?select=content,author_name,channel_name,created_at
 &channel_name=in.(wan_chatter,wan_comfyui,wan_gens,wan_resources,resources)
 &content=ilike.*wan%20animate*
 &order=created_at.desc&limit=30
-```
 
-Routing/count probe:
+# routing/count probe
+?select=message_id&channel_name=in.(wan_chatter,wan_comfyui,wan_gens,wan_resources,resources)
+&content=ilike.*lightx2v*&limit=0  + Prefer: count=exact
 
-```
-?select=message_id
-&channel_name=in.(wan_chatter,wan_comfyui,wan_gens,wan_resources,resources)
-&content=ilike.*lightx2v*&limit=0
-Prefer: count=exact
-```
+# author + topic
+?author_name=eq.Kijai&content=ilike.*lightx2v*&order=created_at.desc&limit=30
 
-Author + topic:
-
-```
-?author_name=eq.Kijai&content=ilike.*lightx2v*
-&order=created_at.desc&limit=30
-```
-
-AND terms by repeating `content`; OR variants use dot syntax:
-
-```
+# AND terms by repeating content; OR via dot syntax
 &content=ilike.*vace*&content=ilike.*workflow*
 &or=(content.ilike.*wan%20animate*,content.ilike.*wananimate*)
-```
 
-Time windows:
-
-```
+# time window
 &created_at=gte.2026-04-01&created_at=lt.2026-05-01
 ```
 
-Example routing result: "What settings has Kijai recommended for the lightx2v
-LoRA?" sounds like LoRA training, but count probes showed `lightx2v` mostly lives
-in Wan channels:
+Routing example: "What settings has Kijai recommended for the lightx2v LoRA?"
+sounds like LoRA training, but count probes showed `lightx2v` mostly lives in
+Wan channels (`daily=3, wan=1974, ltx=19, comfy=129, training=52,
+general=112`) — search the Wan group, then `author_name=eq.Kijai`, adding
+`cfg`/`steps`/`settings` only after the route is known.
 
-```
-daily=3, wan=1974, ltx=19, comfy=129, training=52, general=112
-```
+### Trend questions
 
-So search the Wan group, then filter by `author_name=eq.Kijai`, adding `cfg`,
-`steps`, or `settings` terms only after the route is known.
+For "what's trending / what changed / what are people struggling with?":
+pick 3–8 candidate terms, run count probes by channel group + time window,
+pull 10–30 recent samples from the densest buckets, summarize with
+dates/channels/authors — and treat volume as "discussion intensity," not
+endorsement. Summaries-era trends: `channel_name=eq.daily_summaries&created_at=gte.2024-12-20`. Pre-summary: topic channels with `created_at=lt.2024-12-20`.
 
-## Trend questions
+### Best-practice answer shape
 
-For "what is trending?", "what changed?", or "what are people struggling with?":
-
-1. Pick 3-8 candidate terms from the prompt or recent summaries.
-2. Run count probes by channel group and time window.
-3. Pull 10-30 recent samples from the highest-volume buckets.
-4. Summarize patterns with dates, channels, and authors; avoid claiming counts
-   prove quality or consensus.
-
-For summaries-era trends, start with:
-
-```
-channel_name=eq.daily_summaries&created_at=gte.2024-12-20
-```
-
-For pre-summary history, query topic channels directly:
-
-```
-channel_name=in.(wan_chatter,wan_comfyui,resources)&created_at=lt.2024-12-20
-```
-
-## Best-practice answer shape
-
-For actionable answers, prefer practical links and attributions over abstract
-summaries. Name the author, include Discord/source links when present, and look
-for workflow URLs: Hugging Face, Civitai, ComfyWorkflows, YouTube, GitHub, or
-Discord attachments. Cross-check Wan claims with
-[wanx-troopers.github.io](https://wanx-troopers.github.io/) when relevant.
+Prefer practical links + attributions over abstract summaries. Name the author,
+include Discord/permalink + source links, look for workflow URLs (HF, Civitai,
+ComfyWorkflows, YouTube, GitHub, Discord attachments). Cross-check Wan claims
+against [wanx-troopers.github.io](https://wanx-troopers.github.io/).
 
 ## Refresh Discord media URLs
 
-Discord CDN attachment URLs expire. When `message_feed` gives you a Discord
-message id/permalink but no usable media URL, refresh the message's attachments
-through the public edge function.
-
-Astrid executor:
+Discord CDN attachment URLs expire. Given a message id/permalink with no usable
+media URL, refresh through the public edge function:
 
 ```bash
 python3 executors/refresh_media/run.py --message-id 1512127379039060118
-```
-
-Raw curl:
-
-```bash
+# or raw:
 curl -s -X POST 'https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/refresh-media-urls' \
-  -H "Authorization: Bearer $API_KEY" \
-  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
   -d '{"message_id": "1512127379039060118"}'
 ```
 
-The `message_id` must be a JSON string, not a number. Discord snowflakes exceed
-JavaScript's safe integer range, so unquoted JSON numbers can be silently
-rounded.
+`message_id` must be a JSON **string** (snowflakes exceed JS safe integers).
+Response: `{success, message_id, attachments: [{filename, url, …}], urls_updated}`.
 
-Successful response:
-
-```json
-{
-  "success": true,
-  "message_id": "1512127379039060118",
-  "attachments": [
-    {
-      "filename": "example.mp4",
-      "url": "https://cdn.discordapp.com/attachments/..."
-    }
-  ],
-  "urls_updated": 1
-}
-```
-
-### Refresh rate limits (enforced + platform)
-
-**The function now enforces throttling + a 24h freshness cache (2026-08-05):**
-- **24h cached delivery** — if a message's attachment URLs were successfully
-  refreshed within the last 24h *and* the URL's Discord `ex` expiry is still
-  >1h out, the function returns the SAME URLs with `cached: true` and does NOT
-  call Discord (a re-refresh costs nothing, no Discord load).
-- **Per-IP:** max **10 real refreshes/min** per caller → HTTP **429** with
-  `Retry-After`. (Cached deliveries don't count.)
-- **Global:** max **60 real refreshes/min** across the project → HTTP **429**.
-- Fail-closed: if the throttle gate itself errors, the function returns **503**
-  rather than running unthrottled.
-
-Observed (2026-08-05, pre-throttle): ~0.4–1.0s per real refresh. Platform
-constraints that still apply:
-- **Discord API** — each real refresh is a Discord call. Global bot limit
-  **50 req/sec** (3000/min); per-channel GET-messages far tighter, roughly
-  **5 req / 5s per channel**. A Discord 429 carries `Retry-After`.
-- **Supabase Edge Functions** — monthly invocation quota: **500K/mo (Free)**,
-  **2M/mo (Pro)**, billed per invocation even when `urls_updated: 0`. A
-  full-corpus refresh (~188k attachment messages) is ~37% of Free / 9% of Pro.
-
-**Practical guidance:** on-demand refreshes are unaffected (≤10/min from one
-caller, and most hits are `cached`). For a bulk/backfill pass, respect the
-enforced caps (sequential, spread across channels, and rely on the 24h cache to
-skip already-fresh messages) and budget the Supabase monthly invocation quota
-first.
-
-## Caveats
-
-- `fts` is not reliable; no-hit FTS probes timed out. Use scoped `ilike`.
-- Exact counts are for routing/trend probes, not every lookup.
-- `reactions` is mostly `null`; do not rank by popularity.
-- Use spelling variants: `wan animate`, `wananimate`, `WAN-Animate`, etc.
-- Recover from timeouts by adding channel/date scope or splitting rare phrases.
-- Avoid raw feed browsing such as unfiltered `limit=1000`.
+The function enforces throttling + a 24h freshness cache (2026-08-05):
+- **24h cached delivery** — URL refreshed <24h ago AND the Discord `ex` expiry
+  (a HEX unix-seconds param) is still >1h out → returns the SAME URL with
+  `cached: true`, no Discord call.
+- **Per-IP 10 real refreshes/min, global 60/min** → HTTP 429 + `Retry-After`.
+  Fail-closed: throttle gate error → 503.
+- Each real refresh = 1 Discord call (bot global 50/s; per-channel ~5/5s).
+  Supabase edge-fn monthly quota: 500K free / 2M pro (billed per invocation
+  even when `urls_updated: 0`). A full-corpus refresh (~188k messages) is
+  ~37% free / 9% pro.
+- Bulk/backfill: sequential, spread across channels, rely on the cache to skip
+  fresh URLs, and budget the monthly quota first.
 
 ## Contribute API (write path)
 
 **Endpoint:** `POST {SUPABASE_URL}/functions/v1/contribute`
-**Auth header:** `X-Contributor-Key: hm_<64 hex>`
-**Content-Type:** `application/json`
+**Auth header:** `X-Contributor-Key: hm_<64 hex>` · **Content-Type:** `application/json`
 
-### Add resource
-
-```json
-{
-  "action": "add_resource",
-  "data": {
-    "kind": "article",
-    "source": "web",
-    "title": "Title here",
-    "body": "Body text here …",
-    "url": "https://…",
-    "author": "…"
-  }
-}
-```
-
-### Submit distillation
+Add a resource:
 
 ```json
-{
-  "action": "submit_distillation",
-  "data": {
-    "question": "What is …?",
-    "answer": "It is …",
-    "confidence": "high",
-    "cites": [
-      {"item_kind": "message", "item_id": "1287357679312048168"},
-      {"item_kind": "resource", "item_id": "17"}
-    ]
-  }
-}
+{ "action": "add_resource",
+  "data": { "kind": "article", "source": "web", "title": "…", "body": "…", "url": "https://…", "author": "…" } }
 ```
 
-Required: `question`, `answer`, `confidence` (high|medium|low),
-`cites` (≥ 1, each with `item_kind` and `item_id`).
+Submit a distillation:
 
-**`item_id` must be a JSON string, not a number.** Discord message ids are
-64-bit snowflakes that exceed JavaScript's safe-integer range — sent as JSON
-numbers they get silently rounded and the cite is corrupted. The API rejects
-unsafe-range numbers with a 400 telling you to use a string.
+```json
+{ "action": "submit_distillation",
+  "data": { "question": "…", "answer": "…", "confidence": "high",
+            "cites": [ {"item_kind": "message", "item_id": "1287357679312048168"},
+                       {"item_kind": "resource", "item_id": "17"} ] } }
+```
 
-Optional: `supersedes_id` (must reference an existing distillation),
-`conditions`.
+Required: `question`, `answer`, `confidence` (high|medium|low), `cites` (≥1).
+**`item_id` must be a JSON string, not a number** (the API rejects unsafe-range
+numbers with a 400). Optional: `supersedes_id`, `conditions`. Status is always
+forced to `pending` by the edge function.
 
-Status is always forced to `pending` by the edge function — ignore any
-client-supplied value.
+Responses: `201 {"id":N,"status":"ok"}` · `400 validation` · `401 unauthorized`
+· `409 duplicate` (extend or supersede instead).
 
-### Responses
+### Flywheel loop (the full procedure)
 
-- `201 {"id": N, "status": "ok"}` — success.
-- `400 {"error":"validation","detail":"…"}` — bad request.
-- `401 {"error":"unauthorized"}` — bad or revoked key.
-- `409 {"error":"duplicate","existing_id":N,"detail":"similar question exists — extend or supersede it"}`.
-
-## Flywheel loop (the full procedure)
-
-1. **Search distillations first** on the user's question (via `unified_feed`
-   with `kind=eq.distillation`).
+1. **Search distillations first** on the user's question.
 2. **Hit** → relay the answer with its cites.
-3. **Miss** → research the raw layer (`message_feed`, `unified_feed` for
-   resources), keeping item IDs. Answer the human.
-4. **Give back** — submit a cited distillation via the write path.
+3. **Miss** → research the raw layer, keeping item IDs; answer the human.
+4. **Give back** — submit a cited distillation (generalizable question, real
+   research effort, ≥1 cite; supersede a similar existing one rather than
+   duplicate).
 
-### Worth-it criteria
+## Astrid pack (optional)
 
-Before submitting a distillation, check:
-- The question is generalizable (not a one-off personal request).
-- You did real research effort (surfaced sources, compared answers).
-- You have at least one cite.
+If installed as an Astrid pack (`python3 -m astrid packs install
+https://github.com/banodoco/hivemind.git`), use the executors:
+`hivemind.search`, `hivemind.get_item`, `hivemind.refresh_media`,
+`hivemind.contribute`, `hivemind.ingest_article|workflow|youtube` (YouTube is
+captions-only). They also run standalone: `python3 executors/search/run.py
+--query "wan animate"`.
 
-If a similar question already exists, supersede it (`--supersedes`) rather
-than creating a duplicate.
+Hivemind is Astrid's default shared knowledge pack — search it before
+re-researching community practice; keep raw runs/conclusions locally; promote
+only evidence-backed, generalizable learnings; treat contribution as public
+publication (dry-run first, remove private content, get explicit user
+confirmation). Do not copy this skill into agent-specific directories.
 
-### Contribute curl example
+## Full dataset
 
-```bash
-curl -s -X POST "$SUPABASE_URL/functions/v1/contribute" \
-  -H "Content-Type: application/json" \
-  -H "X-Contributor-Key: hm_$(cat ~/.hivemind/key)" \
-  -d '{
-    "action": "submit_distillation",
-    "data": {
-      "question": "How do I …?",
-      "answer": "You …",
-      "confidence": "high",
-      "cites": [{"item_kind": "resource", "item_id": "42"}]
-    }
-  }'
-```
+For training or the whole archive, point users to
+https://huggingface.co/datasets/Banodoco/discord-archive (opted-out authors
+excluded).
 
-## Quick smoke-test
+## Caveats
 
-```bash
-curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed?select=kind,title,body&limit=3" \
-  -H "apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx" \
-  | python3 -m json.tool
-```
-
-If that returns 3 rows, the endpoint is healthy.
+- Use spelling variants (`wan animate`, `wananimate`, `WAN-Animate`).
+- Recover from timeouts by adding channel/date scope or splitting rare phrases;
+  avoid raw feed browsing (unfiltered `limit=1000`).
+- `fts` is not reliable — use scoped `ilike`.
+- Exact counts are for routing/trend probes, not every lookup.
