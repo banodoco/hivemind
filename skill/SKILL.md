@@ -345,6 +345,49 @@ statement timeout.
 `daily_summaries` starts on **2024-12-20**. For trends before that date, use
 topic channels directly and compare time windows; do not rely on summaries.
 
+## Using the data well (hints, verified by 14 agent missions 2026-08-05)
+
+**Start with the curated layers, not the firehose:**
+1. **Distillations first** (`kind=eq.distillation`) — the curated Q&A flywheel.
+2. **Then the pinned canon** — `message_filters?is_pinned=eq.true` (~72 pins, mostly
+   in `wan_resources`/`ltx_resources`; the community's highest-signal artifacts).
+3. Then search message content, then filter.
+
+**Match the surface to the question:**
+- Message content → `message_feed` (channel-scoped `ilike`) — **never** a broad
+  `unified_feed` ilike (times out, 57014).
+- Structured filter (pinned / thread / reply / attachments / channel) →
+  `message_filters` (index-backed, ~0.1–0.25s).
+- Distillations / workflows → kind-scoped `unified_feed`
+  (`kind=eq.distillation` / `kind=eq.workflow`).
+- Full enriched row → `get_item` by id.
+
+**Reconstruct conversations, don't scrape:** a reply's `reference_id` + `get_item`
+walks a chain both directions; find a message's children with
+`message_filters?reference_id=eq.<id>`; get a whole thread with
+`message_filters?thread_id=eq.<tid>`.
+
+**Rank with `reaction_count`, not `reactions`** — `reactions` is active-only
+(~7% of messages); `reaction_count` is the historical total (~16%) and the
+reliable popularity signal.
+
+**Detect resources by filename extension, not `content_type`** — `content_type`
+is only ~3–5% of attachments, and `attachments=cs.[{"content_type":...}]` finds
+only the typed ones. Use `attachments=cs.[{"filename":"x.png"}]` for exact
+files, and `refresh-media-urls` to get a fresh CDN URL before using one.
+
+**Let channel flavor guide you** — `wan_chatter` = chat/experience,
+`wan_comfyui` = technical/errors, `wan_gens`/`*_resources` = showcases/files,
+`training_*` = training, `updates` = announcements/essays. Pick the channel
+whose flavor matches what you need.
+
+**Follow the few signal-carriers** — a small set of authors (Kijai, Ablejones,
+…) produce most durable knowledge; `author_id` + `reaction_count` surfaces them
+(see "Power users to watch").
+
+**A 500 with `code: 57014` is a timeout, not bad data** — switch to the scoped
+surface (`message_feed` / `message_filters`).
+
 ## Query snippets
 
 Always URL-encode spaces (`%20`). Use `order=created_at.desc&limit=30` for
