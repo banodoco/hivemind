@@ -18,10 +18,13 @@
 --   3. unified_feed (schema/001)      — the MESSAGE branch carries the full
 --      envelope in `metadata` (original channel_id/reactions preserved;
 --      new guild_id / author_id / reference_id / thread_id / message_type /
---      edited_at / is_pinned / reaction_count / embeds / channel_type /
---      avatar_url) sourced by lateral joins into discord_messages /
---      discord_channels / members, and filters deleted messages.
---      Discord snowflakes are STRINGIFIED (JS-safe > 2^53).
+--      edited_at / is_pinned / reaction_count / embeds / attachments /
+--      channel_type / avatar_url) sourced by lateral joins into
+--      discord_messages / discord_channels / members, and filters deleted
+--      messages. Discord snowflakes are STRINGIFIED (JS-safe > 2^53).
+--      `attachments` is the raw Discord attachment array (filename,
+--      content_type/MIME, url, size, dimensions) — the resource-detection
+--      signal; `reference_id` is the message a reply cites (chain-building).
 --
 --   4. hivemind_lexical_search (009)  — mirrors the same metadata shape +
 --      deletion filter so RPC results match the feed row-for-row, and drops
@@ -119,13 +122,14 @@ with (security_invoker = true) as
                'is_pinned',      d.is_pinned,
                'reaction_count', d.reaction_count,
                'embeds',         d.embeds,
+               'attachments',    d.attachments,
                'channel_type',   cc.channel_type,
                'avatar_url',     mm.avatar_url
              )                                   as metadata,
     m.created_at
   from message_feed m
   left join lateral (
-    select dm.embeds, dm.reaction_count, dm.edited_at, dm.is_pinned,
+    select dm.attachments, dm.embeds, dm.reaction_count, dm.edited_at, dm.is_pinned,
            dm.thread_id, dm.message_type, dm.author_id, dm.reference_id,
            dm.is_deleted
       from discord_messages dm
@@ -359,13 +363,14 @@ begin
                'is_pinned',      d.is_pinned,
                'reaction_count', d.reaction_count,
                'embeds',         d.embeds,
+               'attachments',    d.attachments,
                'channel_type',   cc.channel_type,
                'avatar_url',     mm.avatar_url
              )                              as metadata,
              m.created_at
         from public.message_feed m
         left join lateral (
-          select dm.embeds, dm.reaction_count, dm.edited_at, dm.is_pinned,
+          select dm.attachments, dm.embeds, dm.reaction_count, dm.edited_at, dm.is_pinned,
                  dm.thread_id, dm.message_type, dm.author_id, dm.reference_id,
                  dm.is_deleted
             from public.discord_messages dm

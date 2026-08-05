@@ -136,11 +136,52 @@ original `channel_id` + `reactions`):
 | `is_pinned` | bool | pinned/curated |
 | `reaction_count` | int | total reactions (more reliable than `reactions`) |
 | `embeds` | jsonb | Discord embed objects (link previews — title/description/source URL of shared content) |
+| `attachments` | jsonb | Discord attachment objects — **the resource-detection signal**. Each: `filename`, `content_type` (MIME type, e.g. `image/png`, `video/mp4`, `application/json`), `url`, `size`, `width`/`height` |
 | `channel_type` | text | channel kind (`text`, `forum`, …) |
 
 Deleted messages (`is_deleted = true`) are filtered out of `unified_feed`,
 `message_feed`, search results, and direct `discord_messages` reads (RLS)
 entirely — they never appear.
+
+### The two resource signals (attachments + citations)
+
+These are the two high-value levers on message rows. Both are **exposed and
+readable on every message row** — but note the scale caveat below about
+server-side filtering.
+
+**1. Attachments → skip the noise, find the resources.**
+Every message's `metadata.attachments` is the Discord attachment array. A
+message that actually contains/shows something (an image, a video, a workflow
+`.json`, a PDF) has a **non-empty** array; prose-only messages have `[]` or no
+`attachments` key. Each element carries the TYPE:
+
+```json
+{ "filename": "sigmaflux-workflow.json", "content_type": "application/json",
+  "url": "https://cdn.discordapp.com/attachments/...", "size": 2048 }
+```
+
+`content_type` is the MIME type — target `image/*`, `video/mp4`, `application/pdf`,
+ComfyUI workflow JSON, etc. So: read `metadata.attachments` from results to
+detect resource-bearing messages, and use the `refresh_media` executor /
+`refresh-media-urls` edge function to get fresh CDN URLs for the attachment
+(`filename` + `url`) by message id.
+
+**2. `reference_id` → build chains.**
+`reference_id` is the snowflake (a string) of the message this one **replies to**
+(Discord's reply/cite). A message with a `reference_id` is a
+response/correction/elaboration of another; without one it's a root. To
+reconstruct a chain, walk it message-by-message: read the reply's
+`reference_id`, then `get_item` the parent, read *its* `reference_id`, and so
+on, both directions.
+
+> **Filtering caveat (corpus scale).** PostgREST **jsonb-path filters on
+> `metadata` time out** — `unified_feed` is a 1.2M-message view with no index on
+> the derived `metadata`, so `metadata->reference_id=eq.X` / `metadata->attachments`
+> scans and hits the 2s statement timeout. Do NOT rely on server-side metadata
+> filters. Instead: (a) read the fields from result rows / `get_item`
+> (indexed, fast); (b) walk chains via `get_item` by id; or (c) with DB access,
+> filter the SOURCE table directly — `discord_messages.reference_id` is a
+> btree-indexed column and `discord_messages.attachments` is jsonb.
 
 ### Search query pattern
 

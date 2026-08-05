@@ -48,9 +48,11 @@ def _seed_enriched(cluster: R.LP.LocalCluster) -> None:
     stmt = (
         "insert into public.discord_messages (message_id, channel_id, author_id, guild_id, content, "
         "created_at, is_deleted, thread_id, message_type, flags, embeds, reaction_count, reactors, "
-        "reference_id, edited_at, is_pinned, edit_history) values "
+        "attachments, reference_id, edited_at, is_pinned, edit_history) values "
         f"({ENRICHED_ID}, 100, 1, 9000, 'sigmaflux enriched message for exposure test', now(), false, "
         "123, 'DEFAULT', 0, '[{\"type\":\"link\",\"title\":\"Sigma Flux Guide\"}]', 7, '[]', "
+        "'[{\"filename\":\"sigmaflux-workflow.json\",\"content_type\":\"application/json\","
+        "\"url\":\"https://cdn.discordapp.com/attachments/1/sigmaflux-workflow.json\",\"size\":2048}]', "
         f"{REFERENCED_ID}, now() - interval '1 hour', true, '[]')"
     )
     rc, _ = cluster.psql(stmt)
@@ -186,6 +188,9 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
         self.assertEqual(meta["channel_type"], "forum")
         self.assertEqual(meta["avatar_url"], "https://cdn.example/avatar.png")
         self.assertEqual(meta["embeds"][0]["title"], "Sigma Flux Guide")
+        # Attachments carry the resource-detection signal: type (MIME), filename, url.
+        self.assertEqual(meta["attachments"][0]["content_type"], "application/json")
+        self.assertEqual(meta["attachments"][0]["filename"], "sigmaflux-workflow.json")
 
     def test_unified_feed_metadata_for_plain_message(self) -> None:
         """A message with no enrichment still carries the keys (nulls)."""
@@ -196,7 +201,7 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
         )
         for key in ("channel_id", "reactions", "guild_id", "author_id", "reference_id",
                     "thread_id", "message_type", "edited_at", "is_pinned",
-                    "reaction_count", "embeds", "channel_type", "avatar_url"):
+                    "reaction_count", "embeds", "attachments", "channel_type", "avatar_url"):
             self.assertIn(key, meta)
 
     # ------------------------------------------------------------------
@@ -211,6 +216,9 @@ class TestMessageMetadataExposureCluster(unittest.TestCase):
         self.assertEqual(meta["reaction_count"], 7)
         self.assertEqual(meta["channel_type"], "forum")
         self.assertEqual(meta["embeds"][0]["title"], "Sigma Flux Guide")
+        # Attachments carry the resource-detection signal: type (MIME), filename, url.
+        self.assertEqual(meta["attachments"][0]["content_type"], "application/json")
+        self.assertEqual(meta["attachments"][0]["filename"], "sigmaflux-workflow.json")
         self.assertEqual(meta["avatar_url"], "https://cdn.example/avatar.png")
         # Old keys preserved on the RPC path too.
         self.assertIn("channel_id", meta)
