@@ -222,11 +222,17 @@ present on ~4% of attachments, so prefer `filename` for type detection.
 ### Search query pattern
 
 Always query distillations first, then everything else. Merge distillations-first
-in results:
+in results.
 
-```
-GET /unified_feed?select=*&or=(title.ilike.*QUERY*,body.ilike.*QUERY*)&limit=20
-```
+**Timeout trap (verified by agent tests, 2026-08-05):** a broad
+`unified_feed?or=(title.ilike.*X*,body.ilike.*X*)` **times out** (HTTP 500
+`57014`) on message-content queries — the UNION view's resource/distillation
+branches have no trigram index, so the scan exceeds the anon role's 3s limit
+(even at `limit=10`). It's fine for distillation/resource-targeted searches
+(scoped by `kind`), but **for message content searches use `message_feed`
+(scoped by channel) instead** — its content `ilike` uses the trigram index.
+The `message_filters` surface is for structured fields (`is_pinned`, `thread_id`,
+`reference_id`, attachments), not free-text.
 
 For message-only searches (raw Discord), use the original `message_feed` table
 with the channel map below. `message_feed` now filters out deleted messages
