@@ -1,4 +1,4 @@
-# banodoco/hivemind <img src="assets/mascot/jiggle-readme.png" align="right" width="150px">
+# Hivemind — the open-source AI art ecosystem's collective intelligence <img src="assets/mascot/mascot.png" align="right" width="150px">
 
 A drop-in skill that lets a coding agent (Claude Code, Codex, etc.) search the
 **Banodoco Discord message feed** — a public, read-only PostgREST mirror of
