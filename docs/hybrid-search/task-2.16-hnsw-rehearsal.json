@@ -162,7 +162,7 @@
     },
     "build": {
       "build_returncode": 0,
-      "wall_s": 1.033,
+      "wall_s": 1.041,
       "lock_timeout": "5s",
       "statement_timeout": "300s",
       "maintenance_work_mem": "512MB",
@@ -173,7 +173,7 @@
         "selected_contract_vectors": 23138,
         "projected_index_gb": 1.976,
         "storage_gate_gb": 12,
-        "free_disk_gb": 2.114,
+        "free_disk_gb": 12.792,
         "total_disk_gb": 245.107,
         "safe_free_disk_margin_gb": 2.0,
         "hosted_quota_gb": "UNAVAILABLE (local isolated cluster)",
@@ -201,7 +201,7 @@
         "abort_reason": null
       },
       "progress_samples_count": 2,
-      "progress_last": "building index: loading tuples:5785/5785",
+      "progress_last": "building index: loading tuples:5208/5785",
       "build_stderr_redacted": ""
     },
     "catalog": {
@@ -214,12 +214,12 @@
       "size_pretty": "42 MB"
     },
     "storage": {
-      "database_bytes": 143401763,
-      "table_total_bytes": 94158848,
-      "hnsw_index_bytes": 43589632,
+      "database_bytes": 143786787,
+      "table_total_bytes": 94543872,
+      "hnsw_index_bytes": 43974656,
       "hnsw_index_size_pretty": "42 MB",
-      "projected_full_corpus_index_gb": 2.423,
-      "projected_full_corpus_table_gb": 5.234,
+      "projected_full_corpus_index_gb": 2.444,
+      "projected_full_corpus_table_gb": 5.256,
       "storage_gate_gb": 12,
       "within_storage_gate": true
     },

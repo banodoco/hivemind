@@ -33,10 +33,11 @@ Key (anon publishable, safe to commit):
   apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx
 ```
 
-Smoke test:
+Smoke test (raw search surface — per-token OR on message content; do NOT
+text-search `unified_feed`, the UNION scan times out with 57014):
 
 ```bash
-curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed?select=kind,title,body&limit=3" \
+curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed?select=message_id,content,author_name,channel_name,created_at&limit=5&order=created_at.desc&or=(content.ilike.*wan*,content.ilike.*animate*)" \
   -H "apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx"
 ```
 
@@ -44,9 +45,14 @@ curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed?select=ki
 
 | You want to… | Use | Why |
 |---|---|---|
-| Search curated Q&A (distillations) | `unified_feed?kind=eq.distillation` | flywheel, highest signal |
-| Search resources (workflows, articles) | `unified_feed?kind=eq.<resource-kind>` | kind-scoped, fast |
-| **Search message content** (free text) | `message_feed` (channel-scoped `ilike`) | `unified_feed` ilike on messages **times out** (57014) |
+| Search curated Q&A (distillations) | `distillations` + `or=(question.ilike.*T*,answer.ilike.*T*,conditions.ilike.*T*)` | flywheel, highest signal; status `pending,approved` |
+| Search resources (workflows, articles) | `external_resources?kind=eq.<resource-kind>&or=(title.ilike.*T*)` | raw table, kind btree + trigram GIN |
+| **Search message content** (free text) | `message_feed` + `or=(content.ilike.*T1*,content.ilike.*T2*)` | per-token OR is index-friendly; `unified_feed` ilike **times out** (57014) |
+| Just search everything at once | `python3 executors/search/run.py --query "wan animate workflow"` | the pack executor: 3 scopes in parallel, per-token predicates, client-ranked merge |
+| Search one Discord channel | `python3 executors/search/run.py --query "lora" --channel wan_chatter` | channel-scoped message search |
+| Search one person's messages | `python3 executors/search/run.py --query "lora" --author Kijai` | author-scoped message search |
+| Search inside a thread | `python3 executors/search/run.py --query "context" --thread <snowflake>` | index-backed `message_filters` thread surface |
+| Page through results | `--limit 10 --offset 10` (response has `total`/`has_more`) | deterministic ranked pool; stable pages |
 | Filter messages by a field (pinned, thread, reply, attachment, channel) | `message_filters` | index-backed, ~0.1–0.25s |
 | Fetch a full row by id | `get_item` (executor) or `unified_feed?item_id=eq.<id>` | complete body + metadata + cites |
 | Refresh an expiring media URL | `refresh-media-urls` edge function | fresh Discord CDN URL |
@@ -56,11 +62,14 @@ More on each below. The golden rule: **match the surface to the question**
 
 ## The surfaces
 
-### unified_feed — the results feed (distillations + resources; NOT message-content search)
+### unified_feed — the results feed (distillations + resources; NOT text search)
 
 `unified_feed` is a UNION of three layers with one common shape. Use it
-**kind-scoped** for distillations and resources; do NOT use it for broad
-message-content `ilike` searches (the UNION scan times out).
+**kind-scoped** for single-row fetches (`get_item`) of distillations and
+resources; do NOT use it for text search of any kind (a per-token OR over the
+UNION scan times out with 57014). For text search use the raw tables
+(`message_feed` / `external_resources` / `distillations`) or the pack's
+`hivemind.search` executor, which does exactly that.
 
 | kind | source | what it is |
 |---|---|---|
@@ -162,11 +171,23 @@ Returns the full row + metadata + (for distillations) cites / cited-by.
 
 ## How to answer a question (the workflow)
 
-1. **Distillations first** — `unified_feed?kind=eq.distillation&or=(title.ilike.*Q*,body.ilike.*Q*)`. Hit → relay the answer + its cites.
+1. **Distillations first** — `distillations?status=in.(pending,approved)&or=(question.ilike.*T1*,answer.ilike.*T1*,question.ilike.*T2*,answer.ilike.*T2*)` (per-token, not one phrase — a phrase never occurs verbatim and a multi-token OR over `unified_feed` times out). Hit → relay the answer + its cites.
 2. **Then the pinned canon** — `message_filters?is_pinned=eq.true` (~72 pins, mostly in `wan_resources`/`ltx_resources`; the community's highest-signal artifacts).
 3. **Then channel-scoped message search** — `message_feed?channel_name=in.(…)&content=ilike.*term*`, starting from the channel map.
 4. **Verify + deepen** — `get_item` promising ids; walk reply chains (`message_filters?reference_id=eq.<id>`); pull a whole thread (`thread_id=eq.<tid>`).
 5. **Assemble a cited answer** — name authors, include Discord/permalink + source links, prefer concrete settings over abstractions.
+
+**Paging a big result set** — the search response carries `has_more`,
+`page`/`pages`, and `next_offset`. When `has_more` is true, fetch the next
+page by re-running the same query with `--offset <next_offset>` — the next
+offset is given, so do not compute it yourself. `total` is the ranked pool
+(~100–300 rows), not the full corpus match count; to dig further than the
+pool, narrow with `--channel`/`--author`/`--since`/`--thread` instead of
+deep offsets.
+
+**Ordering** — default `--sort relevance`: score (distinctive tokens in
+title weigh more than body; approved distillations and parseable workflows
+float), then recency as tiebreak. Use `--sort recent` for newest-first.
 
 **Let channel flavor guide you** — `wan_chatter` = chat/experience,
 `wan_comfyui` = technical/errors, `*_gens`/`*_resources` = showcases/files,
@@ -175,10 +196,14 @@ orientation (starts 2024-12-20; before that use topic channels).
 
 ## Gotchas (the traps)
 
-- **`unified_feed` message-content `ilike` times out** (HTTP 500 `code 57014`).
-  `57014` = statement timeout — **NOT bad data** (`jsonb_typeof(metadata)` is
-  `object` on every row). It fails even at `limit=5` on big channels because a
-  LIMIT can't skip a scarce-match scan. Use `message_feed`/`message_filters`.
+- **`unified_feed` text search times out** (HTTP 500 `code 57014`) for
+  message-content `ilike` AND for multi-word / per-token ORs over the UNION
+  (the derived-view scan exceeds the anon role's 3s statement budget).
+  `57014` = statement timeout — **NOT bad data**. The pack search executor
+  never touches `unified_feed`: it queries `message_feed`,
+  `external_resources`, and `distillations` directly with per-token
+  predicates and ranks client-side. Use that executor, or the raw tables, or
+  `message_filters`.
 - **Do NOT filter on `unified_feed.metadata` jsonb paths** — same timeout. Read
   the fields from result rows instead, or filter the source columns.
 - **Rank with `reaction_count`, not `reactions`** — `reactions` is active-only

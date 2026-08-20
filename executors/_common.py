@@ -84,13 +84,13 @@ def resolve_refresh_media_url() -> str:
 # ---------------------------------------------------------------------------
 
 
-def _http_get(url: str, headers: dict[str, str]) -> dict[str, Any]:
+def _http_get(url: str, headers: dict[str, str], timeout: float = 30.0) -> dict[str, Any]:
     """Perform a GET and return parsed JSON (dict).
 
     Raises *urllib.error.HTTPError* on non-2xx status.
     """
     req = urllib.request.Request(url, headers=headers, method="GET")
-    with urllib.request.urlopen(req, timeout=30) as resp:
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
         body = resp.read().decode("utf-8")
     return json.loads(body)  # type: ignore[no-any-return]
 
@@ -112,6 +112,7 @@ def postgrest_get(
     *,
     endpoint: str | None = None,
     anon_key: str | None = None,
+    timeout: float = 30.0,
 ) -> dict[str, Any]:
     """Issue a GET against the PostgREST API.
 
@@ -125,6 +126,8 @@ def postgrest_get(
         Base URL override (defaults to :func:`resolve_endpoint`).
     anon_key:
         API key override (defaults to :func:`resolve_anon_key`).
+    timeout:
+        Per-request timeout in seconds (default 30).
 
     Returns the parsed JSON response body (always a dict — PostgREST
     returns either an object or an array, both are valid JSON).
@@ -138,7 +141,7 @@ def postgrest_get(
         "apikey": anon_key or resolve_anon_key(),
         "Accept": "application/json",
     }
-    return _http_get(url, headers)
+    return _http_get(url, headers, timeout=timeout)
 
 
 def edge_post(

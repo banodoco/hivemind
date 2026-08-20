@@ -14,3 +14,5 @@ __pycache__/
 .cache/hivemind-hnsw-task-2.16/
 # Live-DB probe scratch (inventory dumps, backfill scratch). Never commit.
 .codex_tmp/
+.astrid/
+*.egg-info/

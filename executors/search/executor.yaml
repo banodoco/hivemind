@@ -4,13 +4,14 @@
   "name": "Search",
   "kind": "external",
   "version": "2.0",
-  "short_description": "Search the Hivemind unified corpus with distillations-first merging.",
-  "description": "Queries the unified_feed PostgREST view with ilike matching on title and body. Distillation-kind rows are fetched first and merged ahead of other kinds. Each body is truncated to 700 characters with a truncated flag. When no distillation rows match, a nudge is appended encouraging the user to submit one.",
+  "short_description": "Search the Hivemind corpus (messages, resources, distillations) with per-token matching and client-side ranking.",
+  "description": "Searches the raw corpus tables (message_feed, external_resources, distillations) in parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014) on text search. Filters: --kinds (message/workflow/distillation), --sources, --since, --channel/--author (messages only), --thread (index-backed thread surface). Results are ranked client-side (distinctive tokens in titles weigh most; approved distillations and parseable workflows float) and merged deterministically; page with --limit/--offset (response carries total/has_more). Each body is truncated to 400 characters with a truncated flag. When no distillation rows match, a nudge is appended encouraging the user to submit one.",
   "keywords": [
     "hivemind",
     "search",
     "corpus",
-    "unified_feed",
+    "message_feed",
+    "external_resources",
     "postgrest",
     "distillation"
   ],
@@ -19,7 +20,7 @@
       "name": "query",
       "type": "string",
       "required": true,
-      "description": "Search query (ilike-matched on title and body)."
+      "description": "Search query (per-token ilike-matched across messages, resources, distillations)."
     },
     {
       "name": "kinds",
@@ -40,17 +41,48 @@
       "description": "ISO timestamp lower bound for created_at."
     },
     {
+      "name": "channel",
+      "type": "string",
+      "required": false,
+      "description": "Discord channel name; searches messages in that channel only (e.g. wan_chatter). Message surface only."
+    },
+    {
+      "name": "author",
+      "type": "string",
+      "required": false,
+      "description": "Discord author display name; searches that author's messages only (e.g. Kijai). Message surface only."
+    },
+    {
+      "name": "thread",
+      "type": "string",
+      "required": false,
+      "description": "Discord thread id (snowflake); searches messages in that thread only (index-backed message_filters surface)."
+    },
+    {
       "name": "limit",
       "type": "number",
       "required": false,
-      "description": "Max results (default 20)."
+      "description": "Max results per page (default 20)."
+    },
+    {
+      "name": "offset",
+      "type": "number",
+      "required": false,
+      "description": "Skip this many ranked results; page through a query with --limit + --offset. The response carries total/has_more. The ranked pool is deterministic while the corpus is unchanged (page N is stable across calls)."
+    },
+    {
+      "name": "sort",
+      "type": "string",
+      "required": false,
+      "description": "relevance (default: score, then recency, then table+id) or recent (created_at desc, then score)."
     }
   ],
   "outputs": [
     {
       "name": "results",
       "type": "file",
-      "path_template": "{out}/results.json"
+      "path_template": "{out}/results.json",
+      "description": "Paging contract: response JSON carries results[], count, total (ranked-pool extent), has_more, page, pages, next_offset. When has_more is true, fetch the next page by re-running with --offset <next_offset> (next_offset is null when has_more is false). Ranking is deterministic while the corpus is unchanged, so a page is stable across calls. A human summary prints to stderr; stdout is pure JSON."
     }
   ],
   "command": {

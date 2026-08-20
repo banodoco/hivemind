@@ -24,7 +24,12 @@ path (Supabase edge function). The corpus combines:
 - **Distillations** — curated Q&A pairs with cited sources, submitted by agents
   and reviewed by humans
 
-Everything is searchable through one `unified_feed` view. Distillations make
+Everything is searchable: the pack's search executor queries the raw corpus
+tables (`message_feed`, `external_resources`, `distillations`) in parallel
+with per-token ILIKE predicates and ranks the merge client-side — the
+`unified_feed` UNION view is used only for kind-scoped single-row fetches
+(`get_item`), never for text search (its derived-view scan blows the anon
+role's 3s statement budget → HTTP 500 / SQLSTATE 57014). Distillations make
 the corpus self-improving: every researched answer becomes a permanent,
 findable entry for the next person.
 
@@ -63,6 +68,27 @@ Copy `skill/SKILL.md` into your `AGENTS.md` (or equivalent instruction
 file) — the content is self-contained with endpoint, schema, query patterns,
 and the full contribute API.
 
+### 4. Pip package (editable dev install)
+
+The repo root is a Python package (`hivemind`), stdlib-only. Install
+editable so edits to the clone are live:
+
+```bash
+pip install -e .
+pyenv rehash   # only if you use pyenv — exposes the hivemind-search shim
+```
+
+Then, from any directory:
+
+```bash
+python3 -m hivemind.executors.search.run --query "wan animate" --limit 10
+hivemind-search --query "lora" --channel wan_chatter --limit 20   # console script
+python3 -c "import hivemind"                                       # package import
+```
+
+The console script mirrors `python3 executors/search/run.py` exactly
+(same flags, same JSON/stdout contract, same stderr paging hints).
+
 ## Repository layout
 
 One repo, three products — the Astrid pack is contractually pinned to the
@@ -88,8 +114,11 @@ directory whose name equals the pack id, and the clone is named `hivemind`):
 
 - The endpoint URL + the public anon key (safe to commit — it's the
   publishable key, RLS makes it read-only).
-- The `unified_feed` view: messages + resources + distillations in one table.
-- `ilike` search across title and body, distillations-first merging.
+- The `unified_feed` view: messages + resources + distillations in one table
+  (use kind-scoped for single-row fetches — NOT for text search).
+- Per-token `ilike` search over the raw tables (`message_feed` content,
+  `external_resources` title/body, `distillations` question/answer/conditions),
+  client-ranked and merged.
 - Get single items by kind + id with full citation context.
 - A taxonomy of which Discord channels are high-signal (`daily_summaries`,
   `wan_chatter`, `wan_comfyui`, `ltx_chatter`, `comfyui`, `*_resources`)
@@ -160,7 +189,33 @@ curl -s -X POST "$SUPABASE_URL/functions/v1/contribute" \
 
 | Executor | CLI | Description |
 |---|---|---|
-| `search` | `python3 executors/search/run.py --query "..."` | ilike search on unified_feed, distillations-first |
+| `search` | `python3 executors/search/run.py --query "..."` | Per-token ilike search over raw tables, client-ranked; never unified_feed |
+
+Filters: `--kinds message|workflow|distillation` (or a mix), `--sources`,
+`--since`, `--channel <name>`, `--author <name>` (messages only), and
+`--thread <snowflake>` (index-backed thread surface). Ordering: `--sort
+relevance` (default — score, then recency) or `--sort recent`
+(created_at desc, then score). The relevance score: +5 per distinctive
+token in title/question, +3 in body/answer/conditions, +4 approved
+distillation, +3 parseable workflow, +2 exact phrase. Page any query with
+`--limit N --offset M`. Ergonomics: every response carries `count`, `total`
+(ranked-pool extent), `has_more`, `page`, `pages`, and **`next_offset`** —
+when `has_more` is true, the next page is exactly
+`--offset <next_offset>` on the same command, so agents never reconstruct
+the offset. A human summary goes to **stderr** so stdout stays pure JSON:
+`Showing 11-20 of 114 results (page 2 of 12) - next: --limit 10 --offset 20`.
+`total` is the ranked pool bounded by the per-scope fetch (exact corpus
+counts would need the slow `Prefer: count=exact`, which the transport never
+sends). The ranking is deterministic while the corpus is unchanged, so page
+N is stable across calls. Examples:
+
+```bash
+python3 executors/search/run.py --query "wan animate" --limit 10                 # first page, all kinds
+python3 executors/search/run.py --query "wan animate" --limit 10 --offset 10     # second page
+python3 executors/search/run.py --query "lora" --channel wan_chatter --limit 20  # channel filter
+python3 executors/search/run.py --query "lora" --author Kijai --limit 20         # author filter
+python3 executors/search/run.py --query "context" --thread 1175229360781938718   # thread filter
+```
 | `get_item` | `python3 executors/get_item/run.py --kind distillation --id 42` | Full untruncated row with citation context |
 | `refresh_media` | `python3 executors/refresh_media/run.py --message-id 1512127379039060118` | Refresh expiring Discord CDN attachment URLs |
 | `contribute` | `python3 executors/contribute/run.py --type resource ...` | Submit resources or distillations via edge function |
@@ -203,16 +258,18 @@ GET https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed
 Header: apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx
 ```
 
-The `unified_feed` view is at the same base:
+The `unified_feed` view is at the same base (kind-scoped single-row fetches
+only — see the search-executor note above):
 
 ```
 GET https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed
 ```
 
-Smoke-test:
+Smoke-test a raw search surface (per-token OR on message content — the fast
+shape; `order=created_at.desc` bounds the pool):
 
 ```bash
-curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed?select=kind,title,body&limit=3" \
+curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed?select=message_id,content,author_name,channel_name,created_at&limit=5&order=created_at.desc&or=(content.ilike.*wan*,content.ilike.*animate*)" \
   -H "apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx" | python3 -m json.tool
 ```
 

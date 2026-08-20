@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """Hivemind legacy-search baseline capture (hybrid-search plan, task 0.4).
 
-Captures the **current, as-deployed** search behaviour so the hybrid-search
-project has a frozen baseline to compare against. It reproduces the exact
-public/pack legacy search path — the two PostgREST ``ILIKE`` passes against
-``unified_feed`` and the per-pass (not global) limit — and measures it, it does
-**not** implement lexical or hybrid search.
+**FROZEN SNAPSHOT (2026-08-19).** The pack search executor no longer queries
+``unified_feed``: it was rewritten to search the raw tables (message_feed /
+external_resources / distillations) with per-token OR predicates because the
+legacy unified_feed ILIKE-phrase path returns zero rows for multi-word
+queries and blows the anon role's statement budget (HTTP 500 / SQLSTATE
+57014) on per-token ORs.  This script captures the **historical** legacy
+behaviour so the hybrid-search project's phase-0 baseline measurements stay
+reproducible; the request-construction helpers below are frozen copies of the
+old executor and must NOT be updated to track the new one.
+
+It reproduces the exact legacy search path — the two PostgREST ``ILIKE``
+passes against ``unified_feed`` and the per-pass (not global) limit — and
+measures it, it does **not** implement lexical or hybrid search.
 
 What it captures, per query:
 
@@ -190,16 +198,15 @@ REQUIRED_CATEGORIES = {
 
 
 # ---------------------------------------------------------------------------
-# Legacy request construction — a faithful, independent copy of
-# executors/search/run.py, pinned to today's behaviour by the parity tests.
-# Copying (not importing) keeps this baseline a fixed snapshot: if the executor
-# changes later, test_baseline_search.test_params_match_executor_current fails,
-# which is the correct signal that the baseline no longer matches deployed code.
+# Legacy request construction — a FROZEN, independent copy of the old
+# executors/search/run.py (pre-2026-08-19).  Copying (not importing) keeps
+# this baseline a fixed snapshot: the new executor moved off unified_feed and
+# these helpers intentionally do not track it.
 # ---------------------------------------------------------------------------
 
 
 def legacy_ilike_clause(query: str) -> str:
-    """Exact copy of executors.search.run._ilike_clause."""
+    """Frozen copy of the legacy executor's _ilike_clause (pre-2026-08-19)."""
     encoded = query.replace("*", "\\*")  # escape literal asterisks
     return f"(title.ilike.*{encoded}*,body.ilike.*{encoded}*)"
 
@@ -211,7 +218,7 @@ def legacy_build_params(
     since: str | None,
     limit: int,
 ) -> dict[str, str]:
-    """Exact copy of executors.search.run._build_params (common params, pre-kind-override)."""
+    """Frozen copy of the legacy executor's _build_params (common params, pre-kind-override)."""
     params: dict[str, str] = {
         "select": "*",
         "limit": str(limit),
@@ -332,7 +339,7 @@ def normalize_rows(body: Any) -> list[dict[str, Any]]:
     """Coerce a PostgREST response body into a list of row dicts.
 
     PostgREST returns an array normally, but may return a single object for
-    ``limit=1``; mirrors executors.search.run._query_feed.
+    ``limit=1``; mirrors the legacy executor's _query_feed.
     """
     if isinstance(body, list):
         return [r for r in body if isinstance(r, dict)]
@@ -488,7 +495,7 @@ def measure_query(
     record["kind_distribution"] = kind_distribution(merged_rows)
     record["duplicate"] = dup
     record["snowflake"] = snowflake_check(merged_rows)
-    record["nudge_present"] = len(distillation_rows) == 0  # mirrors _merge_results nudge rule
+    record["nudge_present"] = len(distillation_rows) == 0  # mirrors the legacy executor's nudge rule
     record["truncated_rows"] = sum(
         1 for r in (summarize_row(r) for r in merged_rows) if r["body_would_truncate"]
     )

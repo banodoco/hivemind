@@ -199,7 +199,7 @@
   },
   "build": {
     "build_returncode": 0,
-    "wall_s": 1.04,
+    "wall_s": 1.037,
     "lock_timeout": "5s",
     "statement_timeout": "300s",
     "maintenance_work_mem": "512MB",
@@ -210,7 +210,7 @@
       "selected_contract_vectors": 23138,
       "projected_index_gb": 1.976,
       "storage_gate_gb": 12,
-      "free_disk_gb": 2.112,
+      "free_disk_gb": 12.795,
       "total_disk_gb": 245.107,
       "safe_free_disk_margin_gb": 2.0,
       "hosted_quota_gb": "UNAVAILABLE (local isolated cluster)",
@@ -251,53 +251,53 @@
     "size_pretty": "42 MB"
   },
   "storage": {
-    "database_bytes": 143508259,
-    "hnsw_index_bytes": 43696128,
+    "database_bytes": 143557411,
+    "hnsw_index_bytes": 43745280,
     "hnsw_index_size_pretty": "42 MB"
   },
   "exact_baseline": {
-    "latency_ms_mean": 461.915,
-    "latency_ms_p50": 452.491,
-    "latency_ms_p95": 507.198,
+    "latency_ms_mean": 457.322,
+    "latency_ms_p50": 455.733,
+    "latency_ms_p95": 472.024,
     "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
   },
   "per_ef": {
     "40": {
       "warm_n": 50,
-      "latency_ms_mean": 89.366,
-      "latency_ms_p50": 89.225,
-      "latency_ms_p95": 90.358,
-      "latency_ms_max": 93.334,
+      "latency_ms_mean": 92.489,
+      "latency_ms_p50": 91.982,
+      "latency_ms_p95": 95.996,
+      "latency_ms_max": 106.978,
       "exact_vs_ann_recall_at_10_mean": 1.0,
       "exact_vs_ann_recall_at_10_min": 1.0,
       "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
     },
     "80": {
       "warm_n": 50,
-      "latency_ms_mean": 90.16,
-      "latency_ms_p50": 89.601,
-      "latency_ms_p95": 93.501,
-      "latency_ms_max": 95.115,
+      "latency_ms_mean": 91.978,
+      "latency_ms_p50": 91.939,
+      "latency_ms_p95": 94.599,
+      "latency_ms_max": 95.917,
       "exact_vs_ann_recall_at_10_mean": 1.0,
       "exact_vs_ann_recall_at_10_min": 1.0,
       "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
     },
     "120": {
       "warm_n": 50,
-      "latency_ms_mean": 92.069,
-      "latency_ms_p50": 91.544,
-      "latency_ms_p95": 96.788,
-      "latency_ms_max": 103.792,
+      "latency_ms_mean": 94.179,
+      "latency_ms_p50": 93.434,
+      "latency_ms_p95": 98.867,
+      "latency_ms_max": 101.945,
       "exact_vs_ann_recall_at_10_mean": 1.0,
       "exact_vs_ann_recall_at_10_min": 1.0,
       "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"
     },
     "200": {
       "warm_n": 50,
-      "latency_ms_mean": 91.943,
-      "latency_ms_p50": 90.739,
-      "latency_ms_p95": 98.38,
-      "latency_ms_max": 100.614,
+      "latency_ms_mean": 95.592,
+      "latency_ms_p50": 94.768,
+      "latency_ms_p95": 103.175,
+      "latency_ms_max": 105.571,
       "exact_vs_ann_recall_at_10_mean": 1.0,
       "exact_vs_ann_recall_at_10_min": 1.0,
       "ranked_identity_hash_sample": "f31891a340a56d39f3cb7921d55d1b5e5c6d9d693ae18f46946075cb03721b72"

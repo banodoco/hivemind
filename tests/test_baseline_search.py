@@ -24,7 +24,6 @@ sys.path.insert(0, str(_REPO))
 sys.path.insert(0, str(_REPO / "scripts"))
 
 import baseline_search as bs  # noqa: E402
-from executors.search import run as search_run  # noqa: E402  (parity reference)
 
 
 # ---------------------------------------------------------------------------
@@ -60,30 +59,55 @@ def _fake_urlopen_ok(payload_by_kind):
 
 
 # ---------------------------------------------------------------------------
-# Parity with the deployed executor (the whole point of a faithful baseline)
+# Parity with the deployed legacy executor (frozen snapshot)
 # ---------------------------------------------------------------------------
+
+# The search executor was rewritten on 2026-08-19 to query the raw tables
+# (message_feed / external_resources / distillations) with per-token OR
+# predicates — the unified_feed ILIKE-phrase path it previously used blows the
+# anon role's statement budget (HTTP 500 / SQLSTATE 57014) on multi-word
+# queries.  This baseline is a HISTORICAL SNAPSHOT of the legacy request
+# shape; these tests pin that the snapshot is faithful to what the executor
+# actually sent, so the hybrid-search project's baseline measurements stay
+# reproducible.  They deliberately do NOT track the new executor.
 
 
 class ExecutorParityTests(unittest.TestCase):
-    """The baseline must issue byte-identical requests to executors.search.run today."""
+    """The frozen legacy request shape must stay byte-identical to what the
+    old executor sent."""
 
-    def test_ilike_clause_matches_executor(self):
-        for q in ("upscale", "foo*bar", "best upscale model", "FLUX.1", ""):
-            self.assertEqual(bs.legacy_ilike_clause(q), search_run._ilike_clause(q), q)
+    def test_ilike_clause_frozen_legacy_phrase(self):
+        # The old executor matched the WHOLE query as one contiguous ILIKE
+        # substring — the shape that returns zero rows for multi-word
+        # queries.  Frozen as-is for baseline reproducibility.
+        self.assertEqual(
+            bs.legacy_ilike_clause("best upscale model"),
+            "(title.ilike.*best upscale model*,body.ilike.*best upscale model*)",
+        )
+        self.assertEqual(
+            bs.legacy_ilike_clause("foo*bar"),
+            "(title.ilike.*foo\\*bar*,body.ilike.*foo\\*bar*)",
+        )
 
-    def test_build_params_matches_executor_across_filters(self):
-        cases = [
-            ("upscale", None, None, None, 20),
-            ("test", "message,resource", None, None, 20),
-            ("test", None, "banodoco-discord", None, 20),
-            ("test", None, None, "2024-01-01T00:00:00Z", 20),
-            ("test", None, None, None, 5),
-            ("lora", "workflow", "vibecomfy-external", "2024-06-01T00:00:00Z", 10),
-        ]
-        for case in cases:
-            self.assertEqual(bs.legacy_build_params(*case), search_run._build_params(*case), case)
+    def test_build_params_frozen_legacy_shape(self):
+        # select=* + the single phrase OR on unified_feed: the legacy shape.
+        params = bs.legacy_build_params("test", None, None, None, 20)
+        self.assertEqual(
+            params,
+            {
+                "select": "*",
+                "limit": "20",
+                "or": "(title.ilike.*test*,body.ilike.*test*)",
+            },
+        )
+        params_kinds = bs.legacy_build_params("test", "message,resource", None, None, 5)
+        self.assertEqual(params_kinds["kind"], "in.(message,resource)")
+        params_sources = bs.legacy_build_params("test", None, "banodoco-discord", None, 20)
+        self.assertEqual(params_sources["source"], "in.(banodoco-discord)")
+        params_since = bs.legacy_build_params("test", None, None, "2024-01-01T00:00:00Z", 20)
+        self.assertEqual(params_since["created_at"], "gte.2024-01-01T00:00:00Z")
 
-    def test_passes_match_executor_pass_selection(self):
+    def test_passes_frozen_legacy_selection(self):
         # No kinds -> distillation (eq) + others (neq).
         self.assertEqual(
             bs.legacy_passes(None),
@@ -98,6 +122,10 @@ class ExecutorParityTests(unittest.TestCase):
             bs.legacy_passes("message,resource"),
             [("others", "in.(message,resource)")],
         )
+
+    def test_legacy_url_targets_unified_feed(self):
+        url = bs.build_url("https://fake.example.com/rest/v1", {"select": "*", "limit": "1"})
+        self.assertIn("/unified_feed?", url)
 
     def test_final_url_and_headers_match_postgrest_get(self):
         """The URL, headers, and method a pass emits must match executors._common.postgrest_get."""
