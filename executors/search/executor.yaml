@@ -5,7 +5,7 @@
   "kind": "external",
   "version": "2.0",
   "short_description": "Search the Hivemind corpus (messages, resources, distillations) with per-token matching and client-side ranking.",
-  "description": "Searches the raw corpus tables (message_feed, external_resources, distillations) in parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014) on text search. Filters: --kinds (message/workflow/distillation), --sources, --since, --channel/--author (messages only), --thread (index-backed thread surface). Results are ranked client-side (distinctive tokens in titles weigh most; approved distillations and parseable workflows float) and merged deterministically; page with --limit/--offset (response carries total/has_more). Each body is truncated to 400 characters with a truncated flag. When no distillation rows match, a nudge is appended encouraging the user to submit one.",
+  "description": "Searches the raw corpus tables with per-token ILIKE predicates, deterministic client-side ranking, and stable pagination. Supports kind/source/date/channel/author/thread filters and bounded result bodies.",
   "keywords": [
     "hivemind",
     "search",
