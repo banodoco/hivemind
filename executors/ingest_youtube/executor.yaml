@@ -66,7 +66,14 @@
       "allowed_protocols": ["dns", "tcp"],
       "allowed_destinations": ["ujlwuvkrxlvoswwkerdf.supabase.co:443", "www.youtube.com:443", "youtube.com:443", "youtu.be:443"],
       "allow_redirects": false,
-      "proxy": null,
+      "broker": {
+        "host_managed": true,
+        "kind": "broker",
+        "enforced": true,
+        "observable": true,
+        "route": "youtube-captions",
+        "wrapper": "executors/ingest_youtube/broker_yt_dlp.py"
+      },
       "descendant_enforcement": {
         "kind": "broker",
         "validated": true,
