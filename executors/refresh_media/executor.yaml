@@ -56,7 +56,7 @@
       "allowed_protocols": ["dns", "tcp"],
       "allowed_destinations": ["ujlwuvkrxlvoswwkerdf.supabase.co:443"],
       "allow_redirects": false,
-      "proxy": null
+      "broker": {"host_managed": true}
     },
     "runtime_entrypoint": "main",
     "runtime_file": "run.py",

@@ -45,6 +45,9 @@
       "{url}",
       "--out",
       "{out}/result.json"
+    ],
+    "input_args": [
+      {"input": "dry_run", "flag": "--dry-run", "optional": true}
     ]
   },
   "cache": {
@@ -65,6 +68,7 @@
     "network_policy": {
       "allowed_protocols": ["dns", "tcp"],
       "allowed_destinations": ["ujlwuvkrxlvoswwkerdf.supabase.co:443", "www.youtube.com:443", "youtube.com:443", "youtu.be:443"],
+      "dynamic_url_inputs": ["url"],
       "allow_redirects": false,
       "broker": {
         "host_managed": true,
