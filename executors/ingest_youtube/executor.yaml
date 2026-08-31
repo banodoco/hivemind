@@ -45,6 +45,9 @@
       "{url}",
       "--out",
       "{out}/result.json"
+    ],
+    "input_args": [
+      {"input": "dry_run", "flag": "--dry-run", "optional": true}
     ]
   },
   "cache": {
@@ -65,5 +68,6 @@
     "runtime_entrypoint": "main",
     "runtime_file": "run.py",
     "runtime_module": "hivemind.executors.ingest_youtube.run"
+    ,"network_policy": {"allowed_protocols": ["dns", "tcp"], "allowed_destinations": ["https://ujlwuvkrxlvoswwkerdf.supabase.co:443"], "dynamic_url_inputs": ["url"], "allow_redirects": false, "descendant_enforcement": {"kind": "broker", "validated": true, "observable": true, "route": "dynamic-url", "wrapper": "hivemind.executors.ingest_youtube.run"}, "broker": {"host_managed": true}}
   }
 }

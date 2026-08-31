@@ -122,6 +122,22 @@
       "{type}",
       "--out",
       "{out}/result.json"
+    ],
+    "input_args": [
+      {"input": "kind", "flag": "--kind", "optional": true},
+      {"input": "title", "flag": "--title", "optional": true},
+      {"input": "body_file", "flag": "--body-file", "optional": true},
+      {"input": "source", "flag": "--source", "optional": true},
+      {"input": "url", "flag": "--url", "optional": true},
+      {"input": "author", "flag": "--author", "optional": true},
+      {"input": "question", "flag": "--question", "optional": true},
+      {"input": "answer", "flag": "--answer", "optional": true},
+      {"input": "confidence", "flag": "--confidence", "optional": true},
+      {"input": "cites", "flag": "--cites", "optional": true},
+      {"input": "supersedes", "flag": "--supersedes", "optional": true},
+      {"input": "conditions", "flag": "--conditions", "optional": true},
+      {"input": "from_file", "flag": "--from-file", "optional": true},
+      {"input": "dry_run", "flag": "--dry-run", "optional": true}
     ]
   },
   "cache": {
@@ -139,5 +155,6 @@
     "runtime_entrypoint": "main",
     "runtime_file": "run.py",
     "runtime_module": "hivemind.executors.contribute.run"
+    ,"network_policy": {"allowed_protocols": ["dns", "tcp"], "allowed_destinations": ["https://ujlwuvkrxlvoswwkerdf.supabase.co:443"], "allow_redirects": false, "broker": {"host_managed": true}}
   }
 }

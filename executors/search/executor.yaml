@@ -1,115 +1,116 @@
-{
-  "schema_version": 1,
-  "id": "hivemind.search",
-  "name": "Search",
-  "kind": "external",
-  "version": "2.0",
-  "short_description": "Search the Hivemind corpus (messages, resources, distillations) with per-token matching and client-side ranking.",
-  "description": "Searches the raw corpus tables (message_feed, external_resources, distillations) in parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014) on text search. Filters: --kinds (message/workflow/distillation), --sources, --since, --channel/--author (messages only), --thread (index-backed thread surface). Results are ranked client-side (distinctive tokens in titles weigh most; approved distillations and parseable workflows float) and merged deterministically; page with --limit/--offset (response carries total/has_more). Each body is truncated to 400 characters with a truncated flag. When no distillation rows match, a nudge is appended encouraging the user to submit one.",
-  "keywords": [
-    "hivemind",
-    "search",
-    "corpus",
-    "message_feed",
-    "external_resources",
-    "postgrest",
-    "distillation"
-  ],
-  "inputs": [
-    {
-      "name": "query",
-      "type": "string",
-      "required": true,
-      "description": "Search query (per-token ilike-matched across messages, resources, distillations)."
-    },
-    {
-      "name": "kinds",
-      "type": "string",
-      "required": false,
-      "description": "Comma-separated kind filter (message,article,workflow,transcript,distillation,...)."
-    },
-    {
-      "name": "sources",
-      "type": "string",
-      "required": false,
-      "description": "Comma-separated source filter."
-    },
-    {
-      "name": "since",
-      "type": "string",
-      "required": false,
-      "description": "ISO timestamp lower bound for created_at."
-    },
-    {
-      "name": "channel",
-      "type": "string",
-      "required": false,
-      "description": "Discord channel name; searches messages in that channel only (e.g. wan_chatter). Message surface only."
-    },
-    {
-      "name": "author",
-      "type": "string",
-      "required": false,
-      "description": "Discord author display name; searches that author's messages only (e.g. Kijai). Message surface only."
-    },
-    {
-      "name": "thread",
-      "type": "string",
-      "required": false,
-      "description": "Discord thread id (snowflake); searches messages in that thread only (index-backed message_filters surface)."
-    },
-    {
-      "name": "limit",
-      "type": "number",
-      "required": false,
-      "description": "Max results per page (default 20)."
-    },
-    {
-      "name": "offset",
-      "type": "number",
-      "required": false,
-      "description": "Skip this many ranked results; page through a query with --limit + --offset. The response carries total/has_more. The ranked pool is deterministic while the corpus is unchanged (page N is stable across calls)."
-    },
-    {
-      "name": "sort",
-      "type": "string",
-      "required": false,
-      "description": "relevance (default: score, then recency, then table+id) or recent (created_at desc, then score)."
-    }
-  ],
-  "outputs": [
-    {
-      "name": "results",
-      "type": "file",
-      "path_template": "{out}/results.json",
-      "description": "Paging contract: response JSON carries results[], count, total (ranked-pool extent), has_more, page, pages, next_offset. When has_more is true, fetch the next page by re-running with --offset <next_offset> (next_offset is null when has_more is false). Ranking is deterministic while the corpus is unchanged, so a page is stable across calls. A human summary prints to stderr; stdout is pure JSON."
-    }
-  ],
-  "command": {
-    "argv": [
-      "{python_exec}",
-      "-m",
-      "hivemind.executors.search.run",
-      "--query",
-      "{query}",
-      "--out",
-      "{out}/results.json"
-    ]
-  },
-  "cache": {
-    "mode": "none"
-  },
-  "isolation": {
-    "mode": "subprocess",
-    "network": true,
-    "env_passthrough": [
-      "HIVEMIND_API_URL",
-      "HIVEMIND_ANON_KEY"
-    ]
-  },
-  "metadata": {
-    "runtime_entrypoint": "main",
-    "runtime_file": "run.py",
-    "runtime_module": "hivemind.executors.search.run"
-  }
-}
+schema_version: 1
+id: hivemind.search
+name: Search
+kind: external
+version: '2.0'
+short_description: Search the Hivemind corpus (messages, resources, distillations) with per-token matching and client-side ranking.
+description: 'Searches the raw corpus tables (message_feed, external_resources, distillations) in parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014) on text search. Filters: per-token ILIKE predicates, kind/source/date/token gates, pagination.'
+keywords:
+- hivemind
+- search
+- corpus
+- message_feed
+- external_resources
+- postgrest
+- distillation
+inputs:
+- name: query
+  type: string
+  required: true
+  description: Search query (per-token ilike-matched across messages, resources, distillations).
+- name: kinds
+  type: string
+  required: false
+  description: Comma-separated kind filter (message,article,workflow,transcript,distillation,...).
+- name: sources
+  type: string
+  required: false
+  description: Comma-separated source filter.
+- name: since
+  type: string
+  required: false
+  description: ISO timestamp lower bound for created_at.
+- name: channel
+  type: string
+  required: false
+  description: Discord channel name; searches messages in that channel only (e.g. wan_chatter). Message surface only.
+- name: author
+  type: string
+  required: false
+  description: Discord author display name; searches that author's messages only (e.g. Kijai). Message surface only.
+- name: thread
+  type: string
+  required: false
+  description: Discord thread id (snowflake); searches messages in that thread only (index-backed message_filters surface).
+- name: limit
+  type: number
+  required: false
+  description: Max results per page (default 20).
+- name: offset
+  type: number
+  required: false
+  description: Skip this many ranked results; page through a query with --limit + --offset. The response carries total/has_more. The ranked pool is deterministic while the corpus is unchanged (page N is stable across calls).
+- name: sort
+  type: string
+  required: false
+  description: 'relevance (default: score, then recency, then table+id) or recent (created_at desc, then score).'
+outputs:
+- name: results
+  type: file
+  path_template: '{out}/results.json'
+  description: 'Paging contract: response JSON carries results[], count, total (ranked-pool extent), has_more, page, pages, next_offset. When has_more is true, fetch the next page by re-running with --offset <next_offset> (next_offset is null when has_more is false). Ranking is deterministic while the corpus is unchanged, so a page is stable across calls. A human summary prints to stderr; stdout is pure JSON.'
+command:
+  argv:
+  - '{python_exec}'
+  - -m
+  - hivemind.executors.search.run
+  - --query
+  - '{query}'
+  - --out
+  - '{out}/results.json'
+  input_args:
+  - input: kinds
+    flag: --kinds
+    optional: true
+  - input: sources
+    flag: --sources
+    optional: true
+  - input: since
+    flag: --since
+    optional: true
+  - input: channel
+    flag: --channel
+    optional: true
+  - input: author
+    flag: --author
+    optional: true
+  - input: thread
+    flag: --thread
+    optional: true
+  - input: limit
+    flag: --limit
+    optional: true
+  - input: offset
+    flag: --offset
+    optional: true
+  - input: sort
+    flag: --sort
+    optional: true
+cache:
+  mode: none
+isolation:
+  mode: subprocess
+  network: true
+  env_passthrough:
+  - HIVEMIND_API_URL
+  - HIVEMIND_ANON_KEY
+metadata:
+  runtime_entrypoint: main
+  runtime_file: run.py
+  runtime_module: hivemind.executors.search.run
+  network_policy:
+    allowed_protocols: [dns, tcp]
+    allowed_destinations: [https://ujlwuvkrxlvoswwkerdf.supabase.co:443]
+    allow_redirects: false
+    broker:
+      host_managed: true
