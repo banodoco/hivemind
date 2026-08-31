@@ -132,8 +132,7 @@
     "network": true,
     "secrets_required": ["HIVEMIND_CONTRIBUTOR_KEY"],
     "env_passthrough": [
-      "HIVEMIND_API_URL",
-      "HIVEMIND_CONTRIBUTOR_KEY"
+      "HIVEMIND_API_URL"
     ]
   },
   "metadata": {

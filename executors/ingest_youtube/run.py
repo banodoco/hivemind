@@ -20,6 +20,7 @@ import sys
 import tempfile
 import urllib.error
 from typing import Any
+from pathlib import Path
 
 # -- dual-import guard (T5 pattern) -------------------------------------------
 try:
@@ -170,6 +171,14 @@ def _merge_overlap(prev: str, nxt: str) -> str | None:
 # ---------------------------------------------------------------------------
 
 
+def _yt_dlp_argv(*args: str) -> list[str]:
+    """Return the broker-owned yt-dlp launch command."""
+    wrapper = os.environ.get("HIVEMIND_YTDLP_WRAPPER")
+    if not wrapper:
+        wrapper = str(Path(__file__).with_name("broker_yt_dlp.py"))
+    return [sys.executable, wrapper, *args]
+
+
 def fetch_metadata(url: str) -> dict[str, Any]:
     """Run ``yt-dlp -j`` and return the parsed metadata dict.
 
@@ -177,7 +186,7 @@ def fetch_metadata(url: str) -> dict[str, Any]:
     """
     try:
         proc = subprocess.run(
-            ["yt-dlp", "-j", "--skip-download", url],
+            _yt_dlp_argv("-j", "--skip-download", url),
             capture_output=True,
             text=True,
             timeout=120,
@@ -204,7 +213,7 @@ def download_captions(url: str, out_dir: str) -> str | None:
     try:
         proc = subprocess.run(
             [
-                "yt-dlp",
+                *_yt_dlp_argv(
                 "--skip-download",
                 "--write-subs",
                 "--write-auto-subs",
@@ -213,6 +222,7 @@ def download_captions(url: str, out_dir: str) -> str | None:
                 "-o",
                 os.path.join(out_dir, "%(id)s.%(ext)s"),
                 url,
+                ),
             ],
             capture_output=True,
             text=True,

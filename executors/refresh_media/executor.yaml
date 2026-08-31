@@ -48,7 +48,6 @@
     "network": true,
     "secrets_required": ["HIVEMIND_ANON_KEY"],
     "env_passthrough": [
-      "HIVEMIND_ANON_KEY",
       "HIVEMIND_REFRESH_MEDIA_URL"
     ]
   },
