@@ -94,6 +94,14 @@ begin
   if first_response->>'resource_id' <> '1' or first_response->>'revision_id' <> '1' then
     raise exception 'initial IDs were not serialized as strings: %', first_response;
   end if;
+  if public.hivemind_resolve_reference('resource',1)->>'resolution' <> 'unreviewed_identity'
+     or public.hivemind_resolve_reference('resource',1)->>'unreviewed' <> 'true' then
+    raise exception 'unpinned pending resource did not remain an unreviewed identity';
+  end if;
+  if public.hivemind_resolve_reference('resource',1,1)->>'body' <> 'stable input'
+     or public.hivemind_resolve_reference('resource',1,1)->>'state' <> 'pending' then
+    raise exception 'explicit pending revision did not resolve to exact candidate content';
+  end if;
   if (first_response->'diff'->>'text_diff') not like '%+stable input%' then raise exception 'exact text diff missing'; end if;
   if first_response->'diff'->'json_diff'->'candidate'->>'body' <> 'stable input' then raise exception 'exact JSON candidate missing'; end if;
   if (select current_revision_id from public.resources where id=1) is not null then
@@ -106,6 +114,15 @@ begin
   perform public.hivemind_set_editor('postgres',2,true);
   response := public.hivemind_decide_revision(2,'approve-1',1,'accepted','exact review');
   if response->>'current_revision_id' <> '1' then raise exception 'approval did not publish revision'; end if;
+  if public.hivemind_resolve_reference('resource',1)->>'resolution' <> 'accepted_head'
+     or public.hivemind_resolve_reference('resource',1)->>'resolved_revision_id' <> '1' then
+    raise exception 'unpinned accepted resource did not resolve to its head';
+  end if;
+  insert into public.discord_messages(message_id,content) values (9007199254740993,'source v1');
+  perform public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author',now());
+  perform public.hivemind_submit_evidence(1,'evidence-1','v1 completed','4090','reported result','reported',
+    '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"}]',
+    '[{"external_url":"https://example.test/run/1","label":"ordinary source URL"}]');
   perform public.hivemind_propose_revision(1,'proposal-a',1,1,'workflow','Workflow v2a','candidate a','{"nodes":2}','{}','{}','a','[]');
   perform public.hivemind_propose_revision(3,'proposal-b',1,1,'workflow','Workflow v2b','candidate b','{"nodes":3}','{}','{}','b','[]');
   perform public.hivemind_set_editor('postgres',2,false);
@@ -116,6 +133,14 @@ begin
   end;
   perform public.hivemind_set_editor('postgres',2,true);
   perform public.hivemind_decide_revision(2,'approve-a',2,'accepted','winner');
+  if public.hivemind_resolve_reference('resource',1)->>'resolved_revision_id' <> '2'
+     or public.hivemind_resolve_reference('resource',1)->>'body' <> 'candidate a' then
+    raise exception 'unpinned resource did not resolve to the later accepted head';
+  end if;
+  if public.hivemind_resolve_reference('resource',1,1)->>'body' <> 'stable input'
+     or public.hivemind_resolve_reference('resource',1,1)->>'state' <> 'accepted' then
+    raise exception 'explicit v1 reference did not remain exact after v2 publication';
+  end if;
   begin
     perform public.hivemind_decide_revision(2,'approve-b',3,'accepted','competing approval');
     raise exception 'competing approval unexpectedly succeeded';
@@ -141,11 +166,6 @@ begin
   if exists (select 1 from public.resources where id > 3) then raise exception 'failed submission left a resource'; end if;
 end $$;
 
-insert into public.discord_messages(message_id,content) values (9007199254740993,'source v1');
-select public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author',now());
-select public.hivemind_submit_evidence(1,'evidence-1','v1 completed','4090','reported result','reported',
-  '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"}]',
-  '[{"external_url":"https://example.test/run/1","label":"ordinary source URL"}]');
 select public.hivemind_submit_resource(1,'guide-1','guide','Community guide','Evidence-backed guide',null,'{}','{"editorial":"community"}',null,null,'cites the observed run',
   '[{"target_kind":"evidence","target_id":"1","label":"observed run"}]');
 select public.hivemind_decide_revision(2,'guide-approve',5,'accepted','guide review');
@@ -165,10 +185,26 @@ do $$
 begin
   if (select content from public.message_snapshots where id=1) <> 'source v1' then raise exception 'old snapshot changed'; end if;
   if (select target_version_id from public.evidence_subjects where evidence_id=1 and target_kind='message') <> 1 then raise exception 'old evidence pin changed'; end if;
+  if (select target_version_id from public.evidence_subjects where evidence_id=1 and target_kind='resource') <> 1 then raise exception 'old workflow evidence pin changed'; end if;
+  if (select submitted_by from public.evidence where id=1) <> 1
+     or (select captured_by from public.message_snapshots where id=1) <> 1
+     or (select original_author_id from public.message_snapshots where id=1) <> 9007199254740994 then
+    raise exception 'reporter and original-author attribution missing';
+  end if;
   if (select basis from public.evidence where id=2) <> 'observed' or (select supersedes_evidence_id from public.evidence where id=2) <> 1 then raise exception 'contradictory evidence attribution missing'; end if;
   if (select count(*) from public.knowledge_references where source_kind='evidence') <> 5 then raise exception 'derived evidence links missing'; end if;
   if not (select canonical_guide from public.resources where id=3) then raise exception 'canonical guide marker missing'; end if;
   if not exists (select 1 from public.knowledge_references where source_kind='revision' and source_id=5 and target_kind='evidence' and target_id=1) then raise exception 'guide to evidence link missing'; end if;
+  if not exists (select 1 from public.knowledge_outgoing_references
+                 where source_kind='revision' and source_id='5' and target_kind='evidence'
+                   and target_resolution->>'resolution'='exact_evidence') then
+    raise exception 'outgoing projection did not resolve its target';
+  end if;
+  if not exists (select 1 from public.knowledge_backlinks
+                 where linked_kind='evidence' and linked_id='1'
+                   and backlink_source_kind='revision' and backlink_source_id='5') then
+    raise exception 'backlink projection did not expose inbound source semantics';
+  end if;
 end $$;
 """
 

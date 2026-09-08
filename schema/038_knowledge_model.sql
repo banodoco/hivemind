@@ -807,6 +807,114 @@ revoke all on table public.resources, public.resource_revisions, public.message_
   public.evidence, public.evidence_subjects, public.evidence_sources,
   public.knowledge_references, public.knowledge_idempotency from public, anon, authenticated;
 
+-- Read-side resolution distinguishes a stable resource identity from the
+-- exact candidate requested by a pinned reference. An unpinned resource never
+-- guesses among pending proposals: it returns the accepted head when one
+-- exists, otherwise only the identity and an unreviewed status.
+create or replace function public.hivemind_resolve_reference(
+  p_target_kind text, p_target_id bigint, p_target_version_id bigint default null
+)
+returns jsonb
+language plpgsql stable
+set search_path = public, pg_temp
+as $$
+declare
+  resource_row public.resources%rowtype;
+  revision_row public.resource_revisions%rowtype;
+  snapshot_row public.message_snapshots%rowtype;
+  message_row record;
+  evidence_row public.evidence%rowtype;
+begin
+  if p_target_kind = 'resource' then
+    select * into resource_row from public.resources where id = p_target_id;
+    if not found then return null; end if;
+    if p_target_version_id is not null then
+      select * into revision_row from public.resource_revisions
+       where id = p_target_version_id and resource_id = p_target_id;
+      if not found then return null; end if;
+      return jsonb_build_object(
+        'target_kind','resource','target_id',p_target_id::text,
+        'requested_version_id',p_target_version_id::text,
+        'resolution','exact_revision','resolved_revision_id',revision_row.id::text,
+        'state',revision_row.state,'unreviewed',revision_row.state <> 'accepted',
+        'resource_id',revision_row.resource_id::text,'kind',revision_row.kind,
+        'title',revision_row.title,'body',revision_row.body,
+        'payload',revision_row.payload,'metadata',revision_row.metadata,
+        'provenance',revision_row.provenance);
+    end if;
+    if resource_row.current_revision_id is null then
+      return jsonb_build_object(
+        'target_kind','resource','target_id',p_target_id::text,
+        'requested_version_id',null,'resolution','unreviewed_identity',
+        'resolved_revision_id',null,'state',null,'unreviewed',true,
+        'resource_id',p_target_id::text);
+    end if;
+    select * into revision_row from public.resource_revisions
+     where id = resource_row.current_revision_id and state = 'accepted';
+    if not found then
+      return jsonb_build_object(
+        'target_kind','resource','target_id',p_target_id::text,
+        'requested_version_id',null,'resolution','unreviewed_identity',
+        'resolved_revision_id',null,'state',null,'unreviewed',true,
+        'resource_id',p_target_id::text);
+    end if;
+    return jsonb_build_object(
+      'target_kind','resource','target_id',p_target_id::text,
+      'requested_version_id',null,'resolution','accepted_head',
+      'resolved_revision_id',revision_row.id::text,'state',revision_row.state,
+      'unreviewed',false,'resource_id',revision_row.resource_id::text,
+      'kind',revision_row.kind,'title',revision_row.title,'body',revision_row.body,
+      'payload',revision_row.payload,'metadata',revision_row.metadata,
+      'provenance',revision_row.provenance);
+  elsif p_target_kind = 'revision' then
+    if p_target_version_id is not null then return null; end if;
+    select * into revision_row from public.resource_revisions where id = p_target_id;
+    if not found then return null; end if;
+    return jsonb_build_object(
+      'target_kind','revision','target_id',p_target_id::text,
+      'requested_version_id',null,'resolution','exact_revision',
+      'resolved_revision_id',revision_row.id::text,'state',revision_row.state,
+      'unreviewed',revision_row.state <> 'accepted',
+      'resource_id',revision_row.resource_id::text,'kind',revision_row.kind,
+      'title',revision_row.title,'body',revision_row.body,
+      'payload',revision_row.payload,'metadata',revision_row.metadata,
+      'provenance',revision_row.provenance);
+  elsif p_target_kind = 'message' then
+    if p_target_version_id is null then
+      select * into message_row from public.message_feed where message_id = p_target_id;
+      if not found then return null; end if;
+      return jsonb_build_object(
+        'target_kind','message','target_id',p_target_id::text,
+        'requested_version_id',null,'resolution','current_message',
+        'resolved_snapshot_id',null,'state','current','unreviewed',false,
+        'message_id',p_target_id::text,'content',message_row.content);
+    end if;
+    select * into snapshot_row from public.message_snapshots
+     where id = p_target_version_id and message_id = p_target_id;
+    if not found then return null; end if;
+    return jsonb_build_object(
+      'target_kind','message','target_id',p_target_id::text,
+      'requested_version_id',p_target_version_id::text,'resolution','exact_snapshot',
+      'resolved_snapshot_id',snapshot_row.id::text,'state','captured','unreviewed',false,
+      'message_id',p_target_id::text,'content',snapshot_row.content,
+      'source_metadata',snapshot_row.source_metadata,
+      'original_author_id',case when snapshot_row.original_author_id is null then null else snapshot_row.original_author_id::text end,
+      'original_author_name',snapshot_row.original_author_name);
+  elsif p_target_kind = 'evidence' then
+    if p_target_version_id is not null then return null; end if;
+    select * into evidence_row from public.evidence where id = p_target_id;
+    if not found then return null; end if;
+    return jsonb_build_object(
+      'target_kind','evidence','target_id',p_target_id::text,
+      'requested_version_id',null,'resolution','exact_evidence',
+      'state',evidence_row.basis,'unreviewed',false,'claim',evidence_row.claim,
+      'conditions',evidence_row.conditions,'reported_result',evidence_row.reported_result,
+      'basis',evidence_row.basis,'submitted_by',evidence_row.submitted_by::text);
+  end if;
+  return null;
+end;
+$$;
+
 -- ------------------------------ read projections --------------------------
 
 drop view if exists public.knowledge_outgoing_references;
@@ -815,15 +923,18 @@ with (security_invoker = true) as
 select id::text as reference_id, source_kind, source_id::text as source_id,
        target_kind, target_id::text as target_id,
        case when target_version_id is null then null else target_version_id::text end as target_version_id,
+       public.hivemind_resolve_reference(target_kind, target_id, target_version_id) as target_resolution,
        label, created_at
   from public.knowledge_references;
 
 drop view if exists public.knowledge_backlinks;
 create view public.knowledge_backlinks
 with (security_invoker = true) as
-select id::text as reference_id, source_kind, source_id::text as source_id,
-       target_kind, target_id::text as target_id,
-       case when target_version_id is null then null else target_version_id::text end as target_version_id,
+select id::text as reference_id,
+       target_kind as linked_kind, target_id::text as linked_id,
+       case when target_version_id is null then null else target_version_id::text end as linked_version_id,
+       source_kind as backlink_source_kind, source_id::text as backlink_source_id,
+       public.hivemind_resolve_reference(target_kind, target_id, target_version_id) as linked_resolution,
        label, created_at
   from public.knowledge_references;
 
@@ -883,6 +994,13 @@ begin
   if exists (select 1 from pg_roles where rolname='service_role') then
     grant execute on function public.hivemind_set_editor(text,bigint,boolean) to service_role;
   end if;
+  revoke all on function public.hivemind_resolve_reference(text,bigint,bigint) from public, anon, authenticated;
+  if exists (select 1 from pg_roles where rolname='anon') then
+    grant execute on function public.hivemind_resolve_reference(text,bigint,bigint) to anon;
+  end if;
+  if exists (select 1 from pg_roles where rolname='authenticated') then
+    grant execute on function public.hivemind_resolve_reference(text,bigint,bigint) to authenticated;
+  end if;
 end $$;
 
 grant select on public.resources, public.resource_revisions, public.message_snapshots,
@@ -896,3 +1014,9 @@ comment on table public.evidence is
   'Immutable reported/observed claim about exact subjects; editorial acceptance is not truth.';
 comment on table public.message_snapshots is
   'Trusted observations of current messages; captured_by is distinct from original author.';
+comment on function public.hivemind_resolve_reference(text,bigint,bigint) is
+  'Resolves unpinned resources to an accepted head or an unreviewed identity; pinned references return exact candidate or snapshot content.';
+comment on view public.knowledge_outgoing_references is
+  'Derived source-to-target edges with a resolved target payload; no editable graph state.';
+comment on view public.knowledge_backlinks is
+  'Derived inbound projection with linked target columns first and backlink source columns explicit.';
