@@ -1,0 +1,68 @@
+# Adopted declaration; execution not started. Packet scopes are executable H criteria.
+mode: planning_only
+roles:
+  coordinator:
+    model: gpt-5.6-luna
+    reasoning: medium
+  worker_normal:
+    model: gpt-5.6-luna
+    reasoning: high
+  worker_xhard:
+    model: gpt-5.6-sol
+    reasoning: high
+  reviewer_normal:
+    model: gpt-5.6-luna
+    reasoning: medium
+  reviewer_xhard:
+    model: gpt-5.6-sol
+    reasoning: high
+  oracle:
+    model: gpt-5.6-sol
+    reasoning: high
+  final_reviewer:
+    model: gpt-6-astra
+    reasoning: medium
+oracle:
+  max_calls: 3
+review_stages:
+- id: foundation_completion
+  after: C1
+  reviewer_role: reviewer_normal
+  lens: completion
+  max_rounds: 2
+  scope_tasks:
+  - T2
+  - T3
+  - T4
+  - T5
+  - T6
+  criteria_source: implementation-criteria.md
+  criteria:
+  - H1
+  - H2
+  - H3
+- id: final
+  after: T10
+  reviewer_role: final_reviewer
+  lens: completion_and_strategy
+  max_rounds: 3
+  scope_tasks:
+  - T1
+  - T2
+  - T3
+  - T4
+  - T5
+  - T6
+  - T7
+  - T8
+  - T9
+  - T10
+  criteria_source: implementation-criteria.md
+  criteria:
+  - H1
+  - H2
+  - H3
+  - H4
+  - H5
+  - H6
+  - H7

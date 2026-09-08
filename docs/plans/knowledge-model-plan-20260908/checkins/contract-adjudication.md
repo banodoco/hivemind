@@ -1,0 +1,3 @@
+Host accepts Luna planning PASS against unchanged recorded digests. All P1–P5 covered; no implementation proved. Host subsequently identified one local simplification to match user statement that a reference promises connection only: do not block publishing a guide merely because an ordinary linked resource is unreviewed. Record delta and check affected P1/P3 only; all other dispositions preserved.
+
+Host accepts affected P1/P3 delta PASS. Final freeze changes only status headings and ledger disposition; substantive plan matches reviewed delta. No remaining planning blocker. No product correctness verdict issued.
