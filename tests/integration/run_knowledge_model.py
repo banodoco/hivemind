@@ -569,7 +569,7 @@ do $$ begin
   set local role hannahomalley;
 end $$;
 do $$ declare n bigint; replacement_job_id bigint; late_job_id bigint;
-  second_late_job_id bigint; third_late_job_id bigint;
+  second_late_job_id bigint; done_late_job_id bigint; third_late_job_id bigint;
 begin
   if exists(select 1 from public.hivemind_lexical_candidates('codeOnlyToken',100,'{workflow}')) then
     raise exception 'workflow Python code leaked into canonical prose search';
@@ -648,6 +648,17 @@ begin
      or (select last_error from public.embedding_jobs where id=second_late_job_id) <> 'source_changed_replaced'
      or (select status from public.embedding_jobs where id=replacement_job_id) <> 'processing' then
     raise exception 'late finalizer did not protect an in-flight replacement job';
+  end if;
+  update public.embedding_jobs set status='done',locked_by=null,locked_at=null,lease_expires_at=null
+    where id=replacement_job_id;
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
+    values('resource','10','prose','reembed',1360541028304258884,100,'processing','done-worker')
+    returning id into done_late_job_id;
+  perform * from public.hivemind_finalize_embedding_job(done_late_job_id,'done-worker','[]','',null,false);
+  if (select status from public.embedding_jobs where id=done_late_job_id) <> 'cancelled'
+     or (select last_error from public.embedding_jobs where id=done_late_job_id) <> 'source_changed_replaced'
+     or (select status from public.embedding_jobs where id=replacement_job_id) <> 'done' then
+    raise exception 'late finalizer did not protect a completed replacement job';
   end if;
   update public.embedding_jobs set status='cancelled',locked_by=null,locked_at=null,lease_expires_at=null
     where id=replacement_job_id;
