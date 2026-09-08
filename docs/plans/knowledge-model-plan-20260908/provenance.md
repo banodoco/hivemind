@@ -8,7 +8,7 @@
 - Plan state: planning complete; implementation and executable certification are
   NOT_RUN.
 - Megado skill source: `https://github.com/peteromallet/poms-skills.git`, main
-  at commit `b96563fefa9ca399863eb7a6e98687227848dabd` when this handover was
+  at commit `99ba29dd9358d2e52cfe10a113c33624af4ebb44` when this handover was
   prepared.
 - Original control artifacts were kept in a local run-control directory and are
   intentionally represented here by the selected portable documents only.
