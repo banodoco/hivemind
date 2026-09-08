@@ -75,18 +75,33 @@ editable so edits to the clone are live:
 
 ```bash
 pip install -e .
-pyenv rehash   # only if you use pyenv — exposes the hivemind-search shim
+pyenv rehash   # only if you use pyenv — exposes the installed commands
 ```
 
 Then, from any directory:
 
 ```bash
+hivemind --help
+hivemind recent --channel minimax_h3_chatter --term dialogue --limit 10 --json
+hivemind around 1546475342703890513 --window 30
+hivemind search "wan animate" --since yesterday --resources --json
 python3 -m hivemind.executors.search.run --query "wan animate" --limit 10
 hivemind-search --query "lora" --channel wan_chatter --limit 20   # console script
 python3 -c "import hivemind"                                       # package import
 ```
 
-The console script mirrors `python3 executors/search/run.py` exactly
+`hivemind` exposes the full research CLI: search, probe, trend, authors,
+top-authors, recent, around, day, profile, reactions, media, top-reacted, get,
+and cites. Run `hivemind --help` for each command's flags; JSON support is
+command-specific. CLI search delegates to the maintained raw-table search
+implementation, with relative date words normalized before invocation.
+Search supports inclusive `--since` and exclusive `--until` bounds.
+
+The `hivemind` console command is the canonical packaged CLI entrypoint; the
+Astrid pack and `hivemind-search` compatibility command remain owned by this
+same repository.
+
+The existing `hivemind-search` console script mirrors `python3 executors/search/run.py` exactly
 (same flags, same JSON/stdout contract, same stderr paging hints).
 
 ## Repository layout

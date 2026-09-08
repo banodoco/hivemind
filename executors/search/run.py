@@ -346,7 +346,8 @@ def _scope_params(
     channel: str | None = None,
     author: str | None = None,
     thread: str | None = None,
-) -> dict[str, str] | None:
+    until: str | None = None,
+) -> dict[str, Any] | None:
     """Build PostgREST params for one scope.
 
     ``mode`` is ``"and"`` (every token must match — high precision, supported
@@ -378,14 +379,18 @@ def _scope_params(
     if not tokens:
         return None
 
-    params: dict[str, str] = {
+    params: dict[str, Any] = {
         "select": _select_for(table),
         "limit": str(limit),
     }
     if ordered:
         params["order"] = "created_at.desc"
-    if since:
+    if since and until:
+        params["created_at"] = [f"gte.{since}", f"lt.{until}"]
+    elif since:
         params["created_at"] = f"gte.{since}"
+    elif until:
+        params["created_at"] = f"lt.{until}"
 
     if table == "message_feed":
         if sources is not None and _MESSAGE_SOURCE not in sources:
@@ -481,6 +486,7 @@ def _run_scope(
     channel: str | None = None,
     author: str | None = None,
     thread: str | None = None,
+    until: str | None = None,
 ) -> tuple[list[tuple[str, dict[str, Any]]], list[str]]:
     """Fetch one scope's rows (Pass A AND, Pass B OR fallback).
 
@@ -502,6 +508,7 @@ def _run_scope(
             tokens,
             sources=sources,
             since=since,
+            until=until,
             limit=limit,
             mode=mode,
             kind_filter=kind_filter,
@@ -599,6 +606,7 @@ def _run_scopes(
     channel: str | None = None,
     author: str | None = None,
     thread: str | None = None,
+    until: str | None = None,
 ) -> tuple[list[tuple[str, dict[str, Any]]], list[str]]:
     """Run every scope in parallel; merge rows and per-scope errors."""
     results: list[list[tuple[str, dict[str, Any]]]] = [[] for _ in scopes]
@@ -613,6 +621,7 @@ def _run_scopes(
                 tokens,
                 sources=sources,
                 since=since,
+                until=until,
                 limit=limit,
                 endpoint=endpoint,
                 anon_key=anon_key,
@@ -911,6 +920,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--kinds", help="Comma-separated kind filter (message,resource,workflow,distillation,...).")
     parser.add_argument("--sources", help="Comma-separated source filter (banodoco-discord,hivemind,youtube,...).")
     parser.add_argument("--since", help="ISO-8601 timestamp lower bound.")
+    parser.add_argument("--until", help="ISO-8601 timestamp exclusive upper bound.")
     parser.add_argument(
         "--channel", help="Discord channel name — messages only (e.g. wan_chatter)."
     )
@@ -1011,6 +1021,7 @@ def main(argv: list[str] | None = None) -> int:
         scopes,
         sources=user_sources,
         since=args.since,
+        until=args.until,
         limit=_POOL_LIMIT,
         endpoint=endpoint,
         anon_key=anon_key,

@@ -19,6 +19,7 @@ classifiers = [
 
 [project.scripts]
 hivemind-search = "hivemind.executors.search.run:main"
+hivemind = "hivemind.cli:main"
 
 # The project root IS the ``hivemind`` package (repo-root __init__.py), so the
 # package-dir mapping anchors it at "."; subpackages resolve relative to it.

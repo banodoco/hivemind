@@ -24,7 +24,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
-from typing import Any
+from typing import Any, Mapping
 
 # ---------------------------------------------------------------------------
 # Defaults (baked in — overridable via environment variables)
@@ -108,7 +108,7 @@ def _http_post(url: str, headers: dict[str, str], body: bytes) -> dict[str, Any]
 
 def postgrest_get(
     path: str,
-    params: dict[str, str] | None = None,
+    params: Mapping[str, Any] | None = None,
     *,
     endpoint: str | None = None,
     anon_key: str | None = None,
@@ -135,7 +135,10 @@ def postgrest_get(
     base = (endpoint or resolve_endpoint()).rstrip("/")
     url = f"{base}/{path.lstrip('/')}"
     if params:
-        qs = urllib.parse.urlencode(params)
+        # PostgREST accepts repeated operators such as
+        # ``created_at=gte...&created_at=lt...``.  ``doseq`` preserves that
+        # shape for callers that provide a list/tuple value.
+        qs = urllib.parse.urlencode(params, doseq=True)
         url = f"{url}?{qs}"
     headers = {
         "apikey": anon_key or resolve_anon_key(),
