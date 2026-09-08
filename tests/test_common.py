@@ -42,7 +42,10 @@ class EnvelopeTests(unittest.TestCase):
         original = dict(data)
         envelope = build_submit_resource_envelope(data)
         self.assertEqual(envelope["action"], "submit_resource")
-        self.assertEqual(envelope["data"]["idempotency_token"], "ingest:web:https://example.test/a")
+        self.assertRegex(
+            envelope["data"]["idempotency_token"],
+            r"^ingest:web:[0-9a-f]{16}:[0-9a-f]{32}$",
+        )
         self.assertEqual(envelope["data"]["kind"], "article")
         self.assertEqual(data, original)
 

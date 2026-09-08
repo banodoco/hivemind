@@ -113,6 +113,12 @@ do $$ declare e record; rid bigint; vid bigint; rev_state text; begin
   left join legacy_revision_map rr2 on rr2.kind='resource' and rr2.legacy_id=c.item_id and c.item_kind='resource'
   left join legacy_revision_map rr3 on rr3.kind='distillation' and rr3.legacy_id=c.item_id and c.item_kind='distillation'
   on conflict do nothing;
+  -- Retire the old active surfaces in the same transaction as conversion.
+  -- Rehearsal therefore proves both directions: rollback restores the legacy
+  -- tables, while apply leaves one resource/revision/reference model.
+  drop table if exists public.distillation_cites;
+  drop table if exists public.distillations;
+  drop table if exists public.external_resources;
 end $$;
 select jsonb_build_object('resources', (select count(*) from legacy_resource_map where kind='resource'), 'knowledge_resources', (select count(*) from legacy_resource_map where kind='distillation'), 'revisions', (select count(*) from legacy_revision_map), 'references', (select count(*) from public.knowledge_references where label='converted legacy cite'));
 {finish}
@@ -137,7 +143,13 @@ def main(argv: list[str] | None = None) -> int:
     try: url = checked_url(raw)
     except ValueError as exc: print(json.dumps({"status":"failed","error":str(exc)})); return 1
     if args.export:
-        payload = psql(url, "select jsonb_build_object('external_resources',(select count(*) from public.external_resources),'distillations',(select count(*) from public.distillations),'cites',(select count(*) from public.distillation_cites));")
+        payload = psql(url, """
+          select jsonb_build_object(
+            'external_resources', coalesce((select jsonb_agg(to_jsonb(r) order by r.id) from public.external_resources r), '[]'::jsonb),
+            'distillations', coalesce((select jsonb_agg(to_jsonb(d) order by d.id) from public.distillations d), '[]'::jsonb),
+            'cites', coalesce((select jsonb_agg(to_jsonb(c) order by c.distillation_id, c.item_kind, c.item_id) from public.distillation_cites c), '[]'::jsonb)
+          )
+        """)
         args.export.write_text(payload + "\n", encoding="utf-8")
     if not args.rehearse and not args.apply:
         print(json.dumps({"status":"exported" if args.export else "dry_run","boundary":"single transaction","commit":False}, sort_keys=True)); return 0

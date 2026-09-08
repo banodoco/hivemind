@@ -20,6 +20,7 @@ Every executor imports from this module and uses the same dual-import guard:
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import sys
 import urllib.error
@@ -229,7 +230,19 @@ def build_submit_resource_envelope(data: dict[str, Any], *, idempotency_token: s
     """
     if not isinstance(data, dict):
         raise ValueError("resource data must be an object")
-    token = idempotency_token or "ingest:" + str(data.get("origin_source") or "unknown") + ":" + str(data.get("origin_external_id") or data.get("title") or "untitled")
+    if idempotency_token:
+        token = idempotency_token
+    else:
+        # The source identity makes retries for the same representation stable;
+        # the content digest makes a changed re-import a new proposal instead of
+        # colliding with the original submit_resource idempotency row.  Keep the
+        # token bounded because the database contract caps it at 200 characters.
+        source = str(data.get("origin_source") or "unknown")[:32]
+        identity = str(data.get("origin_external_id") or data.get("title") or "untitled")
+        identity_digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
+        request = json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
+        content_digest = hashlib.sha256(request.encode("utf-8")).hexdigest()[:32]
+        token = f"ingest:{source}:{identity_digest}:{content_digest}"
     return build_knowledge_model_envelope("submit_resource", {"idempotency_token": token, **data})
 
 

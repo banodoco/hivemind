@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import subprocess
+import tempfile
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -56,11 +57,21 @@ def _bootstrap(url: str) -> None:
       create table if not exists public.discord_messages (
         message_id bigint primary key, content text not null,
         is_deleted boolean not null default false,
+        author_id bigint, channel_id bigint, guild_id bigint,
         created_at timestamptz not null default now()
       );
       alter table public.discord_messages
         add column if not exists created_at timestamptz not null default now();
+      alter table public.discord_messages add column if not exists author_id bigint;
+      alter table public.discord_messages add column if not exists channel_id bigint;
+      alter table public.discord_messages add column if not exists guild_id bigint;
       create extension if not exists vector;
+      create extension if not exists pgcrypto;
+      create table if not exists public.members (
+        member_id bigint primary key, global_name text, username text,
+        allow_content_sharing boolean not null default true,
+        bot boolean not null default false, system boolean not null default false
+      );
       create table if not exists public.lexical_documents (
         entity_type text not null, item_id text not null, representation_type text not null,
         chunk_index integer not null, chunk_text text not null, tsv tsvector,
@@ -92,6 +103,51 @@ def _bootstrap(url: str) -> None:
         enqueued_at timestamptz not null default now(), updated_at timestamptz not null default now()
       );
       create unique index if not exists one_pending_job_per_identity_rep on public.embedding_jobs(entity_type,item_id,representation_type) where status='pending';
+      create table if not exists public.content_representation_manifest (
+        entity_type text not null, item_id text not null, representation_type text not null,
+        representation_hash text not null, source_available boolean not null,
+        public_state text, chunking_version integer not null default 2,
+        chunk_config_identity text not null, chunks jsonb not null default '[]'::jsonb,
+        chunk_count integer not null default 0, chunk_method text,
+        primary key(entity_type,item_id,representation_type)
+      );
+      create table if not exists public.embedding_contract_config_registry (
+        selected_contract_id bigint primary key, selection_state text not null,
+        base_contract_id bigint, provider text, model text, dimension integer,
+        canonicalization_version integer, chunking_version integer,
+        chunk_config_version integer, prose_target_tokens integer,
+        prose_overlap_tokens integer, python_target_tokens integer,
+        python_overlap_tokens integer, chunk_config_identity text,
+        eval_contract_id text, full_config_sha256 text
+      );
+      create or replace function public.hivemind_normalize_identifier(value text)
+      returns text language sql immutable as $$
+        select regexp_replace(lower(coalesce(value,'')), '[^a-z0-9]+', '', 'g')
+      $$;
+      create or replace function public.hivemind_representation_hash(value text)
+      returns text language sql immutable as $$
+        select encode(digest(coalesce(value,''),'sha256'),'hex')
+      $$;
+      create or replace function public.hivemind_canonical_resource_text(p_title text,p_body text,p_tags text)
+      returns text language sql immutable as $$
+        select btrim(concat_ws(E'\n\n',nullif(btrim(coalesce(p_title,'')),''),nullif(btrim(coalesce(p_body,'')),''),nullif(btrim(coalesce(p_tags,'')),'')))
+      $$;
+      create or replace function public.hivemind_workflow_prose(p_body text,p_kind text)
+      returns text language sql immutable as $$ select coalesce(p_body,'') $$;
+      create or replace function public.hivemind_resource_tags(p_metadata jsonb)
+      returns text language sql immutable as $$ select coalesce(p_metadata->>'tags','') $$;
+      create or replace function public.hivemind_workflow_semantics_text(p_metadata jsonb)
+      returns text language sql immutable as $$ select coalesce(p_metadata->'workflow_semantics'->>'task_type','') $$;
+      create or replace function public.hivemind_sanitize_error(value text)
+      returns text language sql immutable as $$ select left(coalesce(value,''),512) $$;
+      create or replace function public.hivemind_drop_embedding_chunks(p_contract_id bigint,p_entity_type text,p_item_id text,p_representation_type text)
+      returns int language plpgsql as $$ declare n int; begin
+        delete from public.content_embeddings where contract_id=p_contract_id and entity_type=p_entity_type and item_id=p_item_id and (p_representation_type is null or representation_type=p_representation_type);
+        get diagnostics n=row_count; return n;
+      end $$;
+      insert into public.embedding_contract_config_registry(selected_contract_id,selection_state,base_contract_id,provider,model,dimension,canonicalization_version,chunking_version,chunk_config_version,prose_target_tokens,prose_overlap_tokens,python_target_tokens,python_overlap_tokens,chunk_config_identity,eval_contract_id,full_config_sha256)
+      values(1360541028304258884,'active',6368594834396668537,'openai','text-embedding-3-small',384,1,2,1,512,50,512,50,'chunk_config'||E'\x1f'||'v1'||E'\x1f'||'prose#512/50'||E'\x1f'||'workflow_python#512/50','12e19cdb566b8744','12e19cdb566b87445ab2d3563e6cb948f58801f78f8395878fc9e0c2457d5462')
+      on conflict (selected_contract_id) do update set selection_state='active';
       create or replace function public.hivemind_active_contract_id(p_dimension int default 384)
       returns bigint language sql stable as $$ select id from public.embedding_contracts where dimension=p_dimension and status='active' limit 1 $$;
       create table if not exists public.external_resources (
@@ -116,7 +172,7 @@ def _bootstrap(url: str) -> None:
       drop view if exists public.message_feed cascade;
       create view public.message_feed as
         select message_id, content, null::text as author_name,
-          null::text as channel_name, created_at
+          null::text as channel_name, created_at, author_id, channel_id, guild_id
         from public.discord_messages where is_deleted=false;
     """)
     for migration in MIGRATIONS:
@@ -266,22 +322,37 @@ begin
     raise exception 'backlink projection did not expose inbound source semantics';
   end if;
 end $$;
+
+do $$
+declare repeat_response jsonb;
+begin
+  repeat_response := public.hivemind_submit_resource(1,'repeat-import-1','workflow','Workflow reimport','changed source body',
+    '{"nodes":9}','{}','{"import":"repeat"}','manual','workflow-1','repeat import','[]');
+  if repeat_response->>'resource_id' <> '1'
+     or repeat_response->>'repeat_import' <> 'true'
+     or (select count(*) from public.resources where origin_source='manual' and origin_external_id='workflow-1') <> 1 then
+    raise exception 'repeat import did not create a pending revision on the stable resource';
+  end if;
+end $$;
 """
 
 FRESHNESS_SCENARIO = r"""
 insert into public.contributors(name,kind) values ('fixture-agent','agent'),('fixture-editor','human') on conflict (name) do nothing;
 update public.contributors set is_editor=true where id=(select min(id) from public.contributors where kind='human');
 truncate table public.embedding_jobs, public.content_embeddings, public.lexical_documents,
+  public.content_representation_manifest,
   public.knowledge_references, public.resource_revisions, public.resources restart identity cascade;
 insert into public.resources(id,created_by,origin_source,origin_external_id) overriding system value values (10,1,'fixture','freshness');
 insert into public.resource_revisions(id,resource_id,kind,title,body,submitted_by,state,decided_by,decided_at) overriding system value
   values (100,10,'article','Head','headtoken body',1,'accepted',2,now()),(101,10,'article','Historical','headtoken body',1,'accepted',2,now()),(102,10,'article','Pending','headtoken body',1,'pending',null,null);
 update public.resources set current_revision_id=100 where id=10;
+delete from public.embedding_jobs;
+update public.embedding_contracts set status='inactive' where dimension=384;
 insert into public.embedding_contracts(id,provider,model,dimension,canonicalization_version,chunking_version,status)
-  values(384,'fixture','fixture-384',384,1,1,'active')
+  values(1360541028304258884,'fixture','fixture-384',384,1,2,'active')
   on conflict (id) do update set status='active',dimension=384;
 insert into public.content_embeddings(contract_id,entity_type,item_id,representation_type,chunk_index,chunk_text,embedding,representation_hash,chunk_hash,source_revision_id)
-  values(384,'resource','10','prose',0,'headtoken body',array_fill(0::real,ARRAY[384])::vector,repeat('a',64),repeat('b',64),101);
+  values(1360541028304258884,'resource','10','prose',0,'headtoken body',array_fill(0::real,ARRAY[384])::vector,repeat('a',64),repeat('b',64),101);
 do $$ declare n int; begin
   select count(*) into n from public.hivemind_lexical_candidates('headtoken',100,'{resource}');
   if n <> 1 then raise exception 'freshness candidate count expected 1, got %',n; end if;
@@ -290,9 +361,35 @@ do $$ declare n int; begin
   if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 0 then
     raise exception 'stale semantic revision ranked';
   end if;
-  update public.content_embeddings set source_revision_id=100 where contract_id=384 and item_id='10';
+  update public.content_embeddings set source_revision_id=100 where contract_id=1360541028304258884 and item_id='10';
   if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 1 then
     raise exception 'current semantic revision did not rank';
+  end if;
+  insert into public.content_representation_manifest(
+    entity_type,item_id,representation_type,representation_hash,source_available,
+    public_state,chunking_version,chunk_config_identity,chunks,chunk_count,chunk_method)
+  values('resource','10','prose',
+    public.hivemind_representation_hash('Head' || E'\n\n' || 'headtoken body'),true,null,2,
+    'chunk_config'||E'\x1f'||'v1'||E'\x1f'||'prose#512/50'||E'\x1f'||'workflow_python#512/50',
+    jsonb_build_array(jsonb_build_object(
+      'chunk_index',0,'chunk_text','Head' || E'\n\n' || 'headtoken body',
+      'chunk_hash',public.hivemind_representation_hash('Head' || E'\n\n' || 'headtoken body'),
+      'embedding',(array_fill(0::real,ARRAY[384])::vector)::text)),1,'fixture');
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
+    values('resource','10','prose','reembed',1360541028304258884,100,'processing','good-worker');
+  perform * from public.hivemind_finalize_embedding_job(
+    (select max(id) from public.embedding_jobs),'good-worker',
+    jsonb_build_array(jsonb_build_object(
+      'entity_type','resource','item_id','10','representation_type','prose',
+      'chunk_index',0,'chunk_text','Head' || E'\n\n' || 'headtoken body',
+      'chunk_hash',public.hivemind_representation_hash('Head' || E'\n\n' || 'headtoken body'),
+      'representation_hash',public.hivemind_representation_hash('Head' || E'\n\n' || 'headtoken body'),
+      'contract_id','1360541028304258884',
+      'embedding',(array_fill(0::real,ARRAY[384])::vector)::text)),
+    public.hivemind_representation_hash('Head' || E'\n\n' || 'headtoken body'),null,true);
+  if (select status from public.embedding_jobs order by id desc limit 1) <> 'done'
+     or (select source_revision_id from public.content_embeddings where contract_id=1360541028304258884 and item_id='10' and representation_type='prose' limit 1) <> 100 then
+    raise exception 'current-head finalizer did not publish the pinned revision';
   end if;
   insert into public.resource_revisions(resource_id,kind,title,body,submitted_by,state,decided_by,decided_at) values(10,'article','Head v2','headtoken body',1,'accepted',2,now()) returning id into n;
   update public.resources set current_revision_id=n where id=10;
@@ -300,10 +397,11 @@ do $$ declare n int; begin
   if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 0 then
     raise exception 'semantic vector from historical head ranked after head change';
   end if;
-  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,source_revision_id,status,locked_by)
-    values('resource','10','prose','reembed',100,'processing','late-worker');
-  perform public.hivemind_complete_embedding_job((select max(id) from public.embedding_jobs),'late-worker');
-  if (select status from public.embedding_jobs order by id desc limit 1) <> 'cancelled' then raise exception 'late job was not cancelled'; end if;
+  delete from public.embedding_jobs where status='pending';
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
+    values('resource','10','prose','reembed',1360541028304258884,100,'processing','late-worker');
+  perform * from public.hivemind_finalize_embedding_job((select max(id) from public.embedding_jobs),'late-worker','[]','',null,false);
+  if (select status from public.embedding_jobs order by id desc limit 1) <> 'pending' then raise exception 'late finalizer did not requeue the stale job'; end if;
 end $$;
 """
 
@@ -336,6 +434,17 @@ def run(scenario: str) -> dict[str, object]:
     if scenario in {"all", "conversion"}:
         _psql(url, CONVERSION_SEED)
         env = dict(os.environ); env["HIVEMIND_TEST_DATABASE_URL"] = url
+        with tempfile.TemporaryDirectory(prefix="hivemind-conversion-export-") as export_dir:
+            export_path = Path(export_dir) / "legacy.json"
+            exported = subprocess.run(
+                ["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--export", str(export_path)],
+                cwd=ROOT, env=env, text=True, capture_output=True,
+            )
+            if exported.returncode:
+                raise RuntimeError(exported.stderr or exported.stdout)
+            export_payload = json.loads(export_path.read_text(encoding="utf-8"))
+            if len(export_payload.get("external_resources", [])) != 2 or len(export_payload.get("distillations", [])) != 1 or len(export_payload.get("cites", [])) != 1:
+                raise RuntimeError("conversion export was not recoverable row data")
         rehearsal = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--rehearse"], cwd=ROOT, env=env, text=True, capture_output=True)
         if rehearsal.returncode:
             raise RuntimeError(rehearsal.stderr or rehearsal.stdout)
@@ -344,8 +453,8 @@ def run(scenario: str) -> dict[str, object]:
         applied = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--apply"], cwd=ROOT, env=env, text=True, capture_output=True)
         if applied.returncode:
             raise RuntimeError(applied.stderr or applied.stdout)
-        check = _psql(url, "select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.origin_source='legacy-distillation' and v.state='accepted'; select count(*) from public.knowledge_references where label='converted legacy cite';")
-        if check.splitlines() != ["1", "1"]:
+        check = _psql(url, "select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.origin_source='legacy-distillation' and v.state='accepted'; select count(*) from public.knowledge_references where label='converted legacy cite'; select (to_regclass('public.external_resources') is null)::int; select (to_regclass('public.distillations') is null)::int; select (to_regclass('public.distillation_cites') is null)::int;")
+        if check.splitlines() != ["1", "1", "1", "1", "1"]:
             raise RuntimeError("conversion assertions failed: " + check)
         nullable = _psql(url, "select count(*) from public.resources where origin_source is null and origin_external_id is null and id=1; select count(*) from public.resource_revisions where provenance->>'legacy_id'='1' and provenance->>'external_id' is null;")
         if nullable.splitlines() != ["1", "1"]:
