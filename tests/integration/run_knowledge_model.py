@@ -55,8 +55,11 @@ def _bootstrap(url: str) -> None:
       );
       create table if not exists public.discord_messages (
         message_id bigint primary key, content text not null,
-        is_deleted boolean not null default false
+        is_deleted boolean not null default false,
+        created_at timestamptz not null default now()
       );
+      alter table public.discord_messages
+        add column if not exists created_at timestamptz not null default now();
       create extension if not exists vector;
       create table if not exists public.lexical_documents (
         entity_type text not null, item_id text not null, representation_type text not null,
@@ -110,11 +113,11 @@ def _bootstrap(url: str) -> None:
         if not exists (select 1 from pg_roles where rolname='authenticated') then execute 'create role authenticated'; end if;
         if not exists (select 1 from pg_roles where rolname='service_role') then execute 'create role service_role'; end if;
       end $$;
-      do $$ begin
-        if to_regclass('public.message_feed') is null then
-          execute 'create view public.message_feed as select message_id, content, null::text as author_name, null::text as channel_name, now() as created_at from public.discord_messages where is_deleted=false';
-        end if;
-      end $$;
+      drop view if exists public.message_feed cascade;
+      create view public.message_feed as
+        select message_id, content, null::text as author_name,
+          null::text as channel_name, created_at
+        from public.discord_messages where is_deleted=false;
     """)
     for migration in MIGRATIONS:
         _psql(url, "", file=str(migration))
