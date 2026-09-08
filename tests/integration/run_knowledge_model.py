@@ -234,6 +234,11 @@ begin
   end if;
   insert into public.discord_messages(message_id,content) values (9007199254740993,'source v1');
   perform public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author',now());
+  begin
+    perform public.hivemind_capture_message_snapshot(1,'snapshot-mismatch',9007199254740993,'not the source','{"channel":"demo"}',9007199254740994,'Original author',now());
+    raise exception 'mismatched source snapshot unexpectedly succeeded';
+  exception when sqlstate '22023' then null;
+  end;
   perform public.hivemind_submit_evidence(1,'evidence-1','v1 completed','4090','reported result','reported',
     '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"},{"target_kind":"revision","target_id":"1"}]',
     '[{"external_url":"https://example.test/run/1","label":"ordinary source URL"}]');
@@ -397,11 +402,16 @@ do $$ declare n int; begin
   if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 0 then
     raise exception 'semantic vector from historical head ranked after head change';
   end if;
-  delete from public.embedding_jobs where status='pending';
   insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
     values('resource','10','prose','reembed',1360541028304258884,100,'processing','late-worker');
   perform * from public.hivemind_finalize_embedding_job((select max(id) from public.embedding_jobs),'late-worker','[]','',null,false);
-  if (select status from public.embedding_jobs order by id desc limit 1) <> 'pending' then raise exception 'late finalizer did not requeue the stale job'; end if;
+  if (select status from public.embedding_jobs order by id desc limit 1) <> 'cancelled'
+     or (select last_error from public.embedding_jobs order by id desc limit 1) <> 'source_changed_replaced'
+     or (select count(*) from public.embedding_jobs
+         where entity_type='resource' and item_id='10' and representation_type='prose'
+           and status='pending' and source_revision_id=n) <> 1 then
+    raise exception 'late finalizer did not preserve the replacement pending job';
+  end if;
 end $$;
 """
 

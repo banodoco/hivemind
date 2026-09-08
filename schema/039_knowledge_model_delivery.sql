@@ -586,6 +586,7 @@ declare
   manifest record;
   chunk jsonb;
   written int := 0;
+  pending_replacement boolean;
 begin
   select * into j from public.embedding_jobs
    where id=p_job_id for update;
@@ -610,9 +611,20 @@ begin
     select r.current_revision_id into current_head
       from public.resources r where r.id=j.item_id::bigint;
     if j.source_revision_id is null or current_head is distinct from j.source_revision_id then
-      update public.embedding_jobs set status='pending',next_attempt_at=now(),
+      select exists (
+        select 1 from public.embedding_jobs replacement
+         where replacement.entity_type=j.entity_type
+           and replacement.item_id=j.item_id
+           and replacement.representation_type=j.representation_type
+           and replacement.status='pending'
+           and replacement.id<>j.id
+      ) into pending_replacement;
+      update public.embedding_jobs set status=case when pending_replacement then 'cancelled' else 'pending' end,
+        next_attempt_at=case when pending_replacement then next_attempt_at else now() end,
+        last_error=case when pending_replacement then 'source_changed_replaced' else last_error end,
         locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
-      return query select 0,'source_changed'::text,'pending'::text;
+      return query select 0,'source_changed'::text,
+        case when pending_replacement then 'cancelled' else 'pending' end::text;
       return;
     end if;
   end if;
@@ -641,9 +653,20 @@ begin
   if p_expected_source_available is distinct from cur.source_available
      or p_expected_representation_hash is distinct from cur.representation_hash
      or p_expected_public_state is distinct from cur.public_state then
-    update public.embedding_jobs set status='pending',next_attempt_at=now(),
+    select exists (
+      select 1 from public.embedding_jobs replacement
+       where replacement.entity_type=j.entity_type
+         and replacement.item_id=j.item_id
+         and replacement.representation_type=j.representation_type
+         and replacement.status='pending'
+         and replacement.id<>j.id
+    ) into pending_replacement;
+    update public.embedding_jobs set status=case when pending_replacement then 'cancelled' else 'pending' end,
+      next_attempt_at=case when pending_replacement then next_attempt_at else now() end,
+      last_error=case when pending_replacement then 'source_changed_replaced' else last_error end,
       locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
-    return query select 0,'source_changed'::text,'pending'::text;
+    return query select 0,'source_changed'::text,
+      case when pending_replacement then 'cancelled' else 'pending' end::text;
     return;
   end if;
   select * into manifest from public.content_representation_manifest m
@@ -654,9 +677,20 @@ begin
      and m.chunk_config_identity='chunk_config'||E'\x1f'||'v1'||E'\x1f'||'prose#512/50'||E'\x1f'||'workflow_python#512/50';
   if not found or p_chunks is null or jsonb_typeof(p_chunks)<>'array'
      or jsonb_array_length(p_chunks) <> manifest.chunk_count then
-    update public.embedding_jobs set status='pending',next_attempt_at=now(),
+    select exists (
+      select 1 from public.embedding_jobs replacement
+       where replacement.entity_type=j.entity_type
+         and replacement.item_id=j.item_id
+         and replacement.representation_type=j.representation_type
+         and replacement.status='pending'
+         and replacement.id<>j.id
+    ) into pending_replacement;
+    update public.embedding_jobs set status=case when pending_replacement then 'cancelled' else 'pending' end,
+      next_attempt_at=case when pending_replacement then next_attempt_at else now() end,
+      last_error=case when pending_replacement then 'source_changed_replaced' else last_error end,
       locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
-    return query select 0,'source_changed'::text,'pending'::text;
+    return query select 0,'source_changed'::text,
+      case when pending_replacement then 'cancelled' else 'pending' end::text;
     return;
   end if;
   for chunk in select value from jsonb_array_elements(p_chunks) loop

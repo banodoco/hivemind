@@ -679,6 +679,8 @@ as $$
 declare
   prior public.message_snapshots%rowtype;
   snapshot public.message_snapshots%rowtype;
+  source_message record;
+  effective_original_author_id bigint;
   input jsonb;
 begin
   if not public.hivemind_active_contributor(p_submitter) then
@@ -695,10 +697,29 @@ begin
     return public.hivemind_store_idempotency(p_submitter,'capture_message_snapshot',p_idempotency_token,
       public.hivemind_request_hash(input), '{}'::jsonb);
   end if;
+  -- A snapshot is an observation of the trusted source row, not an
+  -- arbitrary caller-supplied copy.  Keep the caller's observation fields
+  -- (metadata, timestamp, and optional original-author name), but fail closed
+  -- when the claimed content or author no longer matches the source row.
+  select m.content, m.author_id into source_message
+    from public.discord_messages m where m.message_id=p_message_id;
+  if not found then
+    raise exception 'unknown source message %',p_message_id using errcode='23503';
+  end if;
+  if source_message.content is distinct from p_content then
+    raise exception 'snapshot content does not match current source message %',p_message_id
+      using errcode='22023';
+  end if;
+  if p_original_author_id is not null and source_message.author_id is not null
+     and p_original_author_id is distinct from source_message.author_id then
+    raise exception 'snapshot author does not match current source message %',p_message_id
+      using errcode='22023';
+  end if;
+  effective_original_author_id := coalesce(p_original_author_id,source_message.author_id);
   select * into prior from public.message_snapshots
    where message_id=p_message_id and content=p_content
      and source_metadata=coalesce(p_source_metadata,'{}')
-     and original_author_id is not distinct from p_original_author_id
+     and original_author_id is not distinct from effective_original_author_id
      and original_author_name is not distinct from p_original_author_name
    order by id desc limit 1;
   if found then
@@ -708,7 +729,7 @@ begin
   end if;
   insert into public.message_snapshots
     (message_id,content,source_metadata,original_author_id,original_author_name,observed_at,captured_by)
-  values (p_message_id,p_content,coalesce(p_source_metadata,'{}'),p_original_author_id,
+  values (p_message_id,p_content,coalesce(p_source_metadata,'{}'),effective_original_author_id,
           p_original_author_name,p_observed_at,p_submitter)
   returning * into snapshot;
   return public.hivemind_store_idempotency(p_submitter,'capture_message_snapshot',p_idempotency_token,
