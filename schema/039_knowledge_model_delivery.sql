@@ -5,6 +5,31 @@
 
 create extension if not exists pg_trgm;
 
+-- Exact revision/evidence subjects use a nullable version pin.  The foundation
+-- table originally included that nullable column in its primary key, which
+-- makes PostgreSQL enforce NOT NULL and rejects valid unversioned revision or
+-- evidence subjects.  Normalize the key in-place for already-created local
+-- databases as well as fresh applies.
+alter table if exists public.evidence_subjects
+  drop constraint if exists evidence_subjects_pkey;
+alter table if exists public.evidence_subjects
+  alter column target_version_id drop not null;
+alter table if exists public.evidence_subjects
+  add constraint evidence_subjects_pkey primary key (evidence_id, target_kind, target_id);
+
+-- The delivery queue has one additional source operation: publication of an
+-- exact accepted revision.  Replace the historical constraint rather than
+-- weakening it or adding a compatibility branch.
+alter table if exists public.embedding_jobs
+  drop constraint if exists embedding_jobs_source_op_check;
+alter table if exists public.embedding_jobs
+  drop constraint if exists embedding_jobs_source_op_delivery_check;
+alter table if exists public.embedding_jobs
+  add constraint embedding_jobs_source_op_delivery_check check (
+    source_op in ('insert','update','delete','soft_delete','status_change',
+                  'python_change','semantic_change','opt_out','revision_accepted')
+  );
+
 -- Direct cutover: legacy presentation/RPC/write branches are no longer active.
 drop view if exists public.unified_feed;
 drop function if exists public.check_duplicate_distillation(text, bigint);
@@ -106,7 +131,13 @@ begin
       join public.resources r on r.id::text=ld.item_id and r.current_revision_id=ld.source_revision_id
       join public.resource_revisions rr on rr.id=r.current_revision_id and rr.state='accepted'
      where want_resource and ld.entity_type='resource' and ld.representation_type='workflow_python'
+       and q <> to_tsquery('simple'::regconfig, '') and ld.tsv @@ q
        and coalesce(public.hivemind_workflow_python_state(r.id),'quarantined')='safe'
+       and (coalesce(array_length(p_sources,1),0)=0 or r.origin_source=any(p_sources))
+       and (p_since is null or r.created_at >= p_since)
+       and rr.kind='workflow'
+       and (not exists(select 1 from unnest(kinds) k where k <> 'message' and k <> 'resource')
+            or rr.kind=any(array(select k from unnest(kinds) k where k <> 'message' and k <> 'resource')))
        and (not has_items or (item_entity='resource' and r.id::text=any(p_item_ids)))
   ), collapsed as (
     select distinct on (entity_type,item_id) * from arms
@@ -158,25 +189,168 @@ create or replace function public.hivemind_semantic_candidates(
 returns table(entity_type text,item_id text,kind text,representation_type text,
   chunk_index integer,matched_snippet text,semantic_distance double precision,
   semantic_rank integer,created_at timestamptz)
-language sql stable security definer set search_path=public,pg_temp as $$
+language plpgsql stable security definer set search_path=public,pg_temp as $$
+declare
+  v_active bigint := public.hivemind_active_contract_id(384);
+  v_limit int := least(greatest(coalesce(p_candidate_limit,100),1),500);
+  v_kinds text[] := coalesce(p_kinds,'{}'::text[]);
+  v_items text[] := coalesce(p_item_ids,'{}'::text[]);
+  v_has_kinds boolean := coalesce(array_length(v_kinds,1),0) > 0;
+  v_has_items boolean := coalesce(array_length(v_items,1),0) > 0;
+  v_want_message boolean := not v_has_kinds or 'message'=any(v_kinds);
+  v_want_resource boolean := not v_has_kinds or exists(select 1 from unnest(v_kinds) k where k <> 'message');
+  v_concrete_kinds text[];
+  v_item_entity text;
+begin
+  if v_active is null then return; end if;
+  select array_agg(k) into v_concrete_kinds
+    from unnest(v_kinds) k where k not in ('message','resource');
+  if v_has_items then
+    if v_want_message and not v_want_resource then v_item_entity := 'message';
+    elsif v_want_resource and not v_want_message then v_item_entity := 'resource';
+    else v_item_entity := null;
+    end if;
+  end if;
+  return query
   with arms as (
-    select 'message'::text entity_type,m.message_id::text item_id,'message'::text kind,
-      e.representation_type,e.chunk_index,left(e.chunk_text,512) matched_snippet,
-      (e.embedding <=> p_query_embedding) semantic_distance,m.created_at
-      from public.content_embeddings e join public.message_feed m on m.message_id::text=e.item_id
-      where e.entity_type='message' and (coalesce(array_length(p_kinds,1),0)=0 or 'message'=any(p_kinds))
+    select 'message'::text as entity_type, m.message_id::text as item_id,
+      'message'::text as kind, e.representation_type, e.chunk_index,
+      e.chunk_text, (e.embedding <=> p_query_embedding) as semantic_distance,
+      m.created_at
+      from public.content_embeddings e
+      join public.message_feed m on m.message_id::text=e.item_id
+     where e.contract_id=v_active and e.entity_type='message'
+       and v_want_message
+       and (not v_has_items or (v_item_entity='message' and e.item_id=any(v_items)))
     union all
-    select 'resource',r.id::text,rr.kind,e.representation_type,e.chunk_index,left(e.chunk_text,512),
-      (e.embedding <=> p_query_embedding),r.created_at
-      from public.content_embeddings e join public.resources r on r.id::text=e.item_id and r.current_revision_id=e.source_revision_id
-      join public.resource_revisions rr on rr.id=r.current_revision_id and rr.state='accepted'
-      where e.entity_type='resource' and (coalesce(array_length(p_kinds,1),0)=0 or 'resource'=any(p_kinds) or rr.kind=any(p_kinds))
-        and (coalesce(array_length(p_item_ids,1),0)=0 or e.item_id=any(p_item_ids))
-  ), ranked as (select *,row_number() over(order by semantic_distance,entity_type,item_id)::int semantic_rank from arms)
-  select entity_type,item_id,kind,representation_type,chunk_index,matched_snippet,
-    semantic_distance,semantic_rank,created_at from ranked
-    order by semantic_distance,entity_type,item_id limit least(greatest(coalesce(p_candidate_limit,100),1),500)
-$$;
+    select 'resource'::text, r.id::text, rr.kind, e.representation_type,
+      e.chunk_index, e.chunk_text, (e.embedding <=> p_query_embedding), r.created_at
+      from public.content_embeddings e
+      join public.resources r on r.id::text=e.item_id
+                             and r.current_revision_id=e.source_revision_id
+      join public.resource_revisions rr on rr.id=r.current_revision_id
+                                       and rr.state='accepted'
+     where e.contract_id=v_active and e.entity_type='resource'
+       and v_want_resource
+       and (not v_has_items or (v_item_entity='resource' and e.item_id=any(v_items)))
+       and (not exists(select 1 from unnest(v_kinds) k where k <> 'message' and k <> 'resource')
+            or rr.kind=any(coalesce(v_concrete_kinds,'{}'::text[])))
+       and (e.representation_type <> 'workflow_python'
+            or (rr.kind='workflow' and coalesce((select s.public_state
+                 from public.knowledge_resource_python_state s
+                where s.resource_id=r.id and s.revision_id=rr.id),'quarantined')='safe'))
+  ), collapsed as (
+    select distinct on (arms.entity_type,arms.item_id) arms.*
+      from arms
+     order by arms.entity_type,arms.item_id,arms.semantic_distance asc nulls last,
+              case when arms.representation_type='prose' then 0 else 1 end,
+              arms.chunk_index asc
+  )
+  select c.entity_type,c.item_id,c.kind,c.representation_type,c.chunk_index,
+    left(coalesce(c.chunk_text,''),512),c.semantic_distance,
+    row_number() over(order by c.semantic_distance,c.entity_type,c.item_id)::int,
+    c.created_at
+    from collapsed c
+   order by c.semantic_distance,c.entity_type,c.item_id
+   limit v_limit;
+end; $$;
+
+-- Replace the historical worker source resolver with the accepted current
+-- resource/revision source.  The function signature stays stable for the
+-- existing finalize/payload surfaces, but no active path reads
+-- external_resources or distillations anymore.
+create or replace function public.hivemind_current_representation(
+  p_entity_type text, p_item_id text, p_representation_type text
+) returns table(representation_hash text, source_available boolean,
+                public_state text, kind_ok boolean)
+language plpgsql stable security definer set search_path=public,pg_temp as $$
+declare
+  v_text text := '';
+  v_state text := null;
+  v_available boolean := false;
+  v_kind_ok boolean := true;
+  v_kind text;
+  v_resource_id bigint;
+  v_revision_id bigint;
+begin
+  if p_entity_type='message' then
+    select coalesce(m.content,'') into v_text
+      from public.discord_messages m
+     where m.message_id=p_item_id::bigint and coalesce(m.is_deleted,false)=false;
+    v_available := found and btrim(v_text) <> '';
+  elsif p_entity_type='resource' then
+    select r.id, r.current_revision_id, rr.kind,
+           public.hivemind_canonical_resource_text(
+             rr.title,
+             public.hivemind_workflow_prose(rr.body,rr.kind),
+             public.hivemind_resource_tags(rr.metadata)||' '||
+               public.hivemind_workflow_semantics_text(rr.metadata)),
+           coalesce(s.public_state,'safe')
+      into v_resource_id, v_revision_id, v_kind, v_text, v_state
+      from public.resources r
+      join public.resource_revisions rr on rr.id=r.current_revision_id
+      left join public.knowledge_resource_python_state s
+        on s.resource_id=r.id and s.revision_id=rr.id
+     where r.id=p_item_id::bigint and rr.state='accepted';
+    if p_representation_type='workflow_python' then
+      select coalesce(rr.payload->>'python_source',''), rr.kind='workflow',
+             coalesce(s.public_state,'safe')
+        into v_text, v_kind_ok, v_state
+        from public.resources r
+        join public.resource_revisions rr on rr.id=r.current_revision_id
+        left join public.knowledge_resource_python_state s
+          on s.resource_id=r.id and s.revision_id=rr.id
+       where r.id=p_item_id::bigint and rr.state='accepted';
+      v_available := found and v_kind_ok and btrim(v_text)<>'' and v_state='safe';
+    else
+      v_available := found and btrim(v_text)<>'';
+    end if;
+  end if;
+  if v_available then
+    return query select public.hivemind_representation_hash(v_text),true,v_state,v_kind_ok;
+  else
+    return query select case when btrim(v_text)<>'' then public.hivemind_representation_hash(v_text) else '' end,
+      false,v_state,v_kind_ok;
+  end if;
+end; $$;
+
+-- Cleanup follows the same current-head source contract.  Historical
+-- distillation/external-resource cleanup is deliberately replaced, not kept
+-- as an active fallback.
+create or replace function public.hivemind_cleanup_ineligible_embeddings(
+  p_batch_size int default 1000
+) returns int
+language plpgsql security definer set search_path=public,pg_temp as $$
+declare
+  v_active bigint := public.hivemind_active_contract_id();
+  v_removed int := 0;
+  v_n int;
+begin
+  if v_active is null then return 0; end if;
+  with doomed as (
+    select ce.ctid from public.content_embeddings ce
+     where ce.contract_id=v_active and ce.entity_type='message'
+       and not exists (select 1 from public.discord_messages m
+                        where m.message_id::text=ce.item_id and coalesce(m.is_deleted,false)=false)
+     limit p_batch_size)
+  delete from public.content_embeddings where ctid in (select ctid from doomed);
+  get diagnostics v_n=row_count; v_removed:=v_removed+v_n;
+  with doomed as (
+    select ce.ctid from public.content_embeddings ce
+     where ce.contract_id=v_active and ce.entity_type='resource'
+       and not exists (
+         select 1 from public.resources r
+         join public.resource_revisions rr on rr.id=r.current_revision_id and rr.state='accepted'
+          where r.id::text=ce.item_id and ce.source_revision_id=rr.id
+            and (ce.representation_type <> 'workflow_python'
+                 or (rr.kind='workflow' and coalesce((select s.public_state
+                    from public.knowledge_resource_python_state s
+                   where s.resource_id=r.id and s.revision_id=rr.id),'quarantined')='safe')))
+     limit greatest(p_batch_size-v_removed,0))
+  delete from public.content_embeddings where ctid in (select ctid from doomed);
+  get diagnostics v_n=row_count; v_removed:=v_removed+v_n;
+  return v_removed;
+end; $$;
 
 -- Resource-head changes are the only source of searchable resource/index work.
 drop trigger if exists trg_embedding_jobs_external_resources on public.external_resources;
@@ -185,9 +359,9 @@ create or replace function public.trg_embedding_jobs_resources_fn() returns trig
 language plpgsql security definer set search_path=public,pg_temp as $$
 begin
   if new.current_revision_id is distinct from old.current_revision_id and new.current_revision_id is not null then
-    perform public.hivemind_enqueue_embedding_job('resource',new.id::text,'prose','reembed','revision_accepted',new.current_revision_id);
+    perform public.hivemind_enqueue_embedding_job('resource',new.id::text,'prose','reembed','revision_accepted',NULL::bigint,new.current_revision_id);
     if exists(select 1 from public.resource_revisions where id=new.current_revision_id and kind='workflow') then
-      perform public.hivemind_enqueue_embedding_job('resource',new.id::text,'workflow_python','reembed','revision_accepted',new.current_revision_id);
+      perform public.hivemind_enqueue_embedding_job('resource',new.id::text,'workflow_python','reembed','revision_accepted',NULL::bigint,new.current_revision_id);
     end if;
   end if;
   return new;
@@ -195,6 +369,8 @@ end; $$;
 drop trigger if exists trg_embedding_jobs_resources on public.resources;
 create trigger trg_embedding_jobs_resources after update of current_revision_id on public.resources for each row execute function public.trg_embedding_jobs_resources_fn();
 
+drop function if exists public.hivemind_enqueue_embedding_job(text,text,text,text,text,bigint);
+drop function if exists public.hivemind_enqueue_embedding_job(text,text,text,text,text,bigint,bigint);
 create or replace function public.hivemind_enqueue_embedding_job(
   p_entity_type text,p_item_id text,p_representation_type text,p_job_kind text,p_source_op text,
   p_contract_id bigint default null,p_source_revision_id bigint default null) returns void
@@ -205,6 +381,30 @@ declare c bigint; begin c:=coalesce(p_contract_id,public.hivemind_active_contrac
   on conflict (entity_type,item_id,representation_type) where status='pending' do update set
     job_kind=excluded.job_kind,source_op=excluded.source_op,contract_id=coalesce(excluded.contract_id,embedding_jobs.contract_id),source_revision_id=excluded.source_revision_id,next_attempt_at=now(),updated_at=now();
 end; $$;
+
+-- Legacy finalization code writes the embedding row while its queue row is
+-- processing.  Fill the exact accepted revision at that storage boundary when
+-- an older caller did not pass the new column explicitly; newer backfill paths
+-- already provide it.  This keeps revision identity attached to every active
+-- resource vector without restoring a legacy source branch.
+create or replace function public.trg_content_embeddings_revision_fn() returns trigger
+language plpgsql security definer set search_path=public,pg_temp as $$
+begin
+  if new.entity_type='resource' and new.source_revision_id is null then
+    select j.source_revision_id into new.source_revision_id
+      from public.embedding_jobs j
+     where j.entity_type='resource' and j.item_id=new.item_id
+       and j.representation_type=new.representation_type
+       and j.contract_id=new.contract_id and j.status='processing'
+       and j.source_revision_id is not null
+     order by j.id desc limit 1;
+  end if;
+  return new;
+end; $$;
+drop trigger if exists trg_content_embeddings_revision on public.content_embeddings;
+create trigger trg_content_embeddings_revision
+  before insert on public.content_embeddings
+  for each row execute function public.trg_content_embeddings_revision_fn();
 
 -- A claimed resource job is stale if its pinned revision is no longer the head.
 create or replace function public.hivemind_complete_embedding_job(p_job_id bigint,p_worker_id text,p_chunks_written int default 0) returns void

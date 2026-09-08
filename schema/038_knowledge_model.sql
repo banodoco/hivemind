@@ -111,7 +111,11 @@ create table if not exists public.evidence_subjects (
   target_kind text not null check (target_kind in ('resource', 'message', 'revision', 'evidence')),
   target_id bigint not null,
   target_version_id bigint,
-  primary key (evidence_id, target_kind, target_id, target_version_id)
+  -- A revision/evidence subject is an exact unversioned identity and therefore
+  -- legitimately stores NULL in target_version_id.  The target identity is
+  -- unique per evidence item; resource/message version pins remain data on the
+  -- row rather than part of a NOT NULL primary key.
+  primary key (evidence_id, target_kind, target_id)
 );
 
 create table if not exists public.evidence_sources (

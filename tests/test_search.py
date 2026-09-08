@@ -60,7 +60,9 @@ class QueryConstructionTests(unittest.TestCase):
         self.assertIn("resource_revisions!resources_current_revision_fk", params["select"])
         self.assertEqual(params["origin_source"], "in.(web)")
         self.assertEqual(params["created_at"], "gte.2026-01-01")
-        self.assertIn("resource_revisions.title.ilike.*wan*", params["and"])
+        self.assertIn("resource_revisions!resources_current_revision_fk!inner", params["select"])
+        self.assertIn("title.ilike.*wan*", params["resource_revisions.and"])
+        self.assertNotIn("and", params)
 
     def test_resource_kind_filter_has_no_distillation_branch(self):
         self.assertIsNone(search._resource_kind_filter(["resource"]))

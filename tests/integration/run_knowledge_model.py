@@ -166,6 +166,12 @@ begin
   perform public.hivemind_set_editor('postgres',2,true);
   response := public.hivemind_decide_revision(2,'approve-1',1,'accepted','exact review');
   if response->>'current_revision_id' <> '1' then raise exception 'approval did not publish revision'; end if;
+  if not exists (select 1 from public.embedding_jobs
+                 where entity_type='resource' and item_id='1'
+                   and source_revision_id=1 and source_op='revision_accepted'
+                   and status='pending') then
+    raise exception 'accepted revision did not enqueue its exact source revision';
+  end if;
   if public.hivemind_resolve_reference('resource',1)->>'resolution' <> 'accepted_head'
      or public.hivemind_resolve_reference('resource',1)->>'resolved_revision_id' <> '1' then
     raise exception 'unpinned accepted resource did not resolve to its head';
@@ -173,7 +179,7 @@ begin
   insert into public.discord_messages(message_id,content) values (9007199254740993,'source v1');
   perform public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author',now());
   perform public.hivemind_submit_evidence(1,'evidence-1','v1 completed','4090','reported result','reported',
-    '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"}]',
+    '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"},{"target_kind":"revision","target_id":"1"}]',
     '[{"external_url":"https://example.test/run/1","label":"ordinary source URL"}]');
   perform public.hivemind_propose_revision(1,'proposal-a',1,1,'workflow','Workflow v2a','candidate a','{"nodes":2}','{}','{}','a','[]');
   perform public.hivemind_propose_revision(3,'proposal-b',1,1,'workflow','Workflow v2b','candidate b','{"nodes":3}','{}','{}','b','[]');
@@ -230,7 +236,7 @@ exception when sqlstate '23514' then null; end $$;
 update public.discord_messages set content='source v2' where message_id=9007199254740993;
 select public.hivemind_capture_message_snapshot(1,'snapshot-2',9007199254740993,'source v2','{"channel":"demo"}',9007199254740994,'Original author',now());
 select public.hivemind_submit_evidence(1,'evidence-2','contradictory reproduction','different seed','did not complete','observed',
-  '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"}]',
+  '[{"target_kind":"resource","target_id":"1","target_version_id":"1"},{"target_kind":"message","target_id":"9007199254740993","target_version_id":"1"},{"target_kind":"evidence","target_id":"1"}]',
   '[{"target_kind":"message","target_id":"9007199254740993","target_version_id":"2"}]','1');
 
 do $$
@@ -238,13 +244,15 @@ begin
   if (select content from public.message_snapshots where id=1) <> 'source v1' then raise exception 'old snapshot changed'; end if;
   if (select target_version_id from public.evidence_subjects where evidence_id=1 and target_kind='message') <> 1 then raise exception 'old evidence pin changed'; end if;
   if (select target_version_id from public.evidence_subjects where evidence_id=1 and target_kind='resource') <> 1 then raise exception 'old workflow evidence pin changed'; end if;
+  if (select target_version_id from public.evidence_subjects where evidence_id=1 and target_kind='revision') is not null then raise exception 'exact revision subject was not unversioned'; end if;
+  if (select target_version_id from public.evidence_subjects where evidence_id=2 and target_kind='evidence') is not null then raise exception 'exact evidence subject was not unversioned'; end if;
   if (select submitted_by from public.evidence where id=1) <> 1
      or (select captured_by from public.message_snapshots where id=1) <> 1
      or (select original_author_id from public.message_snapshots where id=1) <> 9007199254740994 then
     raise exception 'reporter and original-author attribution missing';
   end if;
   if (select basis from public.evidence where id=2) <> 'observed' or (select supersedes_evidence_id from public.evidence where id=2) <> 1 then raise exception 'contradictory evidence attribution missing'; end if;
-  if (select count(*) from public.knowledge_references where source_kind='evidence') <> 5 then raise exception 'derived evidence links missing'; end if;
+  if (select count(*) from public.knowledge_references where source_kind='evidence') <> 7 then raise exception 'derived evidence links missing'; end if;
   if not (select canonical_guide from public.resources where id=3) then raise exception 'canonical guide marker missing'; end if;
   if not exists (select 1 from public.knowledge_references where source_kind='revision' and source_id=5 and target_kind='evidence' and target_id=1) then raise exception 'guide to evidence link missing'; end if;
   if not exists (select 1 from public.knowledge_outgoing_references
@@ -269,14 +277,29 @@ insert into public.resources(id,created_by,origin_source,origin_external_id) ove
 insert into public.resource_revisions(id,resource_id,kind,title,body,submitted_by,state,decided_by,decided_at) overriding system value
   values (100,10,'article','Head','headtoken body',1,'accepted',2,now()),(101,10,'article','Historical','headtoken body',1,'accepted',2,now()),(102,10,'article','Pending','headtoken body',1,'pending',null,null);
 update public.resources set current_revision_id=100 where id=10;
+insert into public.embedding_contracts(id,provider,model,dimension,canonicalization_version,chunking_version,status)
+  values(384,'fixture','fixture-384',384,1,1,'active')
+  on conflict (id) do update set status='active',dimension=384;
+insert into public.content_embeddings(contract_id,entity_type,item_id,representation_type,chunk_index,chunk_text,embedding,representation_hash,chunk_hash,source_revision_id)
+  values(384,'resource','10','prose',0,'headtoken body',array_fill(0::real,ARRAY[384])::vector,repeat('a',64),repeat('b',64),101);
 do $$ declare n int; begin
   select count(*) into n from public.hivemind_lexical_candidates('headtoken',100,'{resource}');
   if n <> 1 then raise exception 'freshness candidate count expected 1, got %',n; end if;
   if not exists(select 1 from public.hivemind_lexical_candidates('headtoken',100,'{resource}') where item_id='10') then raise exception 'current head did not rank'; end if;
   if exists(select 1 from public.hivemind_lexical_candidates('headtoken',100,'{resource}') where item_id in ('101','102')) then raise exception 'historical or pending revision ranked'; end if;
+  if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 0 then
+    raise exception 'stale semantic revision ranked';
+  end if;
+  update public.content_embeddings set source_revision_id=100 where contract_id=384 and item_id='10';
+  if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 1 then
+    raise exception 'current semantic revision did not rank';
+  end if;
   insert into public.resource_revisions(resource_id,kind,title,body,submitted_by,state,decided_by,decided_at) values(10,'article','Head v2','headtoken body',1,'accepted',2,now()) returning id into n;
   update public.resources set current_revision_id=n where id=10;
   if (select count(*) from public.hivemind_lexical_candidates('headtoken',100,'{resource}') where item_id='10') <> 1 then raise exception 'same-content revision lost stable resource identity'; end if;
+  if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 0 then
+    raise exception 'semantic vector from historical head ranked after head change';
+  end if;
   insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,source_revision_id,status,locked_by)
     values('resource','10','prose','reembed',100,'processing','late-worker');
   perform public.hivemind_complete_embedding_job((select max(id) from public.embedding_jobs),'late-worker');
@@ -290,7 +313,8 @@ truncate table public.embedding_jobs, public.content_embeddings, public.lexical_
   public.knowledge_references, public.resource_revisions, public.resources,
   public.external_resources, public.distillations, public.distillation_cites restart identity cascade;
 insert into public.external_resources(id,kind,source,external_id,title,body,author,url,metadata,payload) overriding system value
-  values(900,'workflow','fixture','wf-900','Legacy workflow','workflow body','Author','https://example.test/wf','{"tag":"x"}','{"nodes":1}');
+  values(1,'article','fixture',null,'Legacy nullable-origin','nullable body','Author','https://example.test/null','{"tag":"null"}',null),
+        (900,'workflow','fixture','wf-900','Legacy workflow','workflow body','Author','https://example.test/wf','{"tag":"x"}','{"nodes":1}');
 insert into public.distillations(id,question,conditions,answer,confidence,status,author_id) overriding system value
   values(901,'Legacy question','only on fixture','Legacy answer','high','approved',1);
 insert into public.distillation_cites values(901,'resource',900);
@@ -303,21 +327,29 @@ def run(scenario: str) -> dict[str, object]:
         raise ValueError("set HIVEMIND_TEST_DATABASE_URL to the disposable PostgreSQL URL")
     url = _checked_url(raw_url)
     _bootstrap(url)
-    if scenario not in {"all", "revisions", "evidence", "search_freshness", "conversion"}:
-        raise ValueError("scenario must be all, revisions, evidence, search_freshness, or conversion")
-    if scenario in {"all", "revisions", "evidence"}:
+    if scenario not in {"all", "revisions", "references", "evidence", "search_freshness", "conversion"}:
+        raise ValueError("scenario must be all, revisions, references, evidence, search_freshness, or conversion")
+    if scenario in {"all", "revisions", "references", "evidence"}:
         _psql(url, SCENARIO)
     if scenario in {"all", "search_freshness"}:
         _psql(url, FRESHNESS_SCENARIO)
     if scenario in {"all", "conversion"}:
         _psql(url, CONVERSION_SEED)
         env = dict(os.environ); env["HIVEMIND_TEST_DATABASE_URL"] = url
-        rehearsal = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--apply"], cwd=ROOT, env=env, text=True, capture_output=True)
+        rehearsal = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--rehearse"], cwd=ROOT, env=env, text=True, capture_output=True)
         if rehearsal.returncode:
             raise RuntimeError(rehearsal.stderr or rehearsal.stdout)
+        if _psql(url, "select count(*) from public.resources") != "0":
+            raise RuntimeError("conversion rehearsal did not roll back")
+        applied = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--apply"], cwd=ROOT, env=env, text=True, capture_output=True)
+        if applied.returncode:
+            raise RuntimeError(applied.stderr or applied.stdout)
         check = _psql(url, "select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.origin_source='legacy-distillation' and v.state='accepted'; select count(*) from public.knowledge_references where label='converted legacy cite';")
         if check.splitlines() != ["1", "1"]:
             raise RuntimeError("conversion assertions failed: " + check)
+        nullable = _psql(url, "select count(*) from public.resources where origin_source is null and origin_external_id is null and id=1; select count(*) from public.resource_revisions where provenance->>'legacy_id'='1' and provenance->>'external_id' is null;")
+        if nullable.splitlines() != ["1", "1"]:
+            raise RuntimeError("nullable legacy origin was not preserved: " + nullable)
     return {"status": "passed", "scenario": scenario, "migrations": [str(x) for x in MIGRATIONS]}
 
 

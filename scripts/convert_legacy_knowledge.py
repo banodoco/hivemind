@@ -45,24 +45,43 @@ create temp table legacy_resource_map(kind text, legacy_id bigint, new_id bigint
 create temp table legacy_revision_map(kind text, legacy_id bigint, new_id bigint, resource_id bigint, primary key(kind, legacy_id)) on commit drop;
 do $$ declare e record; rid bigint; vid bigint; rev_state text; begin
   for e in select * from public.external_resources order by id loop
-    select r.id into rid from public.resources r where r.origin_source=e.source and r.origin_external_id is not distinct from e.external_id;
+    -- A nullable legacy external_id cannot be copied into the new origin pair:
+    -- resources require both origin columns or neither.  Preserve the original
+    -- source/id in revision provenance and use that immutable legacy identity
+    -- for rerun lookup when the natural id is absent.
+    select r.id into rid
+      from public.resources r
+     where (e.external_id is not null
+            and r.origin_source=e.source and r.origin_external_id=e.external_id)
+        or (e.external_id is null and exists (
+              select 1 from public.resource_revisions prior
+               where prior.resource_id=r.id
+                 and prior.provenance->>'legacy_table'='external_resources'
+                 and prior.provenance->>'legacy_id'=e.id::text));
     if rid is null then
       if not exists (select 1 from public.resources where id=e.id) then
         insert into public.resources(id,created_by,origin_source,origin_external_id,created_at)
-          overriding system value values(e.id,{submitter_id},e.source,e.external_id,e.created_at) returning id into rid;
+          overriding system value values(e.id,{submitter_id},case when e.external_id is null then null else e.source end,
+            case when e.external_id is null then null else e.external_id end,e.created_at) returning id into rid;
       else
         insert into public.resources(created_by,origin_source,origin_external_id,created_at)
-          values({submitter_id},e.source,e.external_id,e.created_at) returning id into rid;
+          values({submitter_id},case when e.external_id is null then null else e.source end,
+            case when e.external_id is null then null else e.external_id end,e.created_at) returning id into rid;
       end if;
     end if;
     insert into legacy_resource_map values('resource',e.id,rid) on conflict do nothing;
     insert into public.resource_revisions(resource_id,kind,title,body,payload,metadata,provenance,submitted_by,state,decided_by,decided_at,decision_reason)
       values(rid,e.kind,e.title,e.body,e.payload,coalesce(e.metadata,'{{}}'::jsonb),
-        jsonb_strip_nulls(jsonb_build_object('legacy_table','external_resources','source',e.source,'external_id',e.external_id,'author',e.author,'url',e.url)),
+        jsonb_strip_nulls(jsonb_build_object('legacy_table','external_resources','legacy_id',e.id,'source',e.source,'external_id',e.external_id,'author',e.author,'url',e.url)),
         {submitter_id},'accepted',{submitter_id},e.created_at,'converted from legacy visible resource') returning id into vid;
     insert into legacy_revision_map values('resource',e.id,vid,rid) on conflict do nothing;
     update public.resources set current_revision_id=vid where id=rid and current_revision_id is null;
   end loop;
+  -- Rows inserted with OVERRIDING SYSTEM VALUE do not advance an identity
+  -- sequence.  Synchronize before generated distillation resources are added
+  -- so an explicit legacy id can never collide with the next allocation.
+  perform setval(pg_get_serial_sequence('public.resources','id'),
+    greatest(coalesce((select max(id) from public.resources),1),1), true);
   for e in select * from public.distillations order by id loop
     insert into public.resources(created_by,origin_source,origin_external_id,created_at)
       values({submitter_id},'legacy-distillation','distillation:'||e.id,e.created_at) returning id into rid;
@@ -77,6 +96,8 @@ do $$ declare e record; rid bigint; vid bigint; rev_state text; begin
     insert into legacy_revision_map values('distillation',e.id,vid,rid);
     update public.resources set current_revision_id=vid where id=rid and rev_state='accepted';
   end loop;
+  perform setval(pg_get_serial_sequence('public.resource_revisions','id'),
+    greatest(coalesce((select max(id) from public.resource_revisions),1),1), true);
   -- Preserve each cite as a typed exact reference. No target is invented when
   -- a legacy row is absent; the reference remains a source-custody pointer.
   insert into public.knowledge_references(source_kind,source_id,target_kind,target_id,target_version_id,label,created_by)

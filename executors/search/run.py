@@ -230,7 +230,7 @@ _TOKEN_VARIANTS: dict[str, tuple[str, ...]] = {
 _MESSAGE_COLUMNS = "message_id,content,author_name,channel_name,created_at,guild_id,channel_id"
 _RESOURCE_COLUMNS = (
     "id,origin_source,origin_external_id,canonical_guide,created_at,current_revision_id,"
-    "resource_revisions!resources_current_revision_fk(id,kind,title,body,metadata,provenance,"
+    "resource_revisions!resources_current_revision_fk!inner(id,kind,title,body,metadata,provenance,"
     "submitted_by,submitted_at,state)"
 )
 # Index-backed thread surface (schema/036): no author_name/channel_name here.
@@ -404,13 +404,14 @@ def _scope_params(
             params["resource_revisions.kind"] = f"in.({','.join(kind_filter)})"
         if mode == "and":
             # Flat AND of canonical tokens on title: precise, index-friendly.
-            params["and"] = "(" + ",".join(f"resource_revisions.title.ilike.*{t}*" for t in tokens) + ")"
+            params["resource_revisions.and"] = "(" + ",".join(f"title.ilike.*{t}*" for t in tokens) + ")"
         else:
             # Title+body OR — the recall pass (title-only when the body
             # shape is slow).  Unordered: see the timing note above; client
             # ranking prefers titled hits (+5 vs +3) anyway.
             columns = ("resource_revisions.title",) if title_only else ("resource_revisions.title", "resource_revisions.body")
-            params["or"] = "(" + ",".join(_or_arms(columns, tokens)) + ")"
+            embedded_columns = tuple(column.split(".", 1)[1] for column in columns)
+            params["resource_revisions.or"] = "(" + ",".join(_or_arms(embedded_columns, tokens)) + ")"
         return params
 
     return None  # pragma: no cover - unknown scope
