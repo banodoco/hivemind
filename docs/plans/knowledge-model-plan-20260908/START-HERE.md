@@ -30,11 +30,27 @@ git clone --branch hivemind https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
 ```
 
+Make the public Megado skill available before coordinating the run:
+
+```bash
+git clone https://github.com/peteromallet/poms-skills.git ~/.local/share/poms-skills
+mkdir -p ~/.codex/skills
+test -e ~/.codex/skills/megado || ln -s ~/.local/share/poms-skills/megado ~/.codex/skills/megado
+```
+
+If the skill checkout already exists, update it with
+`git -C ~/.local/share/poms-skills pull --ff-only`. The symlink command is
+deliberately no-overwrite: an existing user-managed skill is left untouched.
+Agents without Codex should read
+`~/.local/share/poms-skills/megado/SKILL.md` directly and follow that skill's
+role, custody, review, and evidence instructions.
+
 Before implementation, recheck source drift against this branch, inspect the
-current local tool prerequisites, and preserve any unrelated dirty work. The
-recipient should make the Megado skill available using the public skill source
-provided with the handover, then follow `run.yaml` and execute T1–T10. This
-handover does not add a new gate.
+current local tool prerequisites, and preserve any unrelated dirty work. Before
+executing T1, change `run.yaml` from `mode: planning_only` to the accepted
+execution mode `mode: delivery`, preserving all role bindings, review stages,
+budgets, and counters. Then follow `run.yaml` and execute T1–T10. This is the
+activation transition for the explicit recipient instruction, not a new gate.
 
 The original local receipts, raw logs, exploratory briefs, and archives were
 deliberately not copied. They are local process history, not implementation
