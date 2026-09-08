@@ -54,35 +54,6 @@ class MessageDecisionTests(unittest.TestCase):
         self.assertEqual(intents[0].source_op, ej.SOURCE_DELETE)
 
 
-class DistillationDecisionTests(unittest.TestCase):
-    def test_insert_approved_enqueues_embed(self):
-        intents = ej.decide_jobs(None, {"id": 1, "status": "approved", "question": "q", "answer": "a"}, "distillation", op="insert")
-        self.assertEqual([i.job_kind for i in intents], ["embed"])
-
-    def test_insert_rejected_enqueues_nothing(self):
-        intents = ej.decide_jobs(None, {"id": 1, "status": "rejected", "question": "q", "answer": "a"}, "distillation", op="insert")
-        self.assertEqual(intents, [])
-
-    def test_status_to_rejected_enqueues_drop(self):
-        old = {"id": 1, "status": "approved", "question": "q", "answer": "a"}
-        new = {"id": 1, "status": "rejected", "question": "q", "answer": "a"}
-        intents = ej.decide_jobs(old, new, "distillation", op="update")
-        self.assertEqual([i.job_kind for i in intents], ["drop"])
-        self.assertEqual(intents[0].source_op, ej.SOURCE_STATUS_CHANGE)
-
-    def test_answer_change_enqueues_reembed(self):
-        old = {"id": 1, "status": "approved", "question": "q", "answer": "a"}
-        new = {"id": 1, "status": "approved", "question": "q", "answer": "b"}
-        intents = ej.decide_jobs(old, new, "distillation", op="update")
-        self.assertEqual([i.job_kind for i in intents], ["reembed"])
-
-    def test_rejected_to_approved_enqueues_reembed(self):
-        old = {"id": 1, "status": "rejected", "question": "q", "answer": "a"}
-        new = {"id": 1, "status": "approved", "question": "q", "answer": "a"}
-        intents = ej.decide_jobs(old, new, "distillation", op="update")
-        self.assertEqual([i.job_kind for i in intents], ["reembed"])
-
-
 class ResourceDecisionTests(unittest.TestCase):
     def test_insert_workflow_enqueues_prose_and_python(self):
         row = {"id": 100, "kind": "workflow", "title": "t", "body": "b", "payload": {"python_source": "x=1"}}

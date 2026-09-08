@@ -220,7 +220,7 @@ class TestEmbeddingSchemaSQL(unittest.TestCase):
         self.assertEqual(self._last("select item_id from content_embeddings where entity_type='message';"), snow)
 
     def test_result_kind_mapping_parity(self) -> None:
-        for k in ("message", "resource", "workflow", "article", "transcript", "distillation"):
+        for k in ("message", "resource", "workflow", "article", "transcript"):
             sql_v = self._last(f"select hivemind_entity_type_for_result_kind('{k}');")
             self.assertEqual(sql_v, ei.entity_type_for_result_kind(k), k)
 
@@ -246,12 +246,12 @@ class TestEmbeddingSchemaSQL(unittest.TestCase):
             wr.representation_hash(py_text),
         )
 
-    def test_canonical_distillation_parity(self) -> None:
-        q, cond, ans = "best upscaler", "for anime video", "RealESRGAN x2"
+    def test_workflow_resource_parity(self) -> None:
+        title, body, tags = "Wan workflow", "Use the sampler", "wan video"
         sql_text = self._text(
-            "hivemind_canonical_distillation_text($q${}$q$,$q${}$q$,$q${}$q$)".format(q, cond, ans)
+            "hivemind_canonical_resource_text($q${}$q$,$q${}$q$,$q${}$q$)".format(title, body, tags)
         )
-        self.assertEqual(sql_text, cr.canonical_distillation_text(q, cond, ans))
+        self.assertEqual(sql_text, cr.canonical_resource_text(title, body, tags))
 
 
 if __name__ == "__main__":

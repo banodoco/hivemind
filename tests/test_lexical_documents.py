@@ -285,17 +285,6 @@ class TestRefreshUpsertDropHashSkip(unittest.TestCase):
 
 
 class TestDistillationEligibility(unittest.TestCase):
-    def test_predicate_is_pending_or_approved(self):
-        pred = LD.DISTILLATION_STATUS_PREDICATE
-        self.assertIn("status IN ('pending', 'approved')", pred)
-
-    def test_status_filter_logic(self):
-        ok = {"pending", "approved"}
-        for status in ("pending", "approved"):
-            self.assertIn(status, ok)
-        for status in ("rejected", "superseded"):
-            self.assertNotIn(status, ok)
-
     def test_workflow_python_eligibility_gate(self):
         self.assertIn("hivemind_workflow_python_state", LD.WORKFLOW_PYTHON_ELIGIBLE_PREDICATE)
         self.assertIn("'safe'", LD.WORKFLOW_PYTHON_ELIGIBLE_PREDICATE)

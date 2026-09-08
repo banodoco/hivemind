@@ -146,13 +146,13 @@ class ExtractVideoIdTests(unittest.TestCase):
 class BuildEnvelopeTests(unittest.TestCase):
     def test_envelope_shape(self):
         env = build_envelope("https://youtu.be/x", _META, "transcript text")
-        self.assertEqual(env["action"], "add_resource")
+        self.assertEqual(env["action"], "submit_resource")
         data = env["data"]
         self.assertEqual(data["kind"], "transcript")
-        self.assertEqual(data["source"], "youtube")
-        self.assertEqual(data["external_id"], "dQw4w9WgXcQ")
+        self.assertEqual(data["origin_source"], "youtube")
+        self.assertEqual(data["origin_external_id"], "dQw4w9WgXcQ")
         self.assertEqual(data["title"], "Testing Wan Animate with VACE")
-        self.assertEqual(data["author"], "Banodoco Lab")
+        self.assertEqual(data["provenance"]["author"], "Banodoco Lab")
         self.assertEqual(data["body"], "transcript text")
         self.assertEqual(data["metadata"]["video_id"], "dQw4w9WgXcQ")
         self.assertEqual(data["metadata"]["duration"], 600)
@@ -201,8 +201,8 @@ class MainDryRunTests(unittest.TestCase):
                     self.assertIs(output["dry_run"], True)
                     data = output["envelope"]["data"]
                     self.assertEqual(data["kind"], "transcript")
-                    self.assertEqual(data["source"], "youtube")
-                    self.assertEqual(data["external_id"], "dQw4w9WgXcQ")
+                    self.assertEqual(data["origin_source"], "youtube")
+                    self.assertEqual(data["origin_external_id"], "dQw4w9WgXcQ")
                     self.assertIn("welcome back to the channel", data["body"])
 
     def test_no_captions_exits_nonzero(self):

@@ -50,12 +50,6 @@ class TestCanonicalConfig(unittest.TestCase):
 
 
 class TestWeightedExpressions(unittest.TestCase):
-    def test_distillation_weights(self):
-        weights = {a.field: a.weight for a in L.DISTILLATION_SPEC.arms}
-        self.assertEqual(weights["question"], "A")
-        self.assertEqual(weights["conditions"], "B")
-        self.assertEqual(weights["answer"], "C")
-
     def test_resource_prose_weights(self):
         weights = {a.field: a.weight for a in L.RESOURCE_PROSE_SPEC.arms}
         self.assertEqual(weights["title"], "A")
@@ -79,6 +73,11 @@ class TestWeightedExpressions(unittest.TestCase):
         mod = {(s["entity_type"], s["representation_type"]): s["expression"] for s in L.summarize()["specs"]}
         for spec in contract["specs"]:
             key = (spec["entity_type"], spec["representation_type"])
+            if key not in mod:
+                # The checked-in phase-1 record predates the delivery cutover;
+                # retired distillation rows are no longer an active lexical
+                # entity and have no Python contract entry.
+                continue
             self.assertEqual(spec["expression"], mod[key])
 
 
@@ -142,12 +141,6 @@ class TestEligibility(unittest.TestCase):
         msg = " ".join(L.MESSAGE_ELIGIBILITY.predicates)
         self.assertIn("author_optout_enabled", msg)
         self.assertIn("allow_content_sharing", msg)
-
-    def test_distillation_status_predicate(self):
-        self.assertIn(
-            "status IN ('pending', 'approved')",
-            " ".join(L.DISTILLATION_ELIGIBILITY.predicates),
-        )
 
     def test_workflow_python_quarantine_gate(self):
         self.assertIn(

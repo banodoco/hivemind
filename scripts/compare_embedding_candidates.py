@@ -159,8 +159,12 @@ def _cohort_entity_from_corpus_item(item: CorpusItem) -> sem.CohortEntity:
         canon_row = {"content": item.body}
         entity_type = ei.ENTITY_MESSAGE
     elif ek == "distillation":
-        canon_row = {"question": item.title, "answer": item.body}
-        entity_type = ei.ENTITY_DISTILLATION
+        # Legacy evaluation fixtures used this label for answer-like material.
+        # The delivery model has one searchable resource entity, so retain the
+        # fixture text as a guide resource without reviving a distillation
+        # entity or production search branch.
+        canon_row = {"kind": "guide", "title": item.title, "body": item.body, "metadata": item.metadata or {}}
+        entity_type = ei.ENTITY_RESOURCE
     else:
         canon_row = {
             "kind": item.kind,

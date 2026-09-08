@@ -61,8 +61,8 @@ class GateMathTests(unittest.TestCase):
 
     def test_clean_population_passes_every_gate(self):
         reps = [
-            _rep("distillation", "1", "prose", "approved_distillations"),
-            _rep("distillation", "2", "prose", "pending_distillations"),
+            _rep("resource", "1", "prose", "resources"),
+            _rep("resource", "2", "prose", "resources"),
             _rep("resource", "10", "prose", "resources"),
             _rep("resource", "11", "prose", "resources"),
             _rep("resource", "11", "workflow_python", "resources"),
@@ -90,7 +90,7 @@ class GateMathTests(unittest.TestCase):
 
     def test_c1_fails_when_an_eligible_representation_is_missing(self):
         reps = [
-            _rep("distillation", "1", "prose", "approved_distillations"),
+            _rep("resource", "1", "prose", "resources"),
             _rep("resource", "10", "prose", "resources", stored=[]),  # not indexed
         ]
         report = cov.evaluate_coverage(reps, [])
@@ -153,7 +153,7 @@ class FreshnessAndInvariantsTests(unittest.TestCase):
 
     def test_stale_tail_drives_c5(self):
         reps = [
-            _rep("distillation", "1", "prose", "approved_distillations"),
+            _rep("resource", "1", "prose", "resources"),
             _rep("resource", "10", "prose", "resources", n_expected=1,
                  stored=[_chunk(0), _chunk(1)]),  # stale tail
         ]
@@ -213,7 +213,7 @@ class EnvelopeSafetyTests(unittest.TestCase):
     """The emitted envelope stays secret- and URL-free."""
 
     def test_envelope_carries_no_secret_or_url_substring(self):
-        reps = [_rep("distillation", "1", "prose", "approved_distillations")]
+        reps = [_rep("resource", "1", "prose", "resources")]
         report = cov.evaluate_coverage(reps, [], reason_codes=["skipped_current"])
         envelope = report.to_envelope()
         text = json.dumps(envelope, sort_keys=True)
@@ -243,7 +243,7 @@ class RequiredPopulationTests(unittest.TestCase):
 
     def test_clean_pilot_populations_pass_required_check(self):
         reps = [
-            _rep("distillation", "1", "prose", "approved_distillations"),
+            _rep("resource", "1", "prose", "resources"),
             _rep("resource", "10", "prose", "resources"),
             _rep("message", "9007199254740993", "prose", "messages"),
         ]
@@ -261,7 +261,7 @@ class RequiredPopulationTests(unittest.TestCase):
         # No workflow records: C3/C4 denominators are 0.  Their ==-1.0 / ==-0
         # gate verdicts still PASS vacuously under the generic convention...
         reps = [
-            _rep("distillation", "1", "prose", "approved_distillations"),
+            _rep("resource", "1", "prose", "resources"),
             _rep("message", "9007199254740993", "prose", "messages"),
         ]
         report = cov.evaluate_coverage(reps, [])  # workflows discarded, as the bug did
