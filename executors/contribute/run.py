@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Submit a resource or distillation to Hivemind via the contribute edge function."""
+"""Submit and review immutable resources/evidence via the contribute edge function."""
 
 from __future__ import annotations
 
@@ -12,16 +12,12 @@ from typing import Any
 # -- dual-import guard (T5 pattern) -------------------------------------------
 try:
     from .._common import (
-        build_add_resource_envelope,
-        build_submit_distillation_envelope,
         build_knowledge_model_envelope,
         dry_run_output,
         edge_post,
         format_error,
         output_json,
-        parse_cites,
         read_body_file,
-        resolve_contribute_url,
         resolve_contributor_key,
     )
 except ImportError:
@@ -31,16 +27,12 @@ except ImportError:
     _EXECUTORS = _os.path.dirname(_HERE)
     sys.path.insert(0, _EXECUTORS)
     from _common import (  # type: ignore[import-not-found]
-        build_add_resource_envelope,
-        build_submit_distillation_envelope,
         build_knowledge_model_envelope,
         dry_run_output,
         edge_post,
         format_error,
         output_json,
-        parse_cites,
         read_body_file,
-        resolve_contribute_url,
         resolve_contributor_key,
     )
 
@@ -57,40 +49,25 @@ except ImportError:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="hivemind.contribute",
-        description="Submit a resource or distillation to the Hivemind corpus.",
+        description="Submit and review immutable resources and evidence via the contribute edge function.",
     )
     parser.add_argument(
         "--type",
         required=True,
         choices=[
-            "resource", "distillation", "submit-resource", "propose-revision",
+            "submit-resource", "propose-revision",
             "decide-revision", "mark-canonical", "capture-message", "evidence",
         ],
         help="Submission type.",
     )
-    # Resource fields
-    parser.add_argument("--kind", help="Resource kind (for --type resource).")
+    # Resource revision fields
+    parser.add_argument("--kind", help="Resource kind.")
     parser.add_argument("--title", help="Resource title.")
     parser.add_argument("--body-file", help="File containing the body text.")
     parser.add_argument("--source", help="Source label.")
     parser.add_argument("--external-id", help="Stable source-side identity for a resource.")
     parser.add_argument("--url", help="Source URL.")
     parser.add_argument("--author", help="Author name.")
-    # Distillation fields
-    parser.add_argument("--question", help="The question being answered.")
-    parser.add_argument("--answer", help="The answer text.")
-    parser.add_argument(
-        "--confidence",
-        choices=["high", "medium", "low"],
-        help="Confidence level.",
-    )
-    parser.add_argument(
-        "--cites",
-        help="Comma-separated cites (kind:id, e.g. message:88123,resource:17).",
-    )
-    parser.add_argument(
-        "--supersedes", type=int, help="ID of distillation this supersedes."
-    )
     parser.add_argument("--conditions", help="Conditions / caveats string.")
     # Knowledge-model fields (all IDs stay strings at JSON boundaries).
     parser.add_argument("--idempotency-token", help="Caller-scoped retry token (required for knowledge-model writes).")
@@ -131,40 +108,6 @@ def build_parser() -> argparse.ArgumentParser:
 # ---------------------------------------------------------------------------
 # Envelope assembly
 # ---------------------------------------------------------------------------
-
-
-def _build_resource_data(args: argparse.Namespace) -> dict[str, Any]:
-    """Build the data dict for an add_resource envelope from CLI args."""
-    data: dict[str, Any] = {
-        "kind": args.kind or "unknown",
-        "source": args.source or "cli",
-        "title": args.title or "",
-        "body": "",
-    }
-    if args.body_file:
-        data["body"] = read_body_file(args.body_file)
-    if args.url:
-        data["url"] = args.url
-    if args.author:
-        data["author"] = args.author
-    return data
-
-
-def _build_distillation_data(args: argparse.Namespace) -> dict[str, Any]:
-    """Build the data dict for a submit_distillation envelope from CLI args."""
-    data: dict[str, Any] = {
-        "question": args.question or "",
-        "answer": args.answer or "",
-        "confidence": args.confidence or "medium",
-        "cites": [],
-    }
-    if args.cites:
-        data["cites"] = parse_cites(args.cites)
-    if args.supersedes is not None:
-        data["supersedes_id"] = args.supersedes
-    if args.conditions:
-        data["conditions"] = args.conditions
-    return data
 
 
 def _json_file(path: str | None, default: Any) -> Any:
@@ -319,12 +262,8 @@ def main(argv: list[str] | None = None) -> int:
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             output_json({"error": str(exc)}, args.out)
             return 1
-    elif args.type == "resource":
-        data = _build_resource_data(args)
-        envelope = build_add_resource_envelope(data)
-    else:  # distillation
-        data = _build_distillation_data(args)
-        envelope = build_submit_distillation_envelope(data)
+    else:  # argparse choices make this unreachable
+        raise ValueError("unsupported contribution type")
 
     # --dry-run: print envelope without sending (no key needed)
     if args.dry_run:

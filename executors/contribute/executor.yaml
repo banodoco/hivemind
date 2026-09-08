@@ -4,14 +4,13 @@
   "name": "Contribute",
   "kind": "external",
   "version": "3.0",
-  "short_description": "Submit and review immutable Hivemind resource revisions, evidence, and legacy contributions.",
+  "short_description": "Submit and review immutable Hivemind resource revisions and evidence.",
   "description": "Builds locked contribution envelopes and POSTs them to the single contribute edge function with X-Contributor-Key auth. Knowledge-model writes use full candidate content, exact decimal-string IDs, caller-scoped idempotency tokens, and trusted transactional approval. Supports --dry-run.",
   "keywords": [
     "hivemind",
     "contribute",
     "submit",
     "resource",
-    "distillation",
     "edge-function"
   ],
   "inputs": [
@@ -19,7 +18,7 @@
       "name": "type",
       "type": "string",
       "required": true,
-      "description": "What to contribute: resource | distillation | submit-resource | propose-revision | decide-revision | mark-canonical | capture-message | evidence."
+      "description": "What to contribute: submit-resource | propose-revision | decide-revision | mark-canonical | capture-message | evidence."
     },
     {
       "name": "kind",
@@ -56,42 +55,6 @@
       "type": "string",
       "required": false,
       "description": "author"
-    },
-    {
-      "name": "question",
-      "type": "string",
-      "required": false,
-      "description": "question"
-    },
-    {
-      "name": "answer",
-      "type": "string",
-      "required": false,
-      "description": "answer"
-    },
-    {
-      "name": "confidence",
-      "type": "string",
-      "required": false,
-      "description": "confidence"
-    },
-    {
-      "name": "cites",
-      "type": "string",
-      "required": false,
-      "description": "Comma-separated cites, e.g. message:88123,resource:17."
-    },
-    {
-      "name": "supersedes",
-      "type": "number",
-      "required": false,
-      "description": "supersedes"
-    },
-    {
-      "name": "conditions",
-      "type": "string",
-      "required": false,
-      "description": "conditions"
     },
     {
       "name": "idempotency_token",
@@ -157,12 +120,6 @@
       {"input": "source", "flag": "--source", "optional": true},
       {"input": "url", "flag": "--url", "optional": true},
       {"input": "author", "flag": "--author", "optional": true},
-      {"input": "question", "flag": "--question", "optional": true},
-      {"input": "answer", "flag": "--answer", "optional": true},
-      {"input": "confidence", "flag": "--confidence", "optional": true},
-      {"input": "cites", "flag": "--cites", "optional": true},
-      {"input": "supersedes", "flag": "--supersedes", "optional": true},
-      {"input": "conditions", "flag": "--conditions", "optional": true},
       {"input": "idempotency_token", "flag": "--idempotency-token", "optional": true},
       {"input": "resource_id", "flag": "--resource-id", "optional": true},
       {"input": "base_revision_id", "flag": "--base-revision-id", "optional": true},

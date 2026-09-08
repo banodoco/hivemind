@@ -119,7 +119,7 @@ def postgrest_get(
     Parameters
     ----------
     path:
-        Relative path, e.g. ``"unified_feed"``.
+        Relative path, e.g. ``"message_feed"``.
     params:
         Query-string parameters (e.g. ``{"select": "*", "limit": "20"}``).
     endpoint:
@@ -214,37 +214,6 @@ def public_edge_post(
 # ---------------------------------------------------------------------------
 
 
-def build_add_resource_envelope(data: dict[str, Any]) -> dict[str, Any]:
-    """Construct a complete ``add_resource`` request envelope.
-
-    Parameters
-    ----------
-    data:
-        Must contain ``kind``, ``source``, ``title``, ``body``.
-        Optional: ``external_id``, ``author``, ``url``, ``metadata``,
-        ``payload``.
-    """
-    return {
-        "action": "add_resource",
-        "data": data,
-    }
-
-
-def build_submit_distillation_envelope(data: dict[str, Any]) -> dict[str, Any]:
-    """Construct a complete ``submit_distillation`` request envelope.
-
-    Parameters
-    ----------
-    data:
-        Must contain ``question``, ``answer``, ``confidence``, ``cites``.
-        Optional: ``conditions``, ``supersedes_id``.
-    """
-    return {
-        "action": "submit_distillation",
-        "data": data,
-    }
-
-
 def build_knowledge_model_envelope(action: str, data: dict[str, Any]) -> dict[str, Any]:
     """Build a T2-T6 contribution envelope with caller-scoped retry data."""
     if not action or not isinstance(data, dict):
@@ -252,56 +221,16 @@ def build_knowledge_model_envelope(action: str, data: dict[str, Any]) -> dict[st
     return {"action": action, "data": data}
 
 
-# ---------------------------------------------------------------------------
-# Cite parsing
-# ---------------------------------------------------------------------------
+def build_submit_resource_envelope(data: dict[str, Any], *, idempotency_token: str | None = None) -> dict[str, Any]:
+    """Build the sole initial-resource write envelope used by ingestors.
 
-# Valid cite item kinds (must match the DB constraint and protocol.ts).
-_VALID_CITE_ITEM_KINDS = frozenset({"message", "resource", "distillation"})
-
-
-def parse_cites(cites_str: str) -> list[dict[str, object]]:
-    """Parse a ``--cites`` CLI string into a list of cite objects.
-
-    Expected format: ``"message:88123,resource:17"``.
-
-    Returns a list of ``{"item_kind": "<kind>", "item_id": <int>}`` dicts.
-
-    Raises *ValueError* if any element is malformed.
+    The token is deterministic for source-owned identities, making a retry
+    safe without creating a second contribution endpoint.
     """
-    if not cites_str.strip():
-        raise ValueError("cites string must not be empty")
-
-    results: list[dict[str, object]] = []
-    for chunk in cites_str.split(","):
-        chunk = chunk.strip()
-        if ":" not in chunk:
-            raise ValueError(
-                f"invalid cite '{chunk}': expected format 'kind:id' (e.g. message:88123)"
-            )
-        kind, _, id_str = chunk.partition(":")
-        kind = kind.strip()
-        id_str = id_str.strip()
-
-        if kind not in _VALID_CITE_ITEM_KINDS:
-            raise ValueError(
-                f"invalid cite kind '{kind}': must be one of "
-                f"{sorted(_VALID_CITE_ITEM_KINDS)!r}"
-            )
-        if not id_str.isdigit():
-            raise ValueError(
-                f"invalid cite id '{id_str}': must be a positive integer"
-            )
-        item_id = int(id_str)
-        if item_id < 1:
-            raise ValueError(
-                f"invalid cite id {item_id}: must be >= 1"
-            )
-        # item_id travels as a STRING: Discord snowflake ids exceed the
-        # float64-safe integer range, so a JSON number would be silently
-        # rounded by the edge function's JSON.parse.
-        results.append({"item_kind": kind, "item_id": str(item_id)})
-    return results
+    if not isinstance(data, dict):
+        raise ValueError("resource data must be an object")
+    token = idempotency_token or "ingest:" + str(data.get("origin_source") or "unknown") + ":" + str(data.get("origin_external_id") or data.get("title") or "untitled")
+    return build_knowledge_model_envelope("submit_resource", {"idempotency_token": token, **data})
 
 
 # ---------------------------------------------------------------------------

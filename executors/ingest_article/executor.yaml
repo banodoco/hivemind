@@ -5,7 +5,7 @@
   "kind": "external",
   "version": "2.0",
   "short_description": "Fetch a web article, extract readable text, and submit as a resource.",
-  "description": "Fetches a URL with urllib, extracts readable text with a stdlib html.parser-based extractor (strips script/style/nav, collapses whitespace, picks up title from <title> or og:title), builds the add_resource envelope, and submits via the same code path as hivemind.contribute. --dry-run supported.",
+  "description": "Fetches a URL, extracts readable text with a stdlib html.parser-based extractor, builds a submit_resource envelope, and submits through the immutable revision path. --dry-run supported.",
   "keywords": [
     "hivemind",
     "ingest",

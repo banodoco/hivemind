@@ -1,0 +1,219 @@
+-- Hivemind delivery cutover (T7/T8).
+-- The 038 resources/revisions contract is now the only active resource
+-- surface.  Earlier migrations remain historical; this migration replaces
+-- their active candidate/RPC/queue definitions without rewriting history.
+
+create extension if not exists pg_trgm;
+
+-- Direct cutover: legacy presentation/RPC/write branches are no longer active.
+drop view if exists public.unified_feed;
+drop function if exists public.check_duplicate_distillation(text, bigint);
+
+alter table public.resource_revisions
+  add column if not exists lexical_tsv tsvector generated always as (
+    setweight(to_tsvector('simple'::regconfig, coalesce(title, '')), 'A')
+    || setweight(to_tsvector('simple'::regconfig, coalesce(metadata::text, '')), 'B')
+    || setweight(to_tsvector('simple'::regconfig, coalesce(body, '')), 'C')
+  ) stored;
+create index if not exists resource_revisions_accepted_lexical_idx
+  on public.resource_revisions using gin (lexical_tsv) where state = 'accepted';
+create index if not exists resource_revisions_head_idx
+  on public.resource_revisions (resource_id, id) where state = 'accepted';
+
+alter table public.lexical_documents
+  add column if not exists source_revision_id bigint references public.resource_revisions(id);
+create index if not exists lexical_documents_current_revision_idx
+  on public.lexical_documents (entity_type, item_id, source_revision_id, representation_type, chunk_index);
+
+create table if not exists public.knowledge_resource_python_state (
+  resource_id bigint primary key references public.resources(id) on delete cascade,
+  revision_id bigint not null references public.resource_revisions(id),
+  public_state text not null check (public_state in ('safe','quarantined')),
+  representation_hash text,
+  chunk_count integer not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.content_embeddings
+  add column if not exists source_revision_id bigint references public.resource_revisions(id);
+create index if not exists content_embeddings_current_revision_idx
+  on public.content_embeddings (entity_type, item_id, source_revision_id, representation_type, chunk_index);
+
+alter table public.embedding_jobs
+  add column if not exists source_revision_id bigint references public.resource_revisions(id);
+
+create or replace function public.hivemind_workflow_python_state(p_resource_id bigint)
+returns text language sql stable set search_path = public, pg_temp as $$
+  select public_state from public.knowledge_resource_python_state where resource_id = $1
+$$;
+
+-- Current-head-only lexical candidate stream.  The message arm remains the
+-- existing message behavior; resource arms use the stable resource id and
+-- exact accepted revision head.
+create or replace function public.hivemind_lexical_candidates(
+  p_query text, p_candidate_limit int default 100, p_kinds text[] default '{}',
+  p_sources text[] default '{}', p_item_ids text[] default '{}',
+  p_since timestamptz default null, p_channels text[] default '{}',
+  p_authors text[] default '{}', p_author_optout boolean default false,
+  p_bots_excluded boolean default false
+) returns table(entity_type text, item_id text, representation_type text,
+  matched_snippet text, lexical_rank real, lexical_source text, created_at timestamptz)
+language plpgsql stable security definer set search_path = public, pg_temp as $$
+declare
+  q tsquery := websearch_to_tsquery('simple'::regconfig, coalesce(p_query, ''));
+  kinds text[] := coalesce(p_kinds, '{}'::text[]);
+  has_kinds boolean := coalesce(array_length(kinds, 1), 0) > 0;
+  want_message boolean := not has_kinds or 'message' = any(kinds);
+  want_resource boolean := not has_kinds or exists(select 1 from unnest(kinds) k where k <> 'message');
+  has_items boolean := coalesce(array_length(coalesce(p_item_ids, '{}'::text[]), 1), 0) > 0;
+  item_entity text;
+begin
+  if has_items then
+    if want_message and not want_resource then item_entity := 'message';
+    elsif want_resource and not want_message then item_entity := 'resource';
+    else return;
+    end if;
+  end if;
+  return query
+  with arms as (
+    select 'message'::text, m.message_id::text, 'prose'::text, null::text,
+           ts_rank(to_tsvector('simple'::regconfig, coalesce(m.content,'')), q, 32),
+           'message_fts'::text, m.created_at
+      from public.message_feed m
+     where want_message and q <> to_tsquery('simple'::regconfig, '')
+       and to_tsvector('simple'::regconfig, coalesce(m.content,'')) @@ q
+       and (coalesce(array_length(p_sources,1),0)=0 or 'banodoco-discord'=any(p_sources))
+       and (p_since is null or m.created_at >= p_since)
+       and (coalesce(array_length(p_channels,1),0)=0 or m.channel_name=any(p_channels))
+       and (coalesce(array_length(p_authors,1),0)=0 or m.author_name=any(p_authors))
+       and (not has_items or (item_entity='message' and m.message_id::text=any(p_item_ids)))
+    union all
+    select 'resource'::text, r.id::text, 'prose'::text, null::text,
+           ts_rank(rr.lexical_tsv, q, 32), 'resource_revision_fts'::text, r.created_at
+      from public.resources r
+      join public.resource_revisions rr on rr.id=r.current_revision_id
+     where want_resource and rr.state='accepted'
+       and q <> to_tsquery('simple'::regconfig, '') and rr.lexical_tsv @@ q
+       and (coalesce(array_length(p_sources,1),0)=0 or r.origin_source=any(p_sources))
+       and (p_since is null or r.created_at >= p_since)
+       and (not has_items or (item_entity='resource' and r.id::text=any(p_item_ids)))
+       and (not exists(select 1 from unnest(kinds) k where k <> 'message' and k <> 'resource')
+            or rr.kind=any(array(select k from unnest(kinds) k where k <> 'message' and k <> 'resource')))
+    union all
+    select 'resource'::text, r.id::text, 'workflow_python'::text,
+           left(ld.chunk_text,512), 0.93::real, 'resource_workflow_python'::text, r.created_at
+      from public.lexical_documents ld
+      join public.resources r on r.id::text=ld.item_id and r.current_revision_id=ld.source_revision_id
+      join public.resource_revisions rr on rr.id=r.current_revision_id and rr.state='accepted'
+     where want_resource and ld.entity_type='resource' and ld.representation_type='workflow_python'
+       and coalesce(public.hivemind_workflow_python_state(r.id),'quarantined')='safe'
+       and (not has_items or (item_entity='resource' and r.id::text=any(p_item_ids)))
+  ), collapsed as (
+    select distinct on (entity_type,item_id) * from arms
+    order by entity_type,item_id,lexical_rank desc,representation_type,created_at desc
+  )
+  select * from collapsed order by lexical_rank desc nulls last, created_at desc nulls last,
+    entity_type, item_id limit least(greatest(coalesce(p_candidate_limit,100),1),500);
+end; $$;
+
+create or replace function public.hivemind_lexical_search(
+  p_query text, p_limit int default 20, p_kinds text[] default '{}',
+  p_sources text[] default '{}', p_item_ids text[] default '{}',
+  p_since timestamptz default null, p_channels text[] default '{}',
+  p_authors text[] default '{}', p_mode text default 'lexical') returns jsonb
+language plpgsql security definer set search_path = public, pg_temp as $$
+declare out_rows jsonb; n int := least(greatest(coalesce(p_limit,20),1),100);
+begin
+  if btrim(coalesce(p_query,''))='' then raise exception 'query must be non-empty'; end if;
+  if p_mode <> 'lexical' then raise exception 'mode must be lexical'; end if;
+  with c as (select * from public.hivemind_lexical_candidates(p_query,n*5,p_kinds,p_sources,p_item_ids,p_since,p_channels,p_authors)),
+  h as (
+    select c.*, case when c.entity_type='message' then m.content else rr.body end body,
+      case when c.entity_type='message' then null::text else rr.title end title,
+      case when c.entity_type='message' then m.author_name else null::text end author,
+      case when c.entity_type='message' then m.channel_name else null::text end context,
+      case when c.entity_type='message' then m.created_at else r.created_at end row_created,
+      case when c.entity_type='message' then 'banodoco-discord' else r.origin_source end source,
+      case when c.entity_type='message' then null::jsonb else rr.metadata end metadata,
+      case when c.entity_type='message' then null::text else r.id::text end resource_id
+      from c
+      left join public.message_feed m on c.entity_type='message' and m.message_id::text=c.item_id
+      left join public.resources r on c.entity_type='resource' and r.id::text=c.item_id
+      left join public.resource_revisions rr on c.entity_type='resource' and rr.id=r.current_revision_id
+    ), ranked as (select h.*, row_number() over(order by lexical_rank desc nulls last,row_created desc nulls last,entity_type,item_id) keyword_rank from h limit n)
+  select coalesce(jsonb_agg(jsonb_build_object('kind',case when entity_type='message' then 'message' else rr_kind end,
+    'source',source,'item_id',item_id,'title',title,'body',left(body,400),'author',author,'context',context,
+    'url',null,'metadata',metadata,'created_at',to_char(row_created at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+    'match_type','keyword','keyword_rank',keyword_rank,'rrf_score',lexical_rank,
+    'matched_representation',representation_type,'matched_snippet',matched_snippet) order by keyword_rank),'[]'::jsonb) into out_rows
+  from (select ranked.*, case when entity_type='message' then 'message' else (select kind from public.resource_revisions x where x.id=(select current_revision_id from public.resources y where y.id=ranked.item_id::bigint)) end rr_kind from ranked) z;
+  return jsonb_build_object('results',out_rows,'count',jsonb_array_length(out_rows),'meta',jsonb_build_object('mode_used','lexical','limit',n));
+end; $$;
+
+-- Semantic candidates retain the fixed 384-d contract and message behavior,
+-- but only an accepted current resource revision is eligible.
+create or replace function public.hivemind_semantic_candidates(
+  p_query_embedding vector(384), p_candidate_limit int default 100,
+  p_kinds text[] default '{}', p_item_ids text[] default '{}')
+returns table(entity_type text,item_id text,kind text,representation_type text,
+  chunk_index integer,matched_snippet text,semantic_distance double precision,
+  semantic_rank integer,created_at timestamptz)
+language sql stable security definer set search_path=public,pg_temp as $$
+  with arms as (
+    select 'message'::text entity_type,m.message_id::text item_id,'message'::text kind,
+      e.representation_type,e.chunk_index,left(e.chunk_text,512) matched_snippet,
+      (e.embedding <=> p_query_embedding) semantic_distance,m.created_at
+      from public.content_embeddings e join public.message_feed m on m.message_id::text=e.item_id
+      where e.entity_type='message' and (coalesce(array_length(p_kinds,1),0)=0 or 'message'=any(p_kinds))
+    union all
+    select 'resource',r.id::text,rr.kind,e.representation_type,e.chunk_index,left(e.chunk_text,512),
+      (e.embedding <=> p_query_embedding),r.created_at
+      from public.content_embeddings e join public.resources r on r.id::text=e.item_id and r.current_revision_id=e.source_revision_id
+      join public.resource_revisions rr on rr.id=r.current_revision_id and rr.state='accepted'
+      where e.entity_type='resource' and (coalesce(array_length(p_kinds,1),0)=0 or 'resource'=any(p_kinds) or rr.kind=any(p_kinds))
+        and (coalesce(array_length(p_item_ids,1),0)=0 or e.item_id=any(p_item_ids))
+  ), ranked as (select *,row_number() over(order by semantic_distance,entity_type,item_id)::int semantic_rank from arms)
+  select entity_type,item_id,kind,representation_type,chunk_index,matched_snippet,
+    semantic_distance,semantic_rank,created_at from ranked
+    order by semantic_distance,entity_type,item_id limit least(greatest(coalesce(p_candidate_limit,100),1),500)
+$$;
+
+-- Resource-head changes are the only source of searchable resource/index work.
+drop trigger if exists trg_embedding_jobs_external_resources on public.external_resources;
+drop trigger if exists trg_embedding_jobs_distillations on public.distillations;
+create or replace function public.trg_embedding_jobs_resources_fn() returns trigger
+language plpgsql security definer set search_path=public,pg_temp as $$
+begin
+  if new.current_revision_id is distinct from old.current_revision_id and new.current_revision_id is not null then
+    perform public.hivemind_enqueue_embedding_job('resource',new.id::text,'prose','reembed','revision_accepted',new.current_revision_id);
+    if exists(select 1 from public.resource_revisions where id=new.current_revision_id and kind='workflow') then
+      perform public.hivemind_enqueue_embedding_job('resource',new.id::text,'workflow_python','reembed','revision_accepted',new.current_revision_id);
+    end if;
+  end if;
+  return new;
+end; $$;
+drop trigger if exists trg_embedding_jobs_resources on public.resources;
+create trigger trg_embedding_jobs_resources after update of current_revision_id on public.resources for each row execute function public.trg_embedding_jobs_resources_fn();
+
+create or replace function public.hivemind_enqueue_embedding_job(
+  p_entity_type text,p_item_id text,p_representation_type text,p_job_kind text,p_source_op text,
+  p_contract_id bigint default null,p_source_revision_id bigint default null) returns void
+language plpgsql security definer set search_path=public,pg_temp as $$
+declare c bigint; begin c:=coalesce(p_contract_id,public.hivemind_active_contract_id());
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,source_op,contract_id,source_revision_id,status,next_attempt_at,enqueued_at,updated_at)
+  values(p_entity_type,p_item_id,p_representation_type,p_job_kind,p_source_op,c,p_source_revision_id,'pending',now(),now(),now())
+  on conflict (entity_type,item_id,representation_type) where status='pending' do update set
+    job_kind=excluded.job_kind,source_op=excluded.source_op,contract_id=coalesce(excluded.contract_id,embedding_jobs.contract_id),source_revision_id=excluded.source_revision_id,next_attempt_at=now(),updated_at=now();
+end; $$;
+
+-- A claimed resource job is stale if its pinned revision is no longer the head.
+create or replace function public.hivemind_complete_embedding_job(p_job_id bigint,p_worker_id text,p_chunks_written int default 0) returns void
+language plpgsql security definer set search_path=public,pg_temp as $$
+declare j public.embedding_jobs%rowtype; current_head bigint; begin
+  select * into j from public.embedding_jobs where id=p_job_id and locked_by=p_worker_id and status='processing' for update;
+  if not found then raise exception 'complete: job is not currently processing for worker'; end if;
+  if j.entity_type='resource' then select current_revision_id into current_head from public.resources where id=j.item_id::bigint;
+    if current_head is distinct from j.source_revision_id then update public.embedding_jobs set status='cancelled',locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id; return; end if;
+  end if;
+  update public.embedding_jobs set status='done',locked_by=null,locked_at=null,lease_expires_at=null,last_error=null,updated_at=now() where id=j.id;
+end; $$;

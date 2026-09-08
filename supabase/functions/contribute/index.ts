@@ -1,427 +1,75 @@
 import {
-  formatCreatedResponse,
-  formatDuplicateResponse,
-  formatUnauthorizedResponse,
-  isDuplicateConflict,
-  parseContributorKey,
-  validateContributorKeyHeader,
-  validateContributeRequest,
-  validateKnowledgeModelRequest,
-  parseKnowledgeReferences,
   buildKnowledgeRpcRequest,
+  parseContributorKey,
+  parseKnowledgeReferences,
+  validateContributorKeyHeader,
+  validateKnowledgeModelRequest,
   type KnowledgeModelAction,
-  type AddResourceData,
-  type CheckDuplicateInput,
-  type ContributeRequest,
-  type SubmitDistillationData,
   type ValidationError,
 } from "./protocol.ts";
 
-interface ContributorRow {
-  id: number;
+const HEADERS = { "content-type": "application/json; charset=utf-8" } as const;
+const INTERNAL = { error: "internal", detail: "internal server error" } as const;
+
+function json(body: unknown, status: number): Response { return new Response(JSON.stringify(body), { status, headers: HEADERS }); }
+function validation(detail: string): Response { return json({ error: "validation", detail }, 400); }
+function env(name: "SUPABASE_URL" | "SUPABASE_SERVICE_ROLE_KEY"): string {
+  const value = Deno.env.get(name); if (!value) throw new Error(`Missing required environment variable: ${name}`); return value;
 }
-
-interface DistillationRow {
-  id: number;
+function headers(key: string, extra?: HeadersInit): Headers {
+  const h = new Headers(extra); h.set("apikey", key); h.set("authorization", `Bearer ${key}`); return h;
 }
-
-interface InsertRow {
-  id: number;
+async function errorBody(response: Response): Promise<{ code?: string; message?: string }> {
+  try { return await response.json() as { code?: string; message?: string }; } catch { return {}; }
 }
-
-interface PostgrestError {
-  code?: string;
-  details?: string | null;
-  hint?: string | null;
-  message?: string;
-}
-
-const JSON_HEADERS = {
-  "content-type": "application/json; charset=utf-8",
-} as const;
-
-const INTERNAL_ERROR_BODY = {
-  error: "internal",
-  detail: "internal server error",
-} as const;
-
-function isValidationError(value: unknown): value is ValidationError {
-  return !!value
-    && typeof value === "object"
-    && (value as { error?: string }).error === "validation"
-    && typeof (value as { detail?: unknown }).detail === "string";
-}
-
-function jsonResponse(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: JSON_HEADERS,
-  });
-}
-
-function validationResponse(detail: string): Response {
-  return jsonResponse({ error: "validation", detail }, 400);
-}
-
-function internalErrorResponse(): Response {
-  return jsonResponse(INTERNAL_ERROR_BODY, 500);
-}
-
-function getRequiredEnv(name: "SUPABASE_URL" | "SUPABASE_SERVICE_ROLE_KEY"): string {
-  const value = Deno.env.get(name);
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
-
-function createServiceHeaders(serviceRoleKey: string, extra?: HeadersInit): Headers {
-  const headers = new Headers(extra);
-  headers.set("apikey", serviceRoleKey);
-  headers.set("authorization", `Bearer ${serviceRoleKey}`);
-  return headers;
-}
-
-async function sha256Hex(input: string): Promise<string> {
-  const bytes = new TextEncoder().encode(input);
+async function contributorId(base: string, serviceKey: string, rawKey: string): Promise<number | null> {
+  if (!parseContributorKey(rawKey)) return null;
+  const bytes = new TextEncoder().encode(rawKey);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function readJsonBody(request: Request): Promise<unknown | ValidationError> {
-  const contentType = request.headers.get("content-type");
-  if (!contentType || !contentType.toLowerCase().includes("application/json")) {
-    return { error: "validation", detail: "Content-Type must be application/json" };
-  }
-
-  try {
-    return await request.json();
-  } catch {
-    return { error: "validation", detail: "request body must be valid JSON" };
-  }
-}
-
-async function parseError(response: Response): Promise<PostgrestError | null> {
-  try {
-    return await response.json() as PostgrestError;
-  } catch {
-    return null;
-  }
-}
-
-async function requireContributorId(
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  contributorKey: string,
-): Promise<number | null> {
-  const hash = await sha256Hex(contributorKey);
-  const url = new URL("/rest/v1/contributors", supabaseUrl);
-  url.searchParams.set("api_key_hash", `eq.${hash}`);
-  url.searchParams.set("revoked_at", "is.null");
-  url.searchParams.set("select", "id");
-  url.searchParams.set("limit", "1");
-
-  const response = await fetch(url, {
-    headers: createServiceHeaders(serviceRoleKey),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Contributor lookup failed with status ${response.status}`);
-  }
-
-  const rows = await response.json() as ContributorRow[];
+  const hash = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  const url = new URL("/rest/v1/contributors", base);
+  url.searchParams.set("api_key_hash", `eq.${hash}`); url.searchParams.set("revoked_at", "is.null");
+  url.searchParams.set("select", "id"); url.searchParams.set("limit", "1");
+  const response = await fetch(url, { headers: headers(serviceKey) });
+  if (!response.ok) return null;
+  const rows = await response.json() as Array<{ id: number }>;
   return rows[0]?.id ?? null;
 }
-
-async function checkSupersedesExists(
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  supersedesId: number,
-): Promise<boolean> {
-  const url = new URL("/rest/v1/distillations", supabaseUrl);
-  url.searchParams.set("id", `eq.${supersedesId}`);
-  url.searchParams.set("select", "id");
-  url.searchParams.set("limit", "1");
-
-  const response = await fetch(url, {
-    headers: createServiceHeaders(serviceRoleKey),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Supersedes lookup failed with status ${response.status}`);
-  }
-
-  const rows = await response.json() as DistillationRow[];
-  return rows.length > 0;
-}
-
-async function checkDuplicateDistillation(
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  question: string,
-  supersedesId: number | null | undefined,
-): Promise<CheckDuplicateInput | null> {
-  const url = new URL("/rest/v1/rpc/check_duplicate_distillation", supabaseUrl);
-  const response = await fetch(url, {
-    method: "POST",
-    headers: createServiceHeaders(serviceRoleKey, {
-      "content-type": "application/json",
-    }),
-    body: JSON.stringify({
-      question_text: question,
-      supersedes_id: supersedesId ?? null,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Duplicate RPC failed with status ${response.status}`);
-  }
-
-  const rows = await response.json() as CheckDuplicateInput[] | CheckDuplicateInput | null;
-  if (!rows) return null;
-  if (Array.isArray(rows)) {
-    return rows[0] ?? null;
-  }
-  return rows;
-}
-
-async function callKnowledgeRpc(
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  contributorId: number,
-  action: KnowledgeModelAction,
-  data: Record<string, unknown>,
-): Promise<Response> {
+async function callRpc(base: string, serviceKey: string, id: number, action: KnowledgeModelAction, data: Record<string, unknown>): Promise<Response> {
   const rpcNames: Record<KnowledgeModelAction, string> = {
-    submit_resource: "hivemind_submit_resource",
-    propose_revision: "hivemind_propose_revision",
-    decide_revision: "hivemind_decide_revision",
-    mark_canonical: "hivemind_mark_canonical",
-    capture_message_snapshot: "hivemind_capture_message_snapshot",
-    submit_evidence: "hivemind_submit_evidence",
+    submit_resource: "hivemind_submit_resource", propose_revision: "hivemind_propose_revision",
+    decide_revision: "hivemind_decide_revision", mark_canonical: "hivemind_mark_canonical",
+    capture_message_snapshot: "hivemind_capture_message_snapshot", submit_evidence: "hivemind_submit_evidence",
   };
-  let derivedReferences: unknown = data.references;
+  let references: unknown = data.references;
   if ((action === "submit_resource" || action === "propose_revision") && typeof data.body === "string") {
-    derivedReferences = [
-      ...(Array.isArray(data.references) ? data.references : []),
-      ...parseKnowledgeReferences(data.body).map((reference) => ({
-        target_kind: reference.target_kind,
-        target_id: reference.target_id,
-        ...(reference.target_version_id ? { target_version_id: reference.target_version_id } : {}),
-      })),
-    ];
+    references = [...(Array.isArray(data.references) ? data.references : []), ...parseKnowledgeReferences(data.body).map((r) => ({ target_kind: r.target_kind, target_id: r.target_id, ...(r.target_version_id ? { target_version_id: r.target_version_id } : {}) }))];
   }
-  const request = buildKnowledgeRpcRequest(action, contributorId, data, derivedReferences);
-  const url = new URL(`/rest/v1/rpc/${rpcNames[action]}`, supabaseUrl);
-  const response = await fetch(url, {
-    method: "POST",
-    headers: createServiceHeaders(serviceRoleKey, { "content-type": "application/json" }),
-    body: JSON.stringify(request),
+  const request = buildKnowledgeRpcRequest(action, id, data, references);
+  const response = await fetch(new URL(`/rest/v1/rpc/${rpcNames[action]}`, base), {
+    method: "POST", headers: headers(serviceKey, { "content-type": "application/json" }), body: JSON.stringify(request),
   });
-  if (response.ok) {
-    return jsonResponse(await response.json(), action === "mark_canonical" || action === "decide_revision" ? 200 : 201);
-  }
-  const error = await parseError(response);
-  const code = error?.code;
-  if (code === "42501") return jsonResponse(formatUnauthorizedResponse(), 401);
-  if (["40001", "55000", "23505"].includes(code ?? "")) {
-    return jsonResponse({ error: "conflict", detail: error?.message ?? "revision conflict" }, 409);
-  }
-  if (["22023", "23503", "23514"].includes(code ?? "")) {
-    return validationResponse(error?.message ?? "invalid knowledge-model request");
-  }
-  throw new Error(`Knowledge-model RPC failed with status ${response.status}`);
+  if (response.ok) return json(await response.json(), action === "decide_revision" || action === "mark_canonical" ? 200 : 201);
+  const e = await errorBody(response);
+  if (e.code === "42501") return json({ error: "unauthorized" }, 401);
+  if (["40001", "55000", "23505"].includes(e.code ?? "")) return json({ error: "conflict", detail: e.message ?? "revision conflict" }, 409);
+  if (["22023", "23503", "23514"].includes(e.code ?? "")) return validation(e.message ?? "invalid knowledge-model request");
+  throw new Error(`knowledge RPC failed: ${response.status}`);
 }
 
-async function insertResource(
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  data: AddResourceData,
-): Promise<Response> {
-  const url = new URL("/rest/v1/external_resources", supabaseUrl);
-  const response = await fetch(url, {
-    method: "POST",
-    headers: createServiceHeaders(serviceRoleKey, {
-      "content-type": "application/json",
-      prefer: "return=representation",
-    }),
-    body: JSON.stringify(data),
-  });
-
-  if (response.ok) {
-    const rows = await response.json() as InsertRow[];
-    return jsonResponse(formatCreatedResponse(rows[0].id), 201);
-  }
-
-  const error = await parseError(response);
-  if (error?.code === "23505") {
-    return jsonResponse(
-      { error: "duplicate", detail: "resource with this source+external_id already exists" },
-      409,
-    );
-  }
-
-  throw new Error(`Resource insert failed with status ${response.status}`);
+async function handle(request: Request): Promise<Response> {
+  if (request.method !== "POST") return json({ error: "method_not_allowed", detail: "POST required" }, 405);
+  const contentType = request.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().startsWith("application/json")) return validation("Content-Type must be application/json");
+  const key = request.headers.get("x-contributor-key");
+  const keyError = validateContributorKeyHeader(key); if (keyError) return validation(keyError.detail);
+  let body: unknown; try { body = await request.json(); } catch { return validation("request body must be valid JSON"); }
+  const requestError: ValidationError | null = validateKnowledgeModelRequest(body);
+  if (requestError) return validation(requestError.detail);
+  const parsed = body as { action: KnowledgeModelAction; data: Record<string, unknown> };
+  const base = env("SUPABASE_URL"); const serviceKey = env("SUPABASE_SERVICE_ROLE_KEY");
+  const id = await contributorId(base, serviceKey, key!); if (id === null) return json({ error: "unauthorized" }, 401);
+  return callRpc(base, serviceKey, id, parsed.action, parsed.data);
 }
 
-function uniqueCites(cites: SubmitDistillationData["cites"]): SubmitDistillationData["cites"] {
-  const seen = new Set<string>();
-  return cites.filter((cite) => {
-    const key = `${cite.item_kind}:${cite.item_id}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-async function insertDistillation(
-  supabaseUrl: string,
-  serviceRoleKey: string,
-  contributorId: number,
-  data: SubmitDistillationData,
-): Promise<Response> {
-  const duplicate = await checkDuplicateDistillation(
-    supabaseUrl,
-    serviceRoleKey,
-    data.question,
-    data.supersedes_id,
-  );
-  if (isDuplicateConflict(duplicate, data.supersedes_id)) {
-    return jsonResponse(formatDuplicateResponse(duplicate!.existing_id), 409);
-  }
-
-  if (data.supersedes_id != null) {
-    const exists = await checkSupersedesExists(
-      supabaseUrl,
-      serviceRoleKey,
-      data.supersedes_id,
-    );
-    if (!exists) {
-      return validationResponse("data.supersedes_id does not reference an existing distillation");
-    }
-  }
-
-  const insertUrl = new URL("/rest/v1/distillations", supabaseUrl);
-  const insertResponse = await fetch(insertUrl, {
-    method: "POST",
-    headers: createServiceHeaders(serviceRoleKey, {
-      "content-type": "application/json",
-      prefer: "return=representation",
-    }),
-    body: JSON.stringify({
-      question: data.question,
-      conditions: data.conditions ?? null,
-      answer: data.answer,
-      confidence: data.confidence,
-      status: "pending",
-      author_id: contributorId,
-      supersedes_id: data.supersedes_id ?? null,
-    }),
-  });
-
-  if (!insertResponse.ok) {
-    throw new Error(`Distillation insert failed with status ${insertResponse.status}`);
-  }
-
-  const distillationRows = await insertResponse.json() as InsertRow[];
-  const distillationId = distillationRows[0].id;
-  const cites = uniqueCites(data.cites).map((cite) => ({
-    distillation_id: distillationId,
-    item_kind: cite.item_kind,
-    item_id: cite.item_id,
-  }));
-
-  const citesUrl = new URL("/rest/v1/distillation_cites", supabaseUrl);
-  const citesResponse = await fetch(citesUrl, {
-    method: "POST",
-    headers: createServiceHeaders(serviceRoleKey, {
-      "content-type": "application/json",
-      prefer: "return=minimal",
-    }),
-    body: JSON.stringify(cites),
-  });
-
-  if (!citesResponse.ok) {
-    throw new Error(`Cites insert failed with status ${citesResponse.status}`);
-  }
-
-  return jsonResponse(formatCreatedResponse(distillationId), 201);
-}
-
-async function handleRequest(request: Request): Promise<Response> {
-  if (request.method !== "POST") {
-    return jsonResponse({ error: "method_not_allowed", detail: "POST required" }, 405);
-  }
-
-  const contributorKeyHeader = request.headers.get("x-contributor-key");
-  const headerError = validateContributorKeyHeader(contributorKeyHeader);
-  if (headerError) {
-    return validationResponse(headerError.detail);
-  }
-
-  const body = await readJsonBody(request);
-  if (isValidationError(body)) {
-    return validationResponse(body.detail);
-  }
-
-  const knowledgeError = validateKnowledgeModelRequest(body);
-  if (!knowledgeError) {
-    const parsedKnowledge = body as { action: KnowledgeModelAction; data: Record<string, unknown> };
-    const supabaseUrl = getRequiredEnv("SUPABASE_URL");
-    const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
-    const parsedKey = parseContributorKey(contributorKeyHeader);
-    if (!parsedKey) return validationResponse("X-Contributor-Key must be 'hm_<64 hex chars>'");
-    const contributorId = await requireContributorId(supabaseUrl, serviceRoleKey, parsedKey.raw);
-    if (!contributorId) return jsonResponse(formatUnauthorizedResponse(), 401);
-    return callKnowledgeRpc(supabaseUrl, serviceRoleKey, contributorId, parsedKnowledge.action, parsedKnowledge.data);
-  }
-  if (body && typeof body === "object" && !Array.isArray(body)
-      && ["submit_resource", "propose_revision", "decide_revision", "mark_canonical", "capture_message_snapshot", "submit_evidence"]
-        .includes((body as Record<string, unknown>).action as string)) {
-    return validationResponse(knowledgeError.detail);
-  }
-
-  const requestError = validateContributeRequest(body);
-  if (requestError) {
-    return validationResponse(requestError.detail);
-  }
-
-  const parsedKey = parseContributorKey(contributorKeyHeader);
-  if (!parsedKey) {
-    return validationResponse(`X-Contributor-Key must be 'hm_<64 hex chars>'`);
-  }
-
-  const supabaseUrl = getRequiredEnv("SUPABASE_URL");
-  const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
-  const contributorId = await requireContributorId(supabaseUrl, serviceRoleKey, parsedKey.raw);
-  if (!contributorId) {
-    return jsonResponse(formatUnauthorizedResponse(), 401);
-  }
-
-  const contributeRequest = body as ContributeRequest;
-  if (contributeRequest.action === "add_resource") {
-    return insertResource(
-      supabaseUrl,
-      serviceRoleKey,
-      contributeRequest.data as AddResourceData,
-    );
-  }
-
-  return insertDistillation(
-    supabaseUrl,
-    serviceRoleKey,
-    contributorId,
-    contributeRequest.data as SubmitDistillationData,
-  );
-}
-
-Deno.serve(async (request) => {
-  try {
-    return await handleRequest(request);
-  } catch (error) {
-    console.error("contribute edge function failed", error);
-    return internalErrorResponse();
-  }
-});
+Deno.serve(async (request) => { try { return await handle(request); } catch (error) { console.error("contribute edge function failed", error); return json(INTERNAL, 500); } });

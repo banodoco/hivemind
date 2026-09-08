@@ -21,7 +21,7 @@ from typing import Any
 try:
     from ..workflow_semantics import enrich_resource_data
     from .._common import (
-        build_add_resource_envelope,
+        build_submit_resource_envelope,
         dry_run_output,
         edge_post,
         format_error,
@@ -38,7 +38,7 @@ except ImportError:
     sys.path.insert(0, _EXECUTORS)
     from workflow_semantics import enrich_resource_data  # type: ignore[import-not-found]
     from _common import (  # type: ignore[import-not-found]
-        build_add_resource_envelope,
+        build_submit_resource_envelope,
         dry_run_output,
         edge_post,
         format_error,
@@ -317,7 +317,7 @@ def build_envelope(
     url: str | None,
     external_id: str | None,
 ) -> dict[str, Any]:
-    """Assemble the add_resource envelope for a parsed workflow."""
+    """Assemble the initial resource envelope for a parsed workflow."""
     nodes = _iter_nodes(workflow)
     models = extract_models(nodes)
     custom_nodes = extract_custom_nodes(nodes)
@@ -325,7 +325,7 @@ def build_envelope(
 
     data: dict[str, Any] = {
         "kind": kind,
-        "source": source_label,
+        "origin_source": source_label,
         "title": name,
         "body": body,
         "metadata": {
@@ -334,14 +334,15 @@ def build_envelope(
             "node_count": len(nodes),
         },
         "payload": {"workflow": workflow},
+        "provenance": {"url": url, "source_url": url} if url else {},
     }
     if url:
-        data["url"] = url
+        data["provenance"]["url"] = url
     if external_id:
-        data["external_id"] = external_id
+        data["origin_external_id"] = external_id
     if kind == "workflow":
         data = enrich_resource_data(data)
-    return build_add_resource_envelope(data)
+    return build_submit_resource_envelope(data)
 
 
 # ---------------------------------------------------------------------------
