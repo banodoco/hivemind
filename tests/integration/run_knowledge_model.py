@@ -13,6 +13,7 @@ import json
 import os
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -44,6 +45,88 @@ def _psql(url: str, sql: str, *, file: str | None = None) -> str:
     if result.returncode:
         raise RuntimeError((result.stderr or result.stdout).strip())
     return result.stdout.strip()
+
+
+def _start_psql(url: str) -> subprocess.Popen[str]:
+    return subprocess.Popen(
+        ["psql", "-X", url, "-v", "ON_ERROR_STOP=1", "-v", "VERBOSITY=verbose", "-q", "-t", "-A"],
+        cwd=ROOT,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def _finish_psql(process: subprocess.Popen[str], sql: str) -> tuple[int, str, str]:
+    if process.stdin is None or process.stdout is None or process.stderr is None:
+        raise RuntimeError("psql session did not expose standard pipes")
+    process.stdin.write(sql)
+    process.stdin.close()
+    try:
+        returncode = process.wait(timeout=15)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.wait()
+        raise RuntimeError("concurrent psql session timed out")
+    return returncode, process.stdout.read(), process.stderr.read()
+
+
+def _run_concurrent_competing_approvals(url: str) -> None:
+    first = _start_psql(url)
+    if first.stdin is None:
+        raise RuntimeError("first approval session did not expose stdin")
+    first.stdin.write("""
+begin;
+select public.hivemind_decide_revision(2,'concurrent-approve-a',2,'accepted','winner');
+select pg_sleep(1);
+commit;
+""")
+    first.stdin.close()
+    time.sleep(0.2)
+    second = _start_psql(url)
+    second_code, second_out, second_err = _finish_psql(second, """
+begin;
+select public.hivemind_decide_revision(2,'concurrent-approve-b',3,'accepted','loser');
+commit;
+""")
+    first_code = first.wait(timeout=15)
+    first_out = first.stdout.read() if first.stdout is not None else ""
+    first_err = first.stderr.read() if first.stderr is not None else ""
+    if first_code != 0:
+        raise RuntimeError(f"first competing approval failed: {first_err or first_out}")
+    if second_code == 0 or "40001" not in second_err:
+        raise RuntimeError(f"competing approval was not rejected as stale: {second_err or second_out}")
+    if _psql(url, "select current_revision_id from public.resources where id=1; select state from public.resource_revisions where id=2; select state from public.resource_revisions where id=3;").splitlines() != ["2", "accepted", "pending"]:
+        raise RuntimeError("concurrent approval did not preserve one accepted head")
+
+
+def _run_concurrent_claims(url: str) -> None:
+    first = _start_psql(url)
+    if first.stdin is None:
+        raise RuntimeError("first claim session did not expose stdin")
+    first.stdin.write("""
+begin;
+select * from public.hivemind_claim_embedding_jobs('worker-a',1,60);
+select pg_sleep(1);
+commit;
+""")
+    first.stdin.close()
+    time.sleep(0.2)
+    second = _start_psql(url)
+    second_code, second_out, second_err = _finish_psql(second, "select * from public.hivemind_claim_embedding_jobs('worker-b',1,60);")
+    first_code = first.wait(timeout=15)
+    first_out = first.stdout.read() if first.stdout is not None else ""
+    first_err = first.stderr.read() if first.stderr is not None else ""
+    if first_code != 0 or second_code != 0:
+        raise RuntimeError(f"concurrent claim failed: {first_err or first_out} {second_err or second_out}")
+    if _psql(url, "select count(*) from public.embedding_jobs where status='processing'; select count(distinct locked_by) from public.embedding_jobs where status='processing';").splitlines() != ["2", "2"]:
+        raise RuntimeError("concurrent claims did not lease two distinct jobs")
+    recovered = _psql(url, "update public.embedding_jobs set lease_expires_at=now()-interval '1 second'; select public.hivemind_recover_stale_leases(0);")
+    if recovered != "2":
+        raise RuntimeError("stale lease recovery did not recover both claimed jobs: " + recovered)
+    if _psql(url, "select count(*) from public.embedding_jobs where status='pending'; select count(*) from public.embedding_jobs where locked_by is null and lease_expires_at is null;").splitlines() != ["2", "2"]:
+        raise RuntimeError("stale lease recovery did not clear the leases")
 
 
 def _bootstrap(url: str) -> None:
@@ -133,7 +216,40 @@ def _bootstrap(url: str) -> None:
         select btrim(concat_ws(E'\n\n',nullif(btrim(coalesce(p_title,'')),''),nullif(btrim(coalesce(p_body,'')),''),nullif(btrim(coalesce(p_tags,'')),'')))
       $$;
       create or replace function public.hivemind_workflow_prose(p_body text,p_kind text)
-      returns text language sql immutable as $$ select coalesce(p_body,'') $$;
+      returns text language plpgsql immutable as $$
+      declare
+        v_lines text[];
+        v_line text;
+        v_out text[] := array[]::text[];
+        v_i int;
+        v_n int;
+        v_j int;
+        v_lf text;
+      begin
+        if p_body is null then return ''; end if;
+        if coalesce(p_kind,'') <> 'workflow' then return p_body; end if;
+        v_lf := replace(replace(p_body,e'\r\n',e'\n'),e'\r',e'\n');
+        v_lines := string_to_array(v_lf,e'\n');
+        v_n := array_length(v_lines,1);
+        v_i := 1;
+        while v_i <= v_n loop
+          v_line := rtrim(v_lines[v_i]);
+          if v_line in ('Python ready-template source:','Python scratchpad source:') then
+            v_j := v_i + 1;
+            while v_j <= v_n loop
+              v_line := rtrim(v_lines[v_j]);
+              exit when v_line in ('Python ready-template source:','Python scratchpad source:');
+              exit when v_line like 'Workflow semantics (rule-based):%';
+              v_j := v_j + 1;
+            end loop;
+            v_i := v_j;
+            continue;
+          end if;
+          v_out := array_append(v_out,v_lines[v_i]);
+          v_i := v_i + 1;
+        end loop;
+        return btrim(regexp_replace(array_to_string(v_out,e'\n'),'(\n){3,}',e'\n\n','g'));
+      end $$;
       create or replace function public.hivemind_resource_tags(p_metadata jsonb)
       returns text language sql immutable as $$ select coalesce(p_metadata->>'tags','') $$;
       create or replace function public.hivemind_workflow_semantics_text(p_metadata jsonb)
@@ -164,6 +280,52 @@ def _bootstrap(url: str) -> None:
         distillation_id bigint not null, item_kind text not null, item_id bigint not null,
         primary key(distillation_id,item_kind,item_id)
       );
+      create table if not exists public.lexical_resource_python_state (
+        resource_id bigint primary key references public.external_resources(id) on delete cascade,
+        kind text not null, cohort text not null, public_state text not null,
+        available boolean not null, body_duplicate boolean not null default false
+      );
+      drop materialized view if exists public.lexical_workflow_python_search cascade;
+      create materialized view public.lexical_workflow_python_search as
+        select id::text as item_id, body as search_norm
+          from public.external_resources where kind='workflow';
+      drop function if exists public.hivemind_claim_embedding_jobs(text,int,int);
+      create or replace function public.hivemind_claim_embedding_jobs(
+        p_worker_id text, p_batch_size int default 8, p_lease_seconds int default 300
+      ) returns table(
+        job_id bigint, entity_type text, item_id text, representation_type text,
+        job_kind text, contract_id text, attempts int
+      ) language plpgsql security definer set search_path=public,pg_temp as $$
+      begin
+        if p_worker_id is null or btrim(p_worker_id)='' then raise exception 'worker_id required'; end if;
+        return query with claim as (
+          select j.id from public.embedding_jobs j
+           where j.status='pending' and j.next_attempt_at <= now()
+           order by j.next_attempt_at,j.id limit p_batch_size
+           for update of j skip locked
+        )
+        update public.embedding_jobs j
+           set status='processing', locked_by=p_worker_id, locked_at=now(),
+               lease_expires_at=now()+make_interval(secs=>p_lease_seconds),
+               attempts=j.attempts+1, updated_at=now()
+          from claim where j.id=claim.id
+        returning j.id,j.entity_type,j.item_id,j.representation_type,j.job_kind,
+                  j.contract_id::text,j.attempts;
+      end $$;
+      create or replace function public.hivemind_recover_stale_leases(p_grace_seconds int default 0)
+      returns int language plpgsql security definer set search_path=public,pg_temp as $$
+      declare v_count int;
+      begin
+        with recovered as (
+          update public.embedding_jobs
+             set status='pending', next_attempt_at=now(), locked_by=null,
+                 locked_at=null, lease_expires_at=null, updated_at=now()
+           where status='processing'
+             and lease_expires_at + make_interval(secs=>greatest(p_grace_seconds,0)) < now()
+          returning 1
+        ) select count(*) into v_count from recovered;
+        return v_count;
+      end $$;
       do $$ begin
         if not exists (select 1 from pg_roles where rolname='anon') then execute 'create role anon'; end if;
         if not exists (select 1 from pg_roles where rolname='authenticated') then execute 'create role authenticated'; end if;
@@ -233,7 +395,11 @@ begin
     raise exception 'unpinned accepted resource did not resolve to its head';
   end if;
   insert into public.discord_messages(message_id,content) values (9007199254740993,'source v1');
-  perform public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author',now());
+  response := public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author');
+  second_response := public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author');
+  if second_response->>'idempotent_replay' <> 'true' then
+    raise exception 'snapshot retry with generated observed_at was not idempotent';
+  end if;
   begin
     perform public.hivemind_capture_message_snapshot(1,'snapshot-mismatch',9007199254740993,'not the source','{"channel":"demo"}',9007199254740994,'Original author',now());
     raise exception 'mismatched source snapshot unexpectedly succeeded';
@@ -341,6 +507,30 @@ begin
 end $$;
 """
 
+CONCURRENCY_SETUP = r"""
+truncate table public.embedding_jobs, public.content_embeddings, public.lexical_documents,
+  public.content_representation_manifest, public.knowledge_idempotency, public.knowledge_references,
+  public.evidence_sources, public.evidence_subjects, public.evidence,
+  public.message_snapshots, public.resource_revisions, public.resources,
+  public.discord_messages, public.contributors restart identity cascade;
+insert into public.contributors(name,kind) values ('agent','agent'),('editor','human'),('other','human');
+do $$ begin perform public.hivemind_set_editor('postgres',2,true); end $$;
+select public.hivemind_submit_resource(1,'concurrent-base','workflow','Concurrent base','base body',
+  '{"nodes":1}','{}','{}','manual','concurrent-resource','base','[]');
+select public.hivemind_decide_revision(2,'concurrent-base-approve',1,'accepted','base');
+select public.hivemind_propose_revision(1,'concurrent-proposal-a',1,1,'workflow','Concurrent A','candidate a','{"nodes":2}','{}','{}','a','[]');
+select public.hivemind_propose_revision(3,'concurrent-proposal-b',1,1,'workflow','Concurrent B','candidate b','{"nodes":3}','{}','{}','b','[]');
+"""
+
+QUEUE_SEED = r"""
+truncate table public.embedding_jobs, public.content_embeddings restart identity;
+insert into public.embedding_jobs(
+  entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,next_attempt_at
+) values
+  ('resource','queue-a','prose','reembed',1360541028304258884,null,'pending',now()),
+  ('resource','queue-b','prose','reembed',1360541028304258884,null,'pending',now());
+"""
+
 FRESHNESS_SCENARIO = r"""
 insert into public.contributors(name,kind) values ('fixture-agent','agent'),('fixture-editor','human') on conflict (name) do nothing;
 update public.contributors set is_editor=true where id=(select min(id) from public.contributors where kind='human');
@@ -358,7 +548,38 @@ insert into public.embedding_contracts(id,provider,model,dimension,canonicalizat
   on conflict (id) do update set status='active',dimension=384;
 insert into public.content_embeddings(contract_id,entity_type,item_id,representation_type,chunk_index,chunk_text,embedding,representation_hash,chunk_hash,source_revision_id)
   values(1360541028304258884,'resource','10','prose',0,'headtoken body',array_fill(0::real,ARRAY[384])::vector,repeat('a',64),repeat('b',64),101);
-do $$ declare n int; begin
+insert into public.resources(id,created_by,origin_source,origin_external_id) overriding system value
+  values (11,1,'fixture','workflow-canonical');
+insert into public.resource_revisions(id,resource_id,kind,title,body,metadata,submitted_by,state,decided_by,decided_at) overriding system value
+  values (110,11,'workflow','Canonical prose',
+    'proseToken' || E'\n\n' ||
+    'Python ready-template source:' || E'\n' ||
+    'codeOnlyToken' || E'\n' ||
+    'Workflow semantics (rule-based):' || E'\n' ||
+    'semanticToken',
+    '{"tags":"tagToken","workflow_semantics":{"task_type":"semanticToken"}}',1,'accepted',2,now());
+update public.resources set current_revision_id=110 where id=11;
+do $$ begin
+  begin
+    set local role anon;
+    perform public.hivemind_embedding_payload('resource','10','prose');
+    raise exception 'anonymous payload call unexpectedly succeeded';
+  exception when insufficient_privilege then null;
+  end;
+  set local role hannahomalley;
+end $$;
+do $$ declare n bigint; replacement_job_id bigint; late_job_id bigint;
+  second_late_job_id bigint; third_late_job_id bigint;
+begin
+  if exists(select 1 from public.hivemind_lexical_candidates('codeOnlyToken',100,'{workflow}')) then
+    raise exception 'workflow Python code leaked into canonical prose search';
+  end if;
+  if (select count(*) from public.hivemind_lexical_candidates('proseToken',100,'{workflow}') where item_id='11') <> 1 then
+    raise exception 'canonical workflow prose was not searchable';
+  end if;
+  if exists(select 1 from public.hivemind_lexical_candidates('proseToken',100,'{article}') where item_id='11') then
+    raise exception 'workflow kind filter admitted a non-workflow query';
+  end if;
   select count(*) into n from public.hivemind_lexical_candidates('headtoken',100,'{resource}');
   if n <> 1 then raise exception 'freshness candidate count expected 1, got %',n; end if;
   if not exists(select 1 from public.hivemind_lexical_candidates('headtoken',100,'{resource}') where item_id='10') then raise exception 'current head did not rank'; end if;
@@ -402,15 +623,42 @@ do $$ declare n int; begin
   if (select count(*) from public.hivemind_semantic_candidates(array_fill(0::real,ARRAY[384])::vector,100,'{resource}','{}')) <> 0 then
     raise exception 'semantic vector from historical head ranked after head change';
   end if;
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,source_op,status,locked_by)
+    values('resource','10','prose','reembed',1360541028304258884,n,'revision_accepted','pending',null)
+    on conflict (entity_type,item_id,representation_type) where status='pending' do update
+      set source_revision_id=excluded.source_revision_id, source_op=excluded.source_op,
+          next_attempt_at=now(), updated_at=now()
+    returning id into replacement_job_id;
   insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
-    values('resource','10','prose','reembed',1360541028304258884,100,'processing','late-worker');
-  perform * from public.hivemind_finalize_embedding_job((select max(id) from public.embedding_jobs),'late-worker','[]','',null,false);
-  if (select status from public.embedding_jobs order by id desc limit 1) <> 'cancelled'
-     or (select last_error from public.embedding_jobs order by id desc limit 1) <> 'source_changed_replaced'
-     or (select count(*) from public.embedding_jobs
-         where entity_type='resource' and item_id='10' and representation_type='prose'
-           and status='pending' and source_revision_id=n) <> 1 then
-    raise exception 'late finalizer did not preserve the replacement pending job';
+    values('resource','10','prose','reembed',1360541028304258884,100,'processing','late-worker')
+    returning id into late_job_id;
+  perform * from public.hivemind_finalize_embedding_job(late_job_id,'late-worker','[]','',null,false);
+  if (select status from public.embedding_jobs where id=late_job_id) <> 'cancelled'
+     or (select last_error from public.embedding_jobs where id=late_job_id) <> 'source_changed_replaced'
+     or (select status from public.embedding_jobs where id=replacement_job_id) <> 'pending' then
+    raise exception 'late finalizer did not preserve the pending replacement job';
+  end if;
+  update public.embedding_jobs set status='processing',locked_by='new-worker',locked_at=now(),
+    lease_expires_at=now()+interval '1 minute' where id=replacement_job_id;
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
+    values('resource','10','prose','reembed',1360541028304258884,100,'processing','later-worker')
+    returning id into second_late_job_id;
+  perform * from public.hivemind_finalize_embedding_job(second_late_job_id,'later-worker','[]','',null,false);
+  if (select status from public.embedding_jobs where id=second_late_job_id) <> 'cancelled'
+     or (select last_error from public.embedding_jobs where id=second_late_job_id) <> 'source_changed_replaced'
+     or (select status from public.embedding_jobs where id=replacement_job_id) <> 'processing' then
+    raise exception 'late finalizer did not protect an in-flight replacement job';
+  end if;
+  update public.embedding_jobs set status='cancelled',locked_by=null,locked_at=null,lease_expires_at=null
+    where id=replacement_job_id;
+  insert into public.embedding_jobs(entity_type,item_id,representation_type,job_kind,contract_id,source_revision_id,status,locked_by)
+    values('resource','10','prose','reembed',1360541028304258884,100,'processing','requeue-worker')
+    returning id into third_late_job_id;
+  perform * from public.hivemind_finalize_embedding_job(third_late_job_id,'requeue-worker','[]','',null,false);
+  if (select status from public.embedding_jobs where id=third_late_job_id) <> 'pending'
+     or (select source_revision_id from public.embedding_jobs where id=third_late_job_id) <> n
+     or (select source_op from public.embedding_jobs where id=third_late_job_id) <> 'revision_accepted' then
+    raise exception 'late finalizer did not repin stale work to the current head';
   end if;
 end $$;
 """
@@ -423,6 +671,9 @@ truncate table public.embedding_jobs, public.content_embeddings, public.lexical_
 insert into public.external_resources(id,kind,source,external_id,title,body,author,url,metadata,payload) overriding system value
   values(1,'article','fixture',null,'Legacy nullable-origin','nullable body','Author','https://example.test/null','{"tag":"null"}',null),
         (900,'workflow','fixture','wf-900','Legacy workflow','workflow body','Author','https://example.test/wf','{"tag":"x"}','{"nodes":1}');
+insert into public.lexical_resource_python_state(resource_id,kind,cohort,public_state,available)
+  values(900,'workflow','payload_python','safe',true)
+  on conflict (resource_id) do nothing;
 insert into public.distillations(id,question,conditions,answer,confidence,status,author_id) overriding system value
   values(901,'Legacy question','only on fixture','Legacy answer','high','approved',1);
 insert into public.distillation_cites values(901,'resource',900);
@@ -439,6 +690,11 @@ def run(scenario: str) -> dict[str, object]:
         raise ValueError("scenario must be all, revisions, references, evidence, search_freshness, or conversion")
     if scenario in {"all", "revisions", "references", "evidence"}:
         _psql(url, SCENARIO)
+    if scenario == "all":
+        _psql(url, CONCURRENCY_SETUP)
+        _run_concurrent_competing_approvals(url)
+        _psql(url, QUEUE_SEED)
+        _run_concurrent_claims(url)
     if scenario in {"all", "search_freshness"}:
         _psql(url, FRESHNESS_SCENARIO)
     if scenario in {"all", "conversion"}:
@@ -463,8 +719,8 @@ def run(scenario: str) -> dict[str, object]:
         applied = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--apply"], cwd=ROOT, env=env, text=True, capture_output=True)
         if applied.returncode:
             raise RuntimeError(applied.stderr or applied.stdout)
-        check = _psql(url, "select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.origin_source='legacy-distillation' and v.state='accepted'; select count(*) from public.knowledge_references where label='converted legacy cite'; select (to_regclass('public.external_resources') is null)::int; select (to_regclass('public.distillations') is null)::int; select (to_regclass('public.distillation_cites') is null)::int;")
-        if check.splitlines() != ["1", "1", "1", "1", "1"]:
+        check = _psql(url, "select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.origin_source='legacy-distillation' and v.state='accepted'; select count(*) from public.knowledge_references where label='converted legacy cite'; select (to_regclass('public.external_resources') is null)::int; select (to_regclass('public.lexical_resource_python_state') is null)::int; select (to_regclass('public.lexical_workflow_python_search') is null)::int; select (to_regclass('public.distillations') is null)::int; select (to_regclass('public.distillation_cites') is null)::int;")
+        if check.splitlines() != ["1", "1", "1", "1", "1", "1", "1"]:
             raise RuntimeError("conversion assertions failed: " + check)
         nullable = _psql(url, "select count(*) from public.resources where origin_source is null and origin_external_id is null and id=1; select count(*) from public.resource_revisions where provenance->>'legacy_id'='1' and provenance->>'external_id' is null;")
         if nullable.splitlines() != ["1", "1"]:

@@ -119,15 +119,24 @@ end;
 $$;
 
 alter table public.resource_revisions
-  add column if not exists lexical_tsv tsvector generated always as (
+  drop column if exists lexical_tsv cascade;
+alter table public.resource_revisions
+  add column lexical_tsv tsvector generated always as (
     setweight(to_tsvector('simple'::regconfig, coalesce(title, '')), 'A')
-    || setweight(to_tsvector('simple'::regconfig, coalesce(metadata::text, '')), 'B')
-    || setweight(to_tsvector('simple'::regconfig, coalesce(body, '')), 'C')
+    || setweight(to_tsvector('simple'::regconfig,
+         coalesce(public.hivemind_resource_tags(metadata)
+                  || ' ' || public.hivemind_workflow_semantics_text(metadata), '')), 'B')
+    || setweight(to_tsvector('simple'::regconfig,
+         coalesce(public.hivemind_workflow_prose(body, kind), '')), 'C')
   ) stored;
 create index if not exists resource_revisions_accepted_lexical_idx
   on public.resource_revisions using gin (lexical_tsv) where state = 'accepted';
 create index if not exists resource_revisions_head_idx
   on public.resource_revisions (resource_id, id) where state = 'accepted';
+create index if not exists resource_revisions_title_trgm
+  on public.resource_revisions using gin (title gin_trgm_ops);
+create index if not exists resource_revisions_body_trgm
+  on public.resource_revisions using gin (body gin_trgm_ops);
 
 alter table public.lexical_documents
   add column if not exists source_revision_id bigint references public.resource_revisions(id);
@@ -284,6 +293,8 @@ begin
        and ld.representation_type='workflow_python' and q <> to_tsquery('simple'::regconfig,'')
        and ld.tsv @@ q and char_length(ld.chunk_text) between 1 and 8000
        and rr.state='accepted' and rr.kind='workflow'
+       and (not exists(select 1 from unnest(kinds) k where k <> 'message' and k <> 'resource')
+            or 'workflow'=any(concrete_kinds))
        and coalesce(ps.public_state,'quarantined')='safe'
        and (coalesce(array_length(p_sources,1),0)=0 or r.origin_source=any(p_sources))
        and (p_since is null or r.created_at >= p_since)
@@ -302,6 +313,8 @@ begin
        and char_length(ld.chunk_text) between 1 and 8000
        and qn <> '' and public.hivemind_normalize_identifier(ld.chunk_text) like '%'||qn||'%'
        and rr.state='accepted' and rr.kind='workflow'
+       and (not exists(select 1 from unnest(kinds) k where k <> 'message' and k <> 'resource')
+            or 'workflow'=any(concrete_kinds))
        and coalesce(ps.public_state,'quarantined')='safe'
        and (coalesce(array_length(p_sources,1),0)=0 or r.origin_source=any(p_sources))
        and (p_since is null or r.created_at >= p_since)
@@ -569,6 +582,23 @@ begin
       from jsonb_array_elements(m.chunks) chunk;
 end; $$;
 
+-- The explicit DROP above recreates this SECURITY DEFINER worker surface, so
+-- restore its restricted execution grants after creation.
+revoke execute on function public.hivemind_embedding_payload(text,text,text,int,int)
+  from public;
+do $$
+begin
+  if exists (select 1 from pg_roles where rolname='anon') then
+    revoke execute on function public.hivemind_embedding_payload(text,text,text,int,int) from anon;
+  end if;
+  if exists (select 1 from pg_roles where rolname='authenticated') then
+    revoke execute on function public.hivemind_embedding_payload(text,text,text,int,int) from authenticated;
+  end if;
+  if exists (select 1 from pg_roles where rolname='service_role') then
+    grant execute on function public.hivemind_embedding_payload(text,text,text,int,int) to service_role;
+  end if;
+end $$;
+
 -- The finalizer is the atomic freshness boundary. It checks the job's pinned
 -- resource revision before any drop/delete/replace, then validates the manifest
 -- payload and writes source_revision_id on every stored vector. A late worker
@@ -586,7 +616,7 @@ declare
   manifest record;
   chunk jsonb;
   written int := 0;
-  pending_replacement boolean;
+  replacement_exists boolean;
 begin
   select * into j from public.embedding_jobs
    where id=p_job_id for update;
@@ -609,22 +639,31 @@ begin
   end if;
   if j.entity_type='resource' then
     select r.current_revision_id into current_head
-      from public.resources r where r.id=j.item_id::bigint;
+      from public.resources r where r.id=j.item_id::bigint for update;
+    if current_head is null then
+      update public.embedding_jobs set status='cancelled',last_error='source_changed_no_head',
+        locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
+      return query select 0,'source_changed'::text,'cancelled'::text;
+      return;
+    end if;
     if j.source_revision_id is null or current_head is distinct from j.source_revision_id then
       select exists (
         select 1 from public.embedding_jobs replacement
          where replacement.entity_type=j.entity_type
            and replacement.item_id=j.item_id
            and replacement.representation_type=j.representation_type
-           and replacement.status='pending'
+           and replacement.status in ('pending','processing','done')
+           and replacement.source_revision_id is not distinct from current_head
            and replacement.id<>j.id
-      ) into pending_replacement;
-      update public.embedding_jobs set status=case when pending_replacement then 'cancelled' else 'pending' end,
-        next_attempt_at=case when pending_replacement then next_attempt_at else now() end,
-        last_error=case when pending_replacement then 'source_changed_replaced' else last_error end,
+      ) into replacement_exists;
+      update public.embedding_jobs set status=case when replacement_exists then 'cancelled' else 'pending' end,
+        source_revision_id=case when replacement_exists then j.source_revision_id else current_head end,
+        source_op=case when replacement_exists then j.source_op else 'revision_accepted' end,
+        next_attempt_at=case when replacement_exists then next_attempt_at else now() end,
+        last_error=case when replacement_exists then 'source_changed_replaced' else null end,
         locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
       return query select 0,'source_changed'::text,
-        case when pending_replacement then 'cancelled' else 'pending' end::text;
+        case when replacement_exists then 'cancelled' else 'pending' end::text;
       return;
     end if;
   end if;
@@ -658,15 +697,16 @@ begin
        where replacement.entity_type=j.entity_type
          and replacement.item_id=j.item_id
          and replacement.representation_type=j.representation_type
-         and replacement.status='pending'
+         and replacement.status in ('pending','processing','done')
+         and (j.entity_type <> 'resource' or replacement.source_revision_id is not distinct from current_head)
          and replacement.id<>j.id
-    ) into pending_replacement;
-    update public.embedding_jobs set status=case when pending_replacement then 'cancelled' else 'pending' end,
-      next_attempt_at=case when pending_replacement then next_attempt_at else now() end,
-      last_error=case when pending_replacement then 'source_changed_replaced' else last_error end,
+    ) into replacement_exists;
+    update public.embedding_jobs set status=case when replacement_exists then 'cancelled' else 'pending' end,
+      next_attempt_at=case when replacement_exists then next_attempt_at else now() end,
+      last_error=case when replacement_exists then 'source_changed_replaced' else null end,
       locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
     return query select 0,'source_changed'::text,
-      case when pending_replacement then 'cancelled' else 'pending' end::text;
+      case when replacement_exists then 'cancelled' else 'pending' end::text;
     return;
   end if;
   select * into manifest from public.content_representation_manifest m
@@ -682,15 +722,16 @@ begin
        where replacement.entity_type=j.entity_type
          and replacement.item_id=j.item_id
          and replacement.representation_type=j.representation_type
-         and replacement.status='pending'
+         and replacement.status in ('pending','processing','done')
+         and (j.entity_type <> 'resource' or replacement.source_revision_id is not distinct from current_head)
          and replacement.id<>j.id
-    ) into pending_replacement;
-    update public.embedding_jobs set status=case when pending_replacement then 'cancelled' else 'pending' end,
-      next_attempt_at=case when pending_replacement then next_attempt_at else now() end,
-      last_error=case when pending_replacement then 'source_changed_replaced' else last_error end,
+    ) into replacement_exists;
+    update public.embedding_jobs set status=case when replacement_exists then 'cancelled' else 'pending' end,
+      next_attempt_at=case when replacement_exists then next_attempt_at else now() end,
+      last_error=case when replacement_exists then 'source_changed_replaced' else null end,
       locked_by=null,locked_at=null,lease_expires_at=null,updated_at=now() where id=j.id;
     return query select 0,'source_changed'::text,
-      case when pending_replacement then 'cancelled' else 'pending' end::text;
+      case when replacement_exists then 'cancelled' else 'pending' end::text;
     return;
   end if;
   for chunk in select value from jsonb_array_elements(p_chunks) loop

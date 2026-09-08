@@ -28,19 +28,43 @@ def _masked_markdown(text: str) -> str:
     chars = list(text)
     in_fence = False
     in_inline = False
+    fence_char = ""
+    fence_len = 0
+    inline_len = 0
     i = 0
     while i < len(text):
-        if text.startswith("```", i) or text.startswith("~~~", i):
-            in_fence = not in_fence
-            chars[i : i + 3] = "   "
-            i += 3
-            continue
+        if text[i] in "`~":
+            delimiter = text[i]
+            j = i + 1
+            while j < len(text) and text[j] == delimiter:
+                j += 1
+            run_len = j - i
+            if in_fence:
+                if delimiter == fence_char and run_len >= fence_len:
+                    in_fence = False
+                    fence_char = ""
+                    fence_len = 0
+                chars[i:j] = " " * run_len
+                i = j
+                continue
+            if run_len >= 3:
+                in_fence = True
+                fence_char = delimiter
+                fence_len = run_len
+                chars[i:j] = " " * run_len
+                i = j
+                continue
+            if delimiter == "`":
+                if not in_inline:
+                    in_inline = True
+                    inline_len = run_len
+                elif run_len == inline_len:
+                    in_inline = False
+                    inline_len = 0
+                chars[i:j] = " " * run_len
+                i = j
+                continue
         if in_fence:
-            chars[i] = " "
-            i += 1
-            continue
-        if text[i] == "`":
-            in_inline = not in_inline
             chars[i] = " "
             i += 1
             continue

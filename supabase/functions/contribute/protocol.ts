@@ -45,14 +45,35 @@ const DESTINATION_RE = /\[[^\]\n]*\]\(hivemind:(resource|message|revision|eviden
 
 function maskReferenceCode(text: string): string {
   const chars = [...text]; let fenced = false; let inline = false;
-  for (let i = 0; i < text.length; i++) {
-    if (text.startsWith("```", i) || text.startsWith("~~~", i)) {
-      fenced = !fenced; chars[i] = chars[i + 1] = chars[i + 2] = " "; i += 2; continue;
+  let fenceChar = ""; let fenceLength = 0; let inlineLength = 0;
+  for (let i = 0; i < chars.length; i++) {
+    const delimiter = chars[i];
+    if (delimiter === "`" || delimiter === "~") {
+      let j = i + 1;
+      while (j < chars.length && chars[j] === delimiter) j++;
+      const runLength = j - i;
+      if (fenced) {
+        if (delimiter === fenceChar && runLength >= fenceLength) {
+          fenced = false; fenceChar = ""; fenceLength = 0;
+        }
+        for (let k = i; k < j; k++) chars[k] = " ";
+        i = j - 1; continue;
+      }
+      if (runLength >= 3) {
+        fenced = true; fenceChar = delimiter; fenceLength = runLength;
+        for (let k = i; k < j; k++) chars[k] = " ";
+        i = j - 1; continue;
+      }
+      if (delimiter === "`") {
+        if (!inline) { inline = true; inlineLength = runLength; }
+        else if (runLength === inlineLength) { inline = false; inlineLength = 0; }
+        for (let k = i; k < j; k++) chars[k] = " ";
+        i = j - 1; continue;
+      }
     }
     if (fenced) { chars[i] = " "; continue; }
-    if (text[i] === "`") { inline = !inline; chars[i] = " "; continue; }
     if (inline) { chars[i] = " "; continue; }
-    if (text[i] === "\\") { chars[i] = " "; if (i + 1 < text.length) chars[++i] = " "; }
+    if (chars[i] === "\\") { chars[i] = " "; if (i + 1 < chars.length) chars[++i] = " "; }
   }
   return chars.join("");
 }

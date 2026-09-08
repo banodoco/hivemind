@@ -28,6 +28,12 @@ Deno.test("knowledge protocol rejects versioned revision/evidence tokens", () =>
   assertThrows(() => parseKnowledgeReferences("[evidence:9@1]"));
 });
 
+Deno.test("knowledge protocol excludes double-backtick code spans", () => {
+  assertEquals(parseKnowledgeReferences("``[resource:42]`` [message:7]"), [
+    { target_kind: "message", target_id: "7", labelled: false },
+  ]);
+});
+
 Deno.test("knowledge protocol validates a proposal envelope", () => {
   assertEquals(validateKnowledgeModelRequest({
     action: "propose_revision",

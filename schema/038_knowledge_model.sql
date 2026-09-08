@@ -670,7 +670,7 @@ create or replace function public.hivemind_capture_message_snapshot(
   p_submitter bigint, p_idempotency_token text, p_message_id bigint,
   p_content text, p_source_metadata jsonb default '{}'::jsonb,
   p_original_author_id bigint default null, p_original_author_name text default null,
-  p_observed_at timestamptz default now()
+  p_observed_at timestamptz default null
 )
 returns jsonb
 language plpgsql security definer
@@ -681,6 +681,7 @@ declare
   snapshot public.message_snapshots%rowtype;
   source_message record;
   effective_original_author_id bigint;
+  effective_observed_at timestamptz;
   input jsonb;
 begin
   if not public.hivemind_active_contributor(p_submitter) then
@@ -716,6 +717,7 @@ begin
       using errcode='22023';
   end if;
   effective_original_author_id := coalesce(p_original_author_id,source_message.author_id);
+  effective_observed_at := coalesce(p_observed_at,now());
   select * into prior from public.message_snapshots
    where message_id=p_message_id and content=p_content
      and source_metadata=coalesce(p_source_metadata,'{}')
@@ -730,7 +732,7 @@ begin
   insert into public.message_snapshots
     (message_id,content,source_metadata,original_author_id,original_author_name,observed_at,captured_by)
   values (p_message_id,p_content,coalesce(p_source_metadata,'{}'),effective_original_author_id,
-          p_original_author_name,p_observed_at,p_submitter)
+          p_original_author_name,effective_observed_at,p_submitter)
   returning * into snapshot;
   return public.hivemind_store_idempotency(p_submitter,'capture_message_snapshot',p_idempotency_token,
     public.hivemind_request_hash(input),jsonb_build_object('status','captured','snapshot_id',snapshot.id::text,

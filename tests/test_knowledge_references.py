@@ -31,6 +31,11 @@ class KnowledgeReferenceParserTests(unittest.TestCase):
         refs = parse_references(text)
         self.assertEqual([r["target_id"] for r in refs], ["4"])
 
+    def test_double_backtick_code_span_is_excluded(self) -> None:
+        self.assertEqual(parse_references("``[resource:42]`` [message:7]"), [
+            {"target_kind": "message", "target_id": "7", "target_version_id": None, "labelled": "false"},
+        ])
+
     def test_ordinary_links_unknown_kinds_and_bad_ids_are_not_hivemind_refs(self) -> None:
         refs = parse_references(
             "[resource:0] [thing:1] [resource:x] "

@@ -116,6 +116,11 @@ do $$ declare e record; rid bigint; vid bigint; rev_state text; begin
   -- Retire the old active surfaces in the same transaction as conversion.
   -- Rehearsal therefore proves both directions: rollback restores the legacy
   -- tables, while apply leaves one resource/revision/reference model.
+  -- The lexical state table and per-item materialized view are legacy
+  -- dependents of external_resources; retire them explicitly before dropping
+  -- the source table so the transaction works against the actual prior schema.
+  drop materialized view if exists public.lexical_workflow_python_search;
+  drop table if exists public.lexical_resource_python_state;
   drop table if exists public.distillation_cites;
   drop table if exists public.distillations;
   drop table if exists public.external_resources;
