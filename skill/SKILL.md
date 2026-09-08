@@ -352,6 +352,38 @@ forced to `pending` by the edge function.
 Responses: `201 {"id":N,"status":"ok"}` · `400 validation` · `401 unauthorized`
 · `409 duplicate` (extend or supersede instead).
 
+### Knowledge-model foundation (T2-T6)
+
+Use the same endpoint and contributor key for the transactional revision flow:
+
+```json
+{"action":"submit_resource","data":{"idempotency_token":"create-1",
+  "kind":"workflow","title":"Workflow v1","body":"full candidate text",
+  "payload":{"nodes":[]},"metadata":{},"provenance":{},"references":[]}}
+```
+
+The related actions are `propose_revision` (full candidate plus
+`resource_id`/`base_revision_id`), `decide_revision` (`accepted`, `rejected`,
+or `withdrawn`, editor-only), and `mark_canonical` (accepted guides only).
+Responses carry decimal-string IDs and exact readable text/JSON diffs. Pending
+content never replaces the accepted head; an approval whose base is stale is a
+conflict, not an automatic merge. Reusing an idempotency token with identical
+content replays the original response; reusing it for different content fails.
+
+`capture_message_snapshot` is the trusted path for an on-demand observed
+message copy. `submit_evidence` records an immutable `reported` or `observed`
+claim with conditions, result, basis, exact pinned subjects, sources, and an
+optional superseding evidence ID. `captured_by`/`submitted_by` identifies the
+authenticated reporter separately from any original message author. External
+URLs are source metadata, not retained media.
+
+Typed references are only `[resource:ID]`, `[resource:ID@REV]`,
+`[message:ID]`, `[message:ID@SNAPSHOT]`, `[revision:ID]`, and `[evidence:ID]`,
+plus labelled `hivemind:` destinations. Escaped tokens and inline/fenced code
+are excluded; unknown targets and mismatched owners are rejected at the
+trusted write boundary. Outgoing/backlink projections are derived, not an
+editable graph.
+
 ### Flywheel loop (the full procedure)
 
 1. **Search distillations first** on the user's question.

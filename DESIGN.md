@@ -60,6 +60,16 @@ Six executors wrap the read path:
 
 All writes flow through a single Supabase edge function at `POST /functions/v1/contribute`.
 
+The additive knowledge-model foundation uses the same entrypoint for
+`submit_resource`, `propose_revision`, `decide_revision`, `mark_canonical`,
+`capture_message_snapshot`, and `submit_evidence`. These actions call locked
+transactional PostgreSQL functions. A revision is full immutable candidate
+content; only an editor can move a pending candidate to one terminal decision,
+and acceptance advances the stable resource head only when the exact base still
+matches. Evidence is an immutable attributed report about exact revision or
+message-snapshot subjects, not a claim that editorial acceptance proves truth.
+The legacy actions below remain until conversion.
+
 ### Authentication
 
 1. Client sends `X-Contributor-Key: hm_<64 hex>` header.

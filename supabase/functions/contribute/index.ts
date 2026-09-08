@@ -6,6 +6,10 @@ import {
   parseContributorKey,
   validateContributorKeyHeader,
   validateContributeRequest,
+  validateKnowledgeModelRequest,
+  parseKnowledgeReferences,
+  buildKnowledgeRpcRequest,
+  type KnowledgeModelAction,
   type AddResourceData,
   type CheckDuplicateInput,
   type ContributeRequest,
@@ -183,6 +187,54 @@ async function checkDuplicateDistillation(
   return rows;
 }
 
+async function callKnowledgeRpc(
+  supabaseUrl: string,
+  serviceRoleKey: string,
+  contributorId: number,
+  action: KnowledgeModelAction,
+  data: Record<string, unknown>,
+): Promise<Response> {
+  const rpcNames: Record<KnowledgeModelAction, string> = {
+    submit_resource: "hivemind_submit_resource",
+    propose_revision: "hivemind_propose_revision",
+    decide_revision: "hivemind_decide_revision",
+    mark_canonical: "hivemind_mark_canonical",
+    capture_message_snapshot: "hivemind_capture_message_snapshot",
+    submit_evidence: "hivemind_submit_evidence",
+  };
+  let derivedReferences: unknown = data.references;
+  if ((action === "submit_resource" || action === "propose_revision") && typeof data.body === "string") {
+    derivedReferences = [
+      ...(Array.isArray(data.references) ? data.references : []),
+      ...parseKnowledgeReferences(data.body).map((reference) => ({
+        target_kind: reference.target_kind,
+        target_id: reference.target_id,
+        ...(reference.target_version_id ? { target_version_id: reference.target_version_id } : {}),
+      })),
+    ];
+  }
+  const request = buildKnowledgeRpcRequest(action, contributorId, data, derivedReferences);
+  const url = new URL(`/rest/v1/rpc/${rpcNames[action]}`, supabaseUrl);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: createServiceHeaders(serviceRoleKey, { "content-type": "application/json" }),
+    body: JSON.stringify(request),
+  });
+  if (response.ok) {
+    return jsonResponse(await response.json(), action === "mark_canonical" || action === "decide_revision" ? 200 : 201);
+  }
+  const error = await parseError(response);
+  const code = error?.code;
+  if (code === "42501") return jsonResponse(formatUnauthorizedResponse(), 401);
+  if (["40001", "55000", "23505"].includes(code ?? "")) {
+    return jsonResponse({ error: "conflict", detail: error?.message ?? "revision conflict" }, 409);
+  }
+  if (["22023", "23503", "23514"].includes(code ?? "")) {
+    return validationResponse(error?.message ?? "invalid knowledge-model request");
+  }
+  throw new Error(`Knowledge-model RPC failed with status ${response.status}`);
+}
+
 async function insertResource(
   supabaseUrl: string,
   serviceRoleKey: string,
@@ -312,6 +364,23 @@ async function handleRequest(request: Request): Promise<Response> {
   const body = await readJsonBody(request);
   if (isValidationError(body)) {
     return validationResponse(body.detail);
+  }
+
+  const knowledgeError = validateKnowledgeModelRequest(body);
+  if (!knowledgeError) {
+    const parsedKnowledge = body as { action: KnowledgeModelAction; data: Record<string, unknown> };
+    const supabaseUrl = getRequiredEnv("SUPABASE_URL");
+    const serviceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
+    const parsedKey = parseContributorKey(contributorKeyHeader);
+    if (!parsedKey) return validationResponse("X-Contributor-Key must be 'hm_<64 hex chars>'");
+    const contributorId = await requireContributorId(supabaseUrl, serviceRoleKey, parsedKey.raw);
+    if (!contributorId) return jsonResponse(formatUnauthorizedResponse(), 401);
+    return callKnowledgeRpc(supabaseUrl, serviceRoleKey, contributorId, parsedKnowledge.action, parsedKnowledge.data);
+  }
+  if (body && typeof body === "object" && !Array.isArray(body)
+      && ["submit_resource", "propose_revision", "decide_revision", "mark_canonical", "capture_message_snapshot", "submit_evidence"]
+        .includes((body as Record<string, unknown>).action as string)) {
+    return validationResponse(knowledgeError.detail);
   }
 
   const requestError = validateContributeRequest(body);

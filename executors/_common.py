@@ -245,6 +245,13 @@ def build_submit_distillation_envelope(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_knowledge_model_envelope(action: str, data: dict[str, Any]) -> dict[str, Any]:
+    """Build a T2-T6 contribution envelope with caller-scoped retry data."""
+    if not action or not isinstance(data, dict):
+        raise ValueError("knowledge-model action and object data are required")
+    return {"action": action, "data": data}
+
+
 # ---------------------------------------------------------------------------
 # Cite parsing
 # ---------------------------------------------------------------------------

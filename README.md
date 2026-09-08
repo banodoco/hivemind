@@ -146,6 +146,27 @@ directory whose name equals the pack id, and the clone is named `hivemind`):
 - Responses: 201 (created), 400 (validation), 401 (unauthorized), 409
   (duplicate), 500 (internal error).
 
+The T2-T6 knowledge-model foundation adds the transactional resource lifecycle
+alongside the legacy actions while conversion is pending:
+
+- `submit_resource` creates a stable resource identity and immutable pending
+  revision; `propose_revision` submits the full candidate against an exact
+  accepted head.
+- `decide_revision` is editor-only and atomically publishes, rejects, or
+  withdraws one pending revision. The response includes a readable text diff
+  and an exact base/candidate JSON diff. `mark_canonical` only marks an
+  accepted guide; it is not a truth or approval state.
+- `capture_message_snapshot` and `submit_evidence` record attributed
+  observations. Evidence subjects must pin exact resource revisions or message
+  snapshots; later source edits do not advance old evidence.
+- Every knowledge-model write requires a caller-scoped `idempotency_token`.
+  Decimal resource, revision, message, snapshot, and evidence IDs are JSON
+  strings. Typed references are limited to resource/message/revision/evidence
+  forms; ordinary URLs remain ordinary metadata.
+
+The legacy `add_resource` and `submit_distillation` envelopes remain documented
+until the separately authorized conversion task removes them.
+
 ### Flywheel loop
 
 1. **Search** distillations first on the user's question.

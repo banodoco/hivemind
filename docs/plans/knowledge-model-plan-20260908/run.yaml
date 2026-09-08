@@ -1,5 +1,5 @@
 # Adopted declaration; execution not started. Packet scopes are executable H criteria.
-mode: planning_only
+mode: delivery
 roles:
   coordinator:
     model: gpt-5.6-luna
