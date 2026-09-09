@@ -12,18 +12,21 @@ revisions/evidence have distinct existing publication semantics; the auth
 work preserves them exactly and does not reintroduce a retired presentation
 model. Search/query design remains unchanged.
 
-The shared Supabase identity source is the existing Discord OAuth mapping in
-`members.auth_user_id`, referenced by Arca Gidan's existing auth flow. The
-census found this nullable
-`auth.users`-backed mapping with a partial unique index, plus the existing
-`resolve_discord_member_id`/user-trigger plumbing; do not substitute the
-retired `ag_user_identities` path. Banodoco's static page uses a pinned
-Supabase browser SDK and the existing shared Supabase session identity;
-Arca's implementation is read-only reference material and receives no product
-changes. Hivemind adds the
-same identity reference to `contributors`. Existing contributor rows and IDs
-remain stable. A `contributor_keys` table holds one hash per device key, with
-contributor link, label/created timestamps, last-use metadata, and `revoked_at`;
+The authoritative shared identity evidence is in `banodoco-workspace`, not the
+Arca application checkout. Its current main is pinned in `provenance.md` and
+provides the nullable, unique `members.auth_user_id` mapping, Discord resolver
+and trigger/backfill plumbing, plus a separate `public.admins` authority. The
+Hivemind contributor principal is intentionally narrower: it binds directly to
+the shared Supabase `auth.users.id`, and a mapped `members` row is not an
+admission requirement. `members.auth_user_id` is an optional Discord/profile
+association only. Do not substitute the retired `ag_user_identities` path.
+Banodoco's static page uses a pinned Supabase browser SDK and the existing
+shared Supabase session identity; Arca's implementation is read-only reference
+material and receives no product changes. Hivemind owns its contributor
+identity and adds the direct auth UUID to `contributors`. Existing contributor
+rows and IDs remain stable. A `contributor_keys` table holds one hash per
+device key, with contributor link, label/created timestamps, last-use metadata,
+and `revoked_at`;
 raw keys are never stored. Existing valid and revoked legacy hashes are
 deduplicated/conflict-checked, then copied in one direct transaction preserving
 their state. After migration, new lookup uses `contributor_keys`; no parallel
@@ -80,6 +83,21 @@ error without interrupting reads. Reuse the existing `hivemind.cli:main`,
 do not repurpose admin-switch-session/impersonate-user or unrelated content
 approval-request infrastructure.
 
+## Delivery reconciliation — D2 (2026-09-09)
+
+The separate `submit-vibecomfy-rating` edge writer is included in the shared
+authentication acceptance closure because it directly validates
+`contributors.api_key_hash`/`revoked_at`. It remains a separate endpoint with
+its existing rating semantics, payloads, attribution, and upload behavior; it
+is not a seventh knowledge-model action. T5/C7/C8 evidence must cover its
+migrated-key lookup, revocation, missing-key errors, and no-secret behavior.
+
+Astrid's strict managed external-pack admission makes Hivemind pack-v2
+compatibility and a retrievable immutable Hivemind pin explicit T6 deliverables.
+The received v1 `pack.yaml` and unavailable `50ff509…` pin are not acceptable
+installation evidence. This reconciliation does not release D1's prerequisite
+gate for authoritative shared-Supabase identity-schema evidence.
+
 ## Implementation criteria
 
 These IDs are the implementation contract for the future run and are used by
@@ -96,8 +114,9 @@ regression suite show no auth dependency.
 
 ### C2 — Identity and key schema migration
 
-`contributors.auth_user_id` links to the existing shared member identity with
-the discovered uniqueness/nullability rules. `contributor_keys` supports
+`contributors.auth_user_id` links directly to `auth.users(id)` with a unique
+constraint. A mapped `members` row is not required for admission.
+`contributor_keys` supports
 multiple device keys, hashed lookup, revocation, and useful lifecycle
 timestamps. A direct transactional migration deduplicates/conflict-checks and
 copies both valid and revoked legacy hashes, then the new lookup path is used;
@@ -195,10 +214,9 @@ the broad affected suite once on the final candidate.
 
 ## Uncertainties requiring an owner
 
-- The authoritative current deployment's exact `members.auth_user_id`
-  uniqueness/restriction details and the final server-side mapping operator
-  action must be captured in the delivery receipt; stable mapping remains the
-  only accepted identity proof.
+  - The authoritative workspace migration source is pinned in the delivery
+  receipt. Hivemind's direct auth UUID binding must remain independent of the
+  optional Discord/profile member mapping.
 - The Banodoco static callback route must restore the shared Supabase session
   with the pinned browser SDK, retain request continuity through
   `sessionStorage`, show machine/code, and require explicit approval. The exact

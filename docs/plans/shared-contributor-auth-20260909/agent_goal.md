@@ -90,10 +90,12 @@ The shared Supabase checkout is read-only identity evidence, not the migration
 owner. The durable direction is
 [northstar.md](northstar.md), and the single run declaration is [run.yaml](run.yaml).
 
-The user authorized planning and publication of these documentation artifacts
-only. Do not edit product source, run product tests, deploy, or perform
-production operations in this planning run. Future implementation remains
-subject to the same explicit scope and an authorized delivery mode.
+The user explicitly authorized this delivery run on 2026-09-09. Product source
+mutation and focused validation are permitted within this scope, but PR
+creation, merge, deployment, cutover, and production operations remain
+separately unauthorized. T2/T3 and their dependents must not start until the
+shared Supabase identity-schema prerequisite is resolved with authoritative
+source or concrete operator-owned runtime evidence and access path.
 
 ## Acceptance contract
 

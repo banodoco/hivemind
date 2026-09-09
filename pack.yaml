@@ -1,10 +1,7 @@
-schema_version: 1
+schema_version: 2
 id: hivemind
 name: Hivemind
 version: 2.0.0
-origin: external
-install_tier: default
-pack_type: capability
 domain: integration
 stability: experimental
 support: community
@@ -36,9 +33,15 @@ keywords:
 capabilities:
   - search_corpus
   - get_item
+  - refresh_media
   - submit_resource
   - propose_revision
+  - decide_revision
+  - mark_canonical
+  - capture_message_snapshot
   - submit_evidence
+  - submit_vibecomfy_rating
+  - contributor_auth
   - ingest_article
   - ingest_workflow
   - ingest_youtube

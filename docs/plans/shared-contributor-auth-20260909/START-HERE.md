@@ -1,8 +1,10 @@
 # Megado run: shared contributor authentication
 
-This directory is a planning-only Megado project. It is ready to hand to a
-delivery coordinator, but it contains no product edits, implementation tests,
-deployment, or production-operation preparation.
+This directory was prepared as a planning-only Megado project. On 2026-09-09
+the user explicitly authorized a delivery run; the current run declaration is
+now `delivery`, while the original handover remains historical evidence.
+Product implementation is currently held at T2/T3 pending the documented
+shared-Supabase identity-schema prerequisite.
 
 Read in this order:
 
@@ -36,6 +38,8 @@ The package is selected for publication on `main`. Before implementation, clone 
 branch from it, and reconcile any differences with the historical source pins
 in [provenance.md](provenance.md).
 
-Run mode is deliberately `planning_only`. To execute, a coordinator must
-create a new authorized delivery run or receive explicit authorization to
-change this run's mode; that change is outside this preparation request.
+The delivery run preserves the declared roles, review stages, budgets, and
+counters. T1 source custody/reconciliation is recorded in
+[provenance.md](provenance.md). T2/T3 remain paused until the authoritative
+shared-Supabase identity/schema evidence and operator access path are pinned;
+the oracle disposition is recorded in the delivery status.

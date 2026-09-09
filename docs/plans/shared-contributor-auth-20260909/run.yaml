@@ -1,4 +1,4 @@
-mode: planning_only
+mode: delivery
 roles:
   coordinator: {model: gpt-5.6-luna, reasoning: medium}
   worker_normal: {model: gpt-5.6-luna, reasoning: high}

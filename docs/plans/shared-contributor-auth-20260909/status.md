@@ -1,10 +1,11 @@
 # Status — shared contributor authentication
 
-State: **planning complete; documentation publication targeted to main; ready for an authorized delivery run**.
+State: **delivery run active; T1 source custody/reconciliation complete; T2/T3
+released by D3; implementation in progress**.
 
-Mode: `planning_only`. No product implementation, source mutation,
-execution test, review invocation, deployment preparation, or production
-operation has occurred. The selected publication contains documentation only.
+Mode: `delivery`. Product changes are being made only in the isolated delivery
+worktrees. No product tests, review stages, PR, merge, deployment, or
+production operation has occurred.
 
 Estimate: 5–7 focused engineering days, plus 1–2 focused days of integration
 contingency for the shared OAuth/broker, static host route, and key migration.
@@ -38,18 +39,36 @@ Banodoco deployed/origin `main` is
 Preserve preview and use deployed/origin `main` as the future delivery baseline;
 do not overwrite preview. Arca Gidan is `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135`
 and remains read-only reference material. The shared Supabase checkout is
-read-only identity evidence, not the migration owner. No source was modified or
-discarded.
+read-only identity evidence, not the migration owner. No original checkout
+source was modified or discarded. The received current SHAs and worktree
+branches are recorded in `provenance.md`. Astrid's current auth seam still
+pins Hivemind to the old local SHA `50ff509…`, a concrete follow-up for the
+later T6 reconciliation after T2/T3.
 
-Tests: **NOT RUN**. Review counters: 0 intermediate, 0 final, 0 oracle calls.
-No review packet exists because planning mode dispatches no executable review.
+Tests: **NOT RUN**. Review counters: 0 intermediate, 0 final. Oracle calls: 3
+of 3.
 
-Next action: from current `main`, record the received SHA, create a new work
-branch, reconcile the historical source manifest, and adopt T1 in a newly
-authorized delivery run; then implement T2/T3. The intended first review
-boundary is after T3 (schema/broker contract, maximum two rounds); the final
-integrated boundary is after T8 (maximum three rounds), as declared in
-`run.yaml`.
+Oracle decision D1 (Astra, 2026-09-09): **BLOCKED at the time**. The supplied repositories
+show Arca's client-side `members.auth_user_id` write path and Hivemind's
+contributors/editor rules, but no authoritative shared-Supabase schema or
+operator-owned evidence/access path. Do not implement T2/T3 from inferred
+semantics. Independent T1 work may continue.
+
+Additional T1 findings resolved by D2/D3: the separate contributor-key-gated
+VibeComfy rating writer is outside the plan's six-action inventory, and Astrid
+requires a schema-v2 external pack while received Hivemind is schema-v1 with
+an unavailable `50ff509…` default pin. Banodoco's static packaging is
+fail-closed and has no existing browser-Supabase seam. These findings are
+recorded in the delivery census. D2 (Astra, 2026-09-09) adopts inclusion of
+the rating writer in shared-auth closure and makes a retrievable v2-compatible
+Hivemind pin an explicit T6 deliverable. D3 (Astra, 2026-09-09) adopts direct
+contributor binding to shared `auth.users.id`, rejects a required `members`
+admission gate, and releases T2/T3.
+
+Next action: implement T2/T3 in the isolated worktrees under D3, preserve the
+first review boundary after T3 (schema/broker contract, maximum two rounds),
+and preserve the final boundary after T8 (maximum three rounds), as declared
+in `run.yaml`.
 
 Key implementation detail: Banodoco currently has no `/connect` route. The
 future static page must be allowlisted in `deploy/public-files.json`, use the
@@ -61,11 +80,14 @@ authorized environment; live proof is pending that environment. The current
 `_common.resolve_contributor_key` and `edge_post` are reusable seams, but raw
 key printing must not enter the broker. Hivemind's active model is immutable
 resources/revisions/message snapshots/evidence; no retired presentation model
-is in scope. No product edits, tests, worktrees, commits, deployment, or
-production work is authorized in this planning revision.
+is in scope. No product edits or product tests have occurred in this delivery
+run; no PR, merge, deployment, or production work is authorized by the current
+instruction.
 
 Planning provenance: Luna High performed the source census, reuse exploration,
 and artifact drafting through native subagents; the host adjudicated scope and
-corrected stale-source assumptions. These were factual/planning assignments,
-not independent implementation reviews. The configured oracle allowance is
-for future invoked decisions; no separate oracle model was called in planning.
+corrected stale-source assumptions. Delivery preflight confirmed Luna, Sol,
+and Astra bindings without substitution. These were factual/preflight
+assignments, not independent implementation reviews. The configured review
+counters remain zero; all three configured oracle calls have been consumed for
+D1, D2, and D3.
