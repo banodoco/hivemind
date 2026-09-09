@@ -24,9 +24,10 @@ tests, deployment, or production operations occurred.
   source baseline and preserved in the original checkout.
 
 The handover worktree was created cleanly from the recorded remote baseline.
-No product source is included in this package. No push has been performed by
-the preparer; the root coordinator must audit the selected paths before any
-publication.
+The branch is a full Hivemind repository checkout, while the handover additions
+are documentation-only; no product source was changed or selected as a new
+artifact. No push has been performed by the preparer; the root coordinator
+must audit the selected paths before any publication.
 
 ## Source and dependency pins
 
@@ -45,9 +46,14 @@ retains the exact refs used by the plan even where a dependency's current
 The Hivemind, Banodoco, Arca, and poms-skills pins were reverified against
 their public `main` refs on 2026-09-09. Astrid's census pin was reverified as
 an existing commit and ancestor of its public `main`; its newer tip is
-reported above rather than substituted. The shared Supabase project is a
-runtime identity/configuration dependency, not a source repository in this
-package; its live configuration was not mutated or certified.
+reported above rather than substituted. The shared Supabase project and its
+schema/configuration evidence are runtime dependencies. No fetchable public
+repository/ref for that evidence was identified in the planning run, so it
+remains an explicitly unverified, local-only prerequisite. Before T2/T3 in a
+future delivery, T1 must locate and pin the authoritative Supabase
+schema/configuration source or record the concrete operator-owned evidence and
+its access path; this package does not silently manufacture that missing
+dependency.
 
 ## Skill provenance and dependency install
 
@@ -79,11 +85,11 @@ and reviewer route. The declared model bindings are retained exactly in
 `run.yaml`: Luna for coordinator/normal worker/normal reviewer, Sol for the
 XHARD slots, Astra for oracle/final reviewer. Availability of each model and
 native capability is a recipient prerequisite; this handover does not silently
-substitute a model. The preparer found the native `codex` CLI on PATH and
-matching Luna, Sol, and Astra identifiers in the local Codex configuration; no
-model was reported missing. No model was invoked while packaging this
-planning-only handover, so live quota/provider availability remains an explicit
-recipient check rather than execution evidence.
+substitute a model. The preparer found the native Codex tooling available and
+used the configured Luna planning/factual-audit agents; no product review or
+oracle call was made. Live availability of every configured Luna, Sol, and
+Astra binding was not independently certified, so the recipient must verify
+that prerequisite and report any missing model rather than substitute silently.
 
 ## Included and omitted records
 
@@ -96,9 +102,10 @@ paths with repository URLs or portable descriptions.
 The ignored `.otto` run directory, logs, archives, raw receipts, caches,
 environment files, credentials, untracked working-tree notes, and private
 operational material are intentionally omitted. The original local dirty files
-are historical context only and are not authoritative source. No contributor
-key, Supabase secret, service-role credential, or authentication receipt is
-included.
+remain preserved in the original checkout and are excluded from the
+authoritative source; this package makes no claim about the contents of those
+untracked files. No contributor key, Supabase secret, service-role credential,
+or authentication receipt is included.
 
 ## Receiving checklist
 
@@ -108,8 +115,9 @@ From a clean clone, inspect the branch and then the immutable plan closure:
 git clone https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
 git fetch --no-tags origin handover/shared-contributor-auth-20260909
-git switch --detach origin/handover/shared-contributor-auth-20260909
+git switch --detach 3487d079bce69780d73f6c5511b9f8bf6f8d55dc
 sed -n '1,220p' docs/plans/shared-contributor-auth-20260909/START-HERE.md
+# Optional parser check; PyYAML is only a handover-validation prerequisite.
 python3 -c 'import yaml; yaml.safe_load(open("docs/plans/shared-contributor-auth-20260909/run.yaml"))'
 ```
 

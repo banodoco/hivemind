@@ -24,8 +24,10 @@ Source census: **complete**. The authoritative delivery source is clean
 remote `main` at `e93f7e37bcc49b21b47a715ba6ffc8ce239609f8`,
 with remote `main` and `hivemind` agreeing. The original local checkout was
 `50ff509240c5582a7335dc71920533b59be7792c`, ahead 3/behind 22 with untracked
-`briefing.md` and `handoff-agent-note.txt`; those files are preserved and were not used as product-source evidence.
-Reconcile them if relevant before future execution. Astrid's tracked baseline is
+`briefing.md` and `handoff-agent-note.txt`; those untracked files remain
+preserved and are excluded from the authoritative baseline, without a claim
+about their contents. Reconcile them if relevant before future execution.
+Astrid's tracked baseline is
 `3e1a8c830fcb670b042ea6ce2f8f009ebb2ea91f`; untracked workflow notes/assets
 are preserved but not used as product-source evidence.
 Banodoco deployed/origin `main` is

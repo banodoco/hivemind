@@ -71,8 +71,9 @@ The authoritative delivery source is the clean remote `main` at
 agree). The original local checkout was
 `50ff509240c5582a7335dc71920533b59be7792c`,
 ahead 3/behind 22 with untracked `briefing.md` and
-`handoff-agent-note.txt`; those historical handover docs are preserved and
-excluded from the code baseline. The Astrid source census found clean
+`handoff-agent-note.txt`; those untracked files remain preserved and are
+excluded from the code baseline, without making any claim about their contents.
+The Astrid source census found clean
 `main` `3e1a8c830fcb670b042ea6ce2f8f009ebb2ea91f`; untracked workflow
 notes/assets are preserved but are not product-source evidence.
 Banodoco website deployed/origin `main` is
