@@ -3,7 +3,10 @@
 
 Default is an export/report only. ``--rehearse`` runs the complete conversion
 inside one disposable transaction and rolls it back. ``--apply`` commits the
-same transaction; the URL guard only accepts a local/test/otto database.
+same transaction; disposable targets use the default local/test guard.
+Production requires ``--production-project-ref`` matching the known Hivemind
+project and an explicit ``--rehearse`` or ``--apply``. Production ``--apply``
+also requires ``--export`` so a legacy backup is written before conversion.
 There is no dual write or compatibility endpoint in this script.
 """
 from __future__ import annotations
@@ -16,12 +19,29 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
+PRODUCTION_PROJECT_REF = "ujlwuvkrxlvoswwkerdf"
 
-def checked_url(raw: str) -> str:
+def _matches_production_project(raw: str, project_ref: str) -> bool:
+    p = urlparse(raw)
+    host = (p.hostname or "").lower()
+    user = (p.username or "").lower()
+    direct_host = host in {f"db.{project_ref}.supabase.co", f"{project_ref}.supabase.co"}
+    pooler_host = host.endswith(".pooler.supabase.com") and user.endswith(f".{project_ref}")
+    return direct_host or pooler_host
+
+def checked_url(raw: str, *, production_project_ref: str | None = None) -> str:
     p = urlparse(raw)
     host = p.hostname or ""
     socket_host = parse_qs(p.query).get("host", [""])[0]
     db = (p.path or "").lstrip("/")
+    if production_project_ref is not None:
+        if production_project_ref != PRODUCTION_PROJECT_REF:
+            raise ValueError("refusing unknown production project reference")
+        if not _matches_production_project(raw, production_project_ref):
+            raise ValueError("production project reference does not match database host")
+        if p.scheme not in {"postgres", "postgresql"}:
+            raise ValueError("database URL must be PostgreSQL")
+        return raw
     if p.scheme not in {"postgres", "postgresql"} or (host not in {"", "localhost", "127.0.0.1", "::1"} and not socket_host.startswith("/tmp/")):
         raise ValueError("refusing non-disposable database host")
     if "test" not in db.lower() and "otto" not in raw.lower():
@@ -141,13 +161,21 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--rehearse", action="store_true")
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--export", type=Path)
+    ap.add_argument("--production-project-ref", help="explicitly authorize the known production project")
     args = ap.parse_args(argv)
     if args.rehearse and args.apply: ap.error("choose --rehearse or --apply")
+    production = args.production_project_ref is not None
+    if production and not (args.rehearse or args.apply):
+        ap.error("--production-project-ref requires --rehearse or --apply")
+    if production and args.apply and args.export is None:
+        ap.error("production --apply requires --export LEGACY_BACKUP.json")
     raw = os.environ.get(args.database_url_env)
     if not raw: print(json.dumps({"status":"skipped","reason":"database_url_missing"})); return 0
-    try: url = checked_url(raw)
+    try: url = checked_url(raw, production_project_ref=args.production_project_ref)
     except ValueError as exc: print(json.dumps({"status":"failed","error":str(exc)})); return 1
     if args.export:
+        if production and args.apply and args.export.exists():
+            print(json.dumps({"status":"failed","error":"refusing to overwrite existing production backup"}, sort_keys=True)); return 1
         payload = psql(url, """
           select jsonb_build_object(
             'external_resources', coalesce((select jsonb_agg(to_jsonb(r) order by r.id) from public.external_resources r), '[]'::jsonb),
