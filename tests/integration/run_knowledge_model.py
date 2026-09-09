@@ -394,7 +394,7 @@ begin
      or public.hivemind_resolve_reference('resource',1)->>'resolved_revision_id' <> '1' then
     raise exception 'unpinned accepted resource did not resolve to its head';
   end if;
-  insert into public.discord_messages(message_id,content) values (9007199254740993,'source v1');
+  insert into public.discord_messages(message_id,content,author_id) values (9007199254740993,'source v1',9007199254740994);
   response := public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author');
   second_response := public.hivemind_capture_message_snapshot(1,'snapshot-1',9007199254740993,'source v1','{"channel":"demo"}',9007199254740994,'Original author');
   if second_response->>'idempotent_replay' <> 'true' then
@@ -403,6 +403,13 @@ begin
   begin
     perform public.hivemind_capture_message_snapshot(1,'snapshot-mismatch',9007199254740993,'not the source','{"channel":"demo"}',9007199254740994,'Original author',now());
     raise exception 'mismatched source snapshot unexpectedly succeeded';
+  exception when sqlstate '22023' then null;
+  end;
+  insert into public.discord_messages(message_id,content) values (9007199254740995,'source without author');
+  begin
+    perform public.hivemind_capture_message_snapshot(1,'snapshot-null-author-mismatch',9007199254740995,
+      'source without author','{}',123,'Unexpected author',now());
+    raise exception 'snapshot with an author not present in the source unexpectedly succeeded';
   exception when sqlstate '22023' then null;
   end;
   perform public.hivemind_submit_evidence(1,'evidence-1','v1 completed','4090','reported result','reported',

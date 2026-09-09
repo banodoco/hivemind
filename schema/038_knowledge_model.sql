@@ -711,7 +711,7 @@ begin
     raise exception 'snapshot content does not match current source message %',p_message_id
       using errcode='22023';
   end if;
-  if p_original_author_id is not null and source_message.author_id is not null
+  if p_original_author_id is not null
      and p_original_author_id is distinct from source_message.author_id then
     raise exception 'snapshot author does not match current source message %',p_message_id
       using errcode='22023';
