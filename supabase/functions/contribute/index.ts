@@ -24,16 +24,16 @@ async function errorBody(response: Response): Promise<{ code?: string; message?:
 }
 async function contributorId(base: string, serviceKey: string, rawKey: string): Promise<number | null> {
   if (!parseContributorKey(rawKey)) return null;
-  const bytes = new TextEncoder().encode(rawKey);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  const hash = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  const url = new URL("/rest/v1/contributors", base);
-  url.searchParams.set("api_key_hash", `eq.${hash}`); url.searchParams.set("revoked_at", "is.null");
-  url.searchParams.set("select", "id"); url.searchParams.set("limit", "1");
-  const response = await fetch(url, { headers: headers(serviceKey) });
+  // Protected lookup is delegated to the SQL function, which hashes the raw
+  // key and reads contributor_keys (never contributors.api_key_hash).
+  const response = await fetch(new URL("/rest/v1/rpc/hivemind_resolve_contributor_key", base), {
+    method: "POST",
+    headers: headers(serviceKey, { "content-type": "application/json" }),
+    body: JSON.stringify({ p_key: rawKey }),
+  });
   if (!response.ok) return null;
-  const rows = await response.json() as Array<{ id: number }>;
-  return rows[0]?.id ?? null;
+  const rows = await response.json() as Array<{ contributor_id?: number }>;
+  return rows[0]?.contributor_id ?? null;
 }
 async function callRpc(base: string, serviceKey: string, id: number, action: KnowledgeModelAction, data: Record<string, unknown>): Promise<Response> {
   const rpcNames: Record<KnowledgeModelAction, string> = {

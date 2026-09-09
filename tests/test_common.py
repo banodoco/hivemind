@@ -19,6 +19,7 @@ from executors._common import (  # noqa: E402
     build_submit_resource_envelope,
     dry_run_output,
     format_error,
+    login_required_error,
     output_json,
     postgrest_get,
     read_body_file,
@@ -76,8 +77,17 @@ class UtilityTests(unittest.TestCase):
     def test_format_error(self):
         self.assertIn("400 validation error", format_error(400, {"detail": "bad"}))
         self.assertIn("401 unauthorized", format_error(401, {}))
+        self.assertIn("hivemind auth login", format_error(401, {}))
         self.assertIn("409 duplicate", format_error(409, {"existing_id": "7"}))
         self.assertIn("500 internal", format_error(500, {}))
+
+    def test_login_required_error_is_structured_and_non_secret(self):
+        self.assertEqual(login_required_error(), {
+            "error": "login_required",
+            "detail": "contributor credentials are required for writes",
+            "recovery_command": "hivemind auth login",
+        })
+        self.assertNotIn("HIVEMIND_CONTRIBUTOR_KEY", json.dumps(login_required_error()))
 
     def test_output_and_dry_run_output(self):
         out = io.StringIO()

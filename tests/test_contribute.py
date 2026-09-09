@@ -106,6 +106,37 @@ class MainTests(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertIn("idempotency-token", json.loads(out.getvalue())["error"])
 
+    def test_missing_contributor_key_returns_login_required_error(self):
+        with unittest.mock.patch.dict("os.environ", {}, clear=True), \
+             unittest.mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+            rc = main([
+                "--type", "mark-canonical", "--resource-id", "42",
+                "--idempotency-token", "retry-1",
+            ])
+        self.assertEqual(rc, 1)
+        self.assertEqual(json.loads(out.getvalue()), {
+            "error": "login_required",
+            "detail": "contributor credentials are required for writes",
+            "recovery_command": "hivemind auth login",
+        })
+
+    def test_from_file_missing_contributor_key_returns_same_login_required_error(self):
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", delete=False) as f:
+            json.dump({"action": "submit_resource", "data": {}}, f)
+            payload_path = f.name
+        try:
+            with unittest.mock.patch.dict("os.environ", {}, clear=True), \
+                 unittest.mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+                rc = main(["--type", "submit-resource", "--from-file", payload_path])
+            self.assertEqual(rc, 1)
+            self.assertEqual(json.loads(out.getvalue()), {
+                "error": "login_required",
+                "detail": "contributor credentials are required for writes",
+                "recovery_command": "hivemind auth login",
+            })
+        finally:
+            Path(payload_path).unlink()
+
 
 if __name__ == "__main__":
     unittest.main()

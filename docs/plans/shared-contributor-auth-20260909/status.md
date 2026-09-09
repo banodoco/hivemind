@@ -1,10 +1,15 @@
 # Status — shared contributor authentication
 
-State: **planning complete; documentation publication targeted to main; ready for an authorized delivery run**.
+State: **delivery implementation complete locally; final Astrid review found one
+P2 on the pre-fix candidate, which is corrected and locally verified**.
 
-Mode: `planning_only`. No product implementation, source mutation,
-execution test, review invocation, deployment preparation, or production
-operation has occurred. The selected publication contains documentation only.
+Correction-round contract: unlinked legacy contributor rows and key hashes are
+retained for audit and report `claim_pending`; they cannot authenticate writes
+until an explicit operator claim binds a verified Supabase Auth identity.
+
+Mode: `delivery`. Product changes are retained only in the isolated delivery
+worktrees. No PR, merge, deployment, cutover, or production operation has
+occurred.
 
 Estimate: 5–7 focused engineering days, plus 1–2 focused days of integration
 contingency for the shared OAuth/broker, static host route, and key migration.
@@ -12,9 +17,9 @@ contingency for the shared OAuth/broker, static host route, and key migration.
 Decision update (2026-09-09): **ADOPTED** the `banodoco-host-findings.md`
 recommendation. Banodoco is the browser host: static `/connect/index.html` at
 `https://www.banodoco.ai/connect/`, packaged through `deploy/public-files.json`,
-with a pinned Supabase browser SDK, shared session identity, `sessionStorage`
-request continuity, fixed callback, machine/code display, and explicit approval
-POST. Hivemind owns broker identity, key, and race logic; the browser receives
+with dependency-free direct Supabase Auth REST/PKCE, shared session identity,
+`sessionStorage` request continuity, fixed callback, machine/code display, and
+explicit approval POST. Hivemind owns broker identity, key, and race logic; the browser receives
 no contributor key or service secret. Arca is read-only auth/identity reference
 material and receives no product changes. The existing Hivemind GitHub CTA
 remains; CLI URLs are sufficient. This is direct user steering; no additional
@@ -38,34 +43,62 @@ Banodoco deployed/origin `main` is
 Preserve preview and use deployed/origin `main` as the future delivery baseline;
 do not overwrite preview. Arca Gidan is `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135`
 and remains read-only reference material. The shared Supabase checkout is
-read-only identity evidence, not the migration owner. No source was modified or
-discarded.
+read-only identity evidence, not the migration owner. No original checkout
+source was modified or discarded. The received current SHAs and worktree
+branches are recorded in `provenance.md`. Astrid's auth seam was reconciled
+during T6 to the final local Hivemind delivery SHA recorded in `provenance.md`;
+remote publication is still required before Astrid can install it from GitHub.
 
-Tests: **NOT RUN**. Review counters: 0 intermediate, 0 final, 0 oracle calls.
-No review packet exists because planning mode dispatches no executable review.
+Tests: correction-round checks are recorded in
+`correction-round-3-evidence.md`; the post-final-review correction and full
+suite are recorded in `post-final-review-fix-evidence.md`.
+Review counters: 2 intermediate, 3 final. Final Astrid verdict on the pre-fix
+candidate: **NEEDS_CHANGES**. Oracle calls: 3 of 3. The P2 recovery-guidance
+finding is fixed in local Hivemind commit
+`a4c6610cba1032adb3b4bec541ccf821afba6ba8`; the declared final-review budget
+is exhausted, so this correction is host-verified rather than relabeled as a
+new Astrid PASS.
 
-Next action: from current `main`, record the received SHA, create a new work
-branch, reconcile the historical source manifest, and adopt T1 in a newly
-authorized delivery run; then implement T2/T3. The intended first review
-boundary is after T3 (schema/broker contract, maximum two rounds); the final
-integrated boundary is after T8 (maximum three rounds), as declared in
-`run.yaml`.
+Oracle decision D1 (Astra, 2026-09-09): **BLOCKED at the time**. The supplied repositories
+show Arca's client-side `members.auth_user_id` write path and Hivemind's
+contributors/editor rules, but no authoritative shared-Supabase schema or
+operator-owned evidence/access path. Do not implement T2/T3 from inferred
+semantics. Independent T1 work may continue.
 
-Key implementation detail: Banodoco currently has no `/connect` route. The
-future static page must be allowlisted in `deploy/public-files.json`, use the
-pinned browser SDK, preserve request identity in `sessionStorage` through the
-fixed callback, show machine/code, and require explicit approval. Declare the
-exact Banodoco CORS origin and Supabase redirect allowlist only for a future
-authorized environment; live proof is pending that environment. The current
+Additional T1 findings resolved by D2/D3: the separate contributor-key-gated
+VibeComfy rating writer is outside the plan's six-action inventory, and Astrid
+requires a schema-v2 external pack while received Hivemind is schema-v1 with
+an unavailable `50ff509…` default pin. Banodoco's static packaging is
+fail-closed and has no existing browser-Supabase seam. These findings are
+recorded in the delivery census. D2 (Astra, 2026-09-09) adopts inclusion of
+the rating writer in shared-auth closure and makes a retrievable v2-compatible
+Hivemind pin an explicit T6 deliverable. D3 (Astra, 2026-09-09) adopts direct
+contributor binding to shared `auth.users.id`, rejects a required `members`
+admission gate, and releases T2/T3.
+
+Next action: preserve the local delivery candidate and review receipt. Any
+publication, staging OAuth check, merge, deployment, or fresh review budget
+requires separate authorization; do not change the roles, stages, budgets, or
+counters in `run.yaml`.
+
+Key implementation detail: Banodoco's `/connect/` route is now allowlisted in
+`deploy/public-files.json` and uses the dependency-free direct PKCE/Auth REST
+flow against the pinned Hivemind Supabase project. It preserves request
+identity in `sessionStorage` through the fixed callback, shows machine/code,
+and requires explicit approval. The exact origin and redirect defaults are
+checked in, while live environment validation remains pending authorization.
+The current
 `issue_contributor_key.py` helper generates/prints legacy key SQL;
 `_common.resolve_contributor_key` and `edge_post` are reusable seams, but raw
 key printing must not enter the broker. Hivemind's active model is immutable
 resources/revisions/message snapshots/evidence; no retired presentation model
-is in scope. No product edits, tests, worktrees, commits, deployment, or
-production work is authorized in this planning revision.
+is in scope. Product edits and local verification are recorded in
+`correction-round-3-evidence.md` and `post-final-review-fix-evidence.md`; no PR,
+merge, deployment, or production work is authorized by the current instruction.
 
 Planning provenance: Luna High performed the source census, reuse exploration,
 and artifact drafting through native subagents; the host adjudicated scope and
-corrected stale-source assumptions. These were factual/planning assignments,
-not independent implementation reviews. The configured oracle allowance is
-for future invoked decisions; no separate oracle model was called in planning.
+corrected stale-source assumptions. Delivery preflight confirmed Luna, Sol,
+and Astra bindings without substitution. The first review boundary consumed
+both configured rounds; the final Astra review remains required. All three
+configured oracle calls have been consumed for D1, D2, and D3.

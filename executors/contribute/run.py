@@ -16,6 +16,7 @@ try:
         dry_run_output,
         edge_post,
         format_error,
+        login_required_error,
         output_json,
         read_body_file,
         resolve_contributor_key,
@@ -31,6 +32,7 @@ except ImportError:
         dry_run_output,
         edge_post,
         format_error,
+        login_required_error,
         output_json,
         read_body_file,
         resolve_contributor_key,
@@ -232,13 +234,7 @@ def main(argv: list[str] | None = None) -> int:
         # Real send with from-file — requires contributor key
         contributor_key = resolve_contributor_key()
         if not contributor_key:
-            output_json(
-                {
-                    "error": "contributor key required",
-                    "detail": "set HIVEMIND_CONTRIBUTOR_KEY or use --dry-run",
-                },
-                args.out,
-            )
+            output_json(login_required_error(), args.out)
             return 1
 
         try:
@@ -273,13 +269,7 @@ def main(argv: list[str] | None = None) -> int:
     # Real send — requires contributor key
     contributor_key = resolve_contributor_key()
     if not contributor_key:
-        output_json(
-            {
-                "error": "contributor key required",
-                "detail": "set HIVEMIND_CONTRIBUTOR_KEY or use --dry-run",
-            },
-            args.out,
-        )
+        output_json(login_required_error(), args.out)
         return 1
 
     try:

@@ -2,8 +2,8 @@
 
 ## Objective
 
-Prepare and, in a future authorized delivery run, implement a shared login
-path for Hivemind contributors. Public search and read behavior must remain
+Implement a shared login path for Hivemind contributors in the authorized
+delivery run. Public search and read behavior must remain
 available without authentication, including through Astrid. Contribution must
 require an authenticated contributor key; editor approval must remain a
 separate existing permission.
@@ -15,14 +15,16 @@ separate existing permission.
 - Hivemind owns the canonical schema/RPC/broker logic; add a static
   `/connect/index.html` route to the Banodoco website at
   `https://www.banodoco.ai/connect/`, including its `deploy/public-files.json`
-  allowlist entry. Use a pinned Supabase browser SDK and the existing shared
+  allowlist entry. Use the pinned direct Supabase Auth REST/PKCE browser flow and the existing shared
   Supabase session identity; Arca Gidan is read-only auth/identity reference
   material and receives no product changes.
 - Migrate existing valid and revoked `contributors.api_key_hash` credentials
   in one direct transaction, preserving contributor IDs, attribution, editor
   status, revocation, and key validity. Deduplicate/conflict-check before the
-  copy, then use the new key table for lookup; do not add a parallel dual-read
-  compatibility shim.
+  copy, then use the new key table for lookup; retain unlinked legacy rows/keys
+  for audit as `claim_pending`, but do not let them authenticate writes until
+  an operator claim binds a verified Auth identity. Do not add a parallel
+  dual-read compatibility shim.
 - Reuse the shared Supabase Discord OAuth identity (`members.auth_user_id`)
   used by Arca Gidan. Link only through a trusted stable mapping or explicit
   operator action; never match on display name or email. Any verified Discord
@@ -90,21 +92,23 @@ The shared Supabase checkout is read-only identity evidence, not the migration
 owner. The durable direction is
 [northstar.md](northstar.md), and the single run declaration is [run.yaml](run.yaml).
 
-The user authorized planning and publication of these documentation artifacts
-only. Do not edit product source, run product tests, deploy, or perform
-production operations in this planning run. Future implementation remains
-subject to the same explicit scope and an authorized delivery mode.
+The user explicitly authorized this delivery run on 2026-09-09. Product source
+mutation and focused validation are permitted within this scope, but PR
+creation, merge, deployment, cutover, and production operations remain
+separately unauthorized. The shared Supabase identity-schema prerequisite was
+resolved from the authoritative workspace migration checkout; T2/T3 and their
+dependents were then implemented in isolated worktrees.
 
 ## Acceptance contract
 
 Implementation criteria are C1–C9 in [plan.md](plan.md). The source census is
-complete; the future run must stop if implementation uncovers a conflicting
+complete; the delivery must stop if implementation uncovers a conflicting
 admission rule, editor rule, or identity mapping, and the configured oracle
 adjudicates that concrete conflict. Arca `is_admin` remains distinct from
 Hivemind `contributors.is_editor`. No criterion may be weakened to make a
 review pass. Exact Banodoco CORS origin and Supabase redirect-allowlist entries
-are declared configuration for a future authorized environment only; this
-planning run does not deploy or mutate them.
+are checked into the local delivery contract; this run does not deploy or
+mutate live configuration.
 
 ## Estimate and limits
 
