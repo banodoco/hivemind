@@ -61,6 +61,33 @@ insert into public.contributors (name, kind, api_key_hash) values
         resolved_rc, resolved = cluster.psql("select contributor_id from hivemind_resolve_contributor_key('hm_' || repeat('a', 64));")
         assert resolved_rc == 0 and resolved.strip() == "1", resolved
 
+        # Safe rollback simulation: callers may be backed out while migration
+        # 040's resolver and service-role boundary remain in place.  A revoked
+        # legacy key must still be rejected through that boundary; restoring a
+        # direct contributors.api_key_hash lookup would violate the policy.
+        boundary_rc, boundary = cluster.psql(
+            "select has_function_privilege('anon', 'public.hivemind_resolve_contributor_key(text)', 'execute')::int "
+            "|| '|' || has_function_privilege('service_role', 'public.hivemind_resolve_contributor_key(text)', 'execute')::int;"
+        )
+        assert boundary_rc == 0 and boundary.strip() == "0|1", boundary
+        legacy_revoke_rc, legacy_revoke = cluster.psql(
+            "select hivemind_auth_revoke_key('hm_' || repeat('a', 64))->>'revoked';"
+        )
+        assert legacy_revoke_rc == 0 and legacy_revoke.strip() == "true", legacy_revoke
+        revoked_legacy_status_rc, revoked_legacy_status = cluster.psql(
+            "select hivemind_auth_key_status('hm_' || repeat('a', 64))->>'status';"
+        )
+        assert revoked_legacy_status_rc == 0 and revoked_legacy_status.strip() == "revoked", revoked_legacy_status
+        revoked_legacy_resolve_rc, revoked_legacy_resolve = cluster.psql(
+            "select count(*) from hivemind_resolve_contributor_key('hm_' || repeat('a', 64));"
+        )
+        assert revoked_legacy_resolve_rc == 0 and revoked_legacy_resolve.strip() == "0", revoked_legacy_resolve
+        legacy_audit_rc, legacy_audit = cluster.psql(
+            "select (select count(*) from contributors where id = 1 and api_key_hash is not null) "
+            "|| '|' || (select count(*) from contributor_keys where contributor_id = 1 and revoked_at is not null);"
+        )
+        assert legacy_audit_rc == 0 and legacy_audit.strip() == "1|1", legacy_audit
+
         request = secrets.token_urlsafe(32)
         poll = secrets.token_urlsafe(32)
         approval = secrets.token_hex(8).upper()
@@ -200,7 +227,7 @@ insert into public.contributors (name, kind, api_key_hash) values
         )
         assert per_key_revoke_rc == 0 and per_key_revoke.strip() == "true", per_key_revoke
         time.sleep(0.01)
-        print("contributor auth disposable migration/redeem rehearsal passed")
+        print("contributor auth disposable migration/redeem rehearsal passed; safe rollback revoked-legacy rejection passed")
         return 0
     finally:
         cluster.tear_down()

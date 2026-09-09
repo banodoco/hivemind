@@ -17,9 +17,9 @@ contingency for the shared OAuth/broker, static host route, and key migration.
 Decision update (2026-09-09): **ADOPTED** the `banodoco-host-findings.md`
 recommendation. Banodoco is the browser host: static `/connect/index.html` at
 `https://www.banodoco.ai/connect/`, packaged through `deploy/public-files.json`,
-with a pinned Supabase browser SDK, shared session identity, `sessionStorage`
-request continuity, fixed callback, machine/code display, and explicit approval
-POST. Hivemind owns broker identity, key, and race logic; the browser receives
+with dependency-free direct Supabase Auth REST/PKCE, shared session identity,
+`sessionStorage` request continuity, fixed callback, machine/code display, and
+explicit approval POST. Hivemind owns broker identity, key, and race logic; the browser receives
 no contributor key or service secret. Arca is read-only auth/identity reference
 material and receives no product changes. The existing Hivemind GitHub CTA
 remains; CLI URLs are sufficient. This is direct user steering; no additional
@@ -50,7 +50,7 @@ during T6 to the final local Hivemind delivery SHA recorded in `provenance.md`;
 remote publication is still required before Astrid can install it from GitHub.
 
 Tests: focused correction-round checks are recorded in
-`correction-round-2-evidence.md`; final integrated review pending.
+`correction-round-3-evidence.md`; final integrated review pending.
 Review counters: 2 intermediate, 0 final. Oracle calls: 3 of 3.
 
 Oracle decision D1 (Astra, 2026-09-09): **BLOCKED at the time**. The supplied repositories
@@ -87,7 +87,7 @@ The current
 key printing must not enter the broker. Hivemind's active model is immutable
 resources/revisions/message snapshots/evidence; no retired presentation model
 is in scope. Product edits and local verification are recorded in
-`correction-round-2-evidence.md`; no PR, merge, deployment, or production work
+`correction-round-3-evidence.md`; no PR, merge, deployment, or production work
 is authorized by the current instruction.
 
 Planning provenance: Luna High performed the source census, reuse exploration,

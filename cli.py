@@ -8,6 +8,7 @@ owner-only permissions and is never included in structured output.
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import os
 import secrets
@@ -116,7 +117,14 @@ def _login(args: argparse.Namespace) -> int:
                 if not isinstance(key, str):
                     raise ValueError("broker did not return a key")
                 path = write_contributor_key(key)
-            except (urllib.error.HTTPError, ValueError, OSError):
+            except (
+                urllib.error.HTTPError,
+                http.client.IncompleteRead,
+                http.client.HTTPException,
+                urllib.error.ContentTooShortError,
+                ValueError,
+                OSError,
+            ):
                 cleanup = _attempt_request_cleanup(request_token, poll_secret)
                 _json({
                     "error": "broker_redeem_failed",

@@ -17,12 +17,20 @@
 -- exist, and before deploying the contributor-auth edge revision that calls
 -- these RPCs.  The request/key association below is additive and must be
 -- applied before enabling CLI cleanup of a lost redemption response.
--- Rollback: first roll back the edge/CLI callers, then revoke the service-role
--- grants for these RPCs if needed.  Do not delete contributor rows, legacy
--- api_key_hash values, key rows, or request audit rows as a rollback shortcut;
--- this migration preserves those records and a forward reconciliation is the
--- safe recovery path.  On a disposable database, drop the additive objects by
--- tearing down the database, never by deleting production audit history.
+-- SAFE ROLLBACK PROCEDURE (mandatory): first disable all contributor writes
+-- before backing out the edge/CLI deployment.  If contributor writes must stay
+-- available during recovery, retain migration 040's resolver and its
+-- service-role-only function/table boundaries until the replacement is live.
+-- NEVER restore legacy contributors.api_key_hash authentication: doing so
+-- bypasses claim_pending and device revocation, and would re-enable revoked
+-- legacy credentials outside contributor_keys.  In particular, rolling back
+-- the callers must not mean restoring the old direct api_key_hash lookup.
+-- Revoke service-role grants for these RPCs only after writes are disabled or
+-- the replacement boundary is ready.  Do not delete contributor rows, legacy
+-- api_key_hash values, contributor_keys rows, or contributor_auth_requests
+-- audit rows as a rollback shortcut; preserve them for forward reconciliation.
+-- On a disposable database, drop additive objects only by tearing down that
+-- database, never by deleting production audit history.
 
 create extension if not exists pgcrypto;
 

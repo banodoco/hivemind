@@ -49,9 +49,10 @@ permission checks or publication semantics.
 Hivemind owns the schema, RPC, identity mapping, and broker edge logic. The
 hosted `/connect/index.html` route is served by Banodoco at
 `https://www.banodoco.ai/connect/` and is included through
-`deploy/public-files.json`; it uses a pinned Supabase browser SDK. The page
-stores the opaque request capability in `sessionStorage`, returns to the fixed
-`/connect/` callback, and restores the shared Supabase session. A CLI creates a
+`deploy/public-files.json`; it uses a dependency-free direct Supabase Auth
+REST/PKCE flow and the shared Supabase session identity. The page stores the
+opaque request capability in `sessionStorage`, returns to the fixed `/connect/`
+callback, and restores the shared Supabase session. A CLI creates a
 request containing an opaque short-lived request identifier and a high-entropy
 polling secret. Only the approval URL capability is sent to the browser; the
 CLI secret stays local and is never put in a URL or log. After Discord OAuth,
@@ -224,8 +225,8 @@ the broad affected suite once on the final candidate.
   - The authoritative workspace migration source is pinned in the delivery
   receipt. Hivemind's direct auth UUID binding must remain independent of the
   optional Discord/profile member mapping.
-- The Banodoco static callback route must restore the shared Supabase session
-  with the pinned browser SDK, retain request continuity through
+  - The Banodoco static callback route must restore the shared Supabase session
+  with direct Supabase Auth REST/PKCE, retain request continuity through
   `sessionStorage`, show machine/code, and require explicit approval. The exact
   `https://www.banodoco.ai` CORS origin and fixed Supabase redirect allowlist
   entry are configuration for a future authorized environment only; no deploy

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import http.client
 import json
 import os
 import stat
@@ -113,6 +114,37 @@ class CliTests(unittest.TestCase):
         self.assertIn("retry login", result["guidance"])
         self.assertEqual(post.call_args_list[-1].args[0]["action"], "cleanup")
 
+    def test_truncated_redeem_response_attempts_cleanup_and_redacts_cleanup_failure(self):
+        poll_secret = "poll-secret-that-must-not-be-printed"
+        truncated = http.client.IncompleteRead(
+            ('{"status":"redeemed","key":"' + KEY).encode("utf-8"), 80
+        )
+        responses = [
+            {"approval_url": "https://www.banodoco.ai/connect/?request=opaque&approval_code=ABCD1234"},
+            {"status": "approved"},
+            truncated,
+            OSError("cleanup transport failed"),
+        ]
+        with mock.patch("cli.auth_post", side_effect=responses) as post, \
+             mock.patch("cli.secrets.token_urlsafe", side_effect=["request-token", poll_secret]), \
+             mock.patch("cli.webbrowser.open", return_value=True), \
+             mock.patch("cli.write_contributor_key") as write, \
+             mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            # The cleanup failure is intentionally opaque: no exception text,
+            # partial body, request capability, or key may reach the user.
+            self.assertEqual(auth_main(["auth", "login", "--interval", "0", "--timeout", "1"]), 1)
+        write.assert_not_called()
+        rendered = output.getvalue()
+        self.assertNotIn("IncompleteRead", rendered)
+        self.assertNotIn(KEY, rendered)
+        self.assertNotIn(poll_secret, rendered)
+        self.assertNotIn("redeemed", rendered)
+        result = json.loads(rendered.splitlines()[-1])
+        self.assertEqual(result["cleanup"], "failed")
+        self.assertIn("retry login", result["guidance"])
+        self.assertEqual(post.call_args_list[2].args[0]["action"], "redeem")
+        self.assertEqual(post.call_args_list[3].args[0]["action"], "cleanup")
+
 
 class MigrationContractTests(unittest.TestCase):
     @classmethod
@@ -140,6 +172,17 @@ class MigrationContractTests(unittest.TestCase):
         self.assertIn("hivemind_auth_cleanup_request(text,text)", self.sql)
         self.assertIn("when r.auth_user_id is null then 'claim_pending'", self.sql)
         self.assertIn("and c.auth_user_id is not null", self.sql)
+
+    def test_safe_rollback_never_restores_legacy_authentication(self):
+        lower = self.sql.lower()
+        self.assertIn("safe rollback procedure", lower)
+        self.assertIn("disable all contributor writes", lower)
+        self.assertIn("retain migration 040's resolver", lower)
+        self.assertIn("never restore legacy contributors.api_key_hash authentication", lower)
+        self.assertIn("bypasses claim_pending and device revocation", lower)
+        self.assertIn("contributor_auth_requests", lower)
+        self.assertIn("audit rows", lower)
+        self.assertNotIn("where api_key_hash =", lower)
 
 
 class EdgeContractTests(unittest.TestCase):
