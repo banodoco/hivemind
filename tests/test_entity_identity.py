@@ -1,8 +1,7 @@
 """Offline tests for the entity_type/result_kind identity + snowflake boundary (task 2.4).
 
 Pure and offline. Pins:
-  * result_kind -> entity_type mapping (messages, concrete resource kinds,
-    distillations, the workflow/resource alias all agree);
+  * result_kind -> entity_type mapping (messages and concrete resource kinds);
   * exact Discord-snowflake string handling — a >2^53 id survives a JSON
     round-trip as an exact string and is never coerced to a float/number;
   * the embedding/shared-index identity key mirrors the content_embeddings PK.
@@ -25,9 +24,6 @@ from executors import entity_identity as ei  # noqa: E402
 class ResultKindMappingTests(unittest.TestCase):
     def test_message_maps_to_message(self):
         self.assertEqual(ei.entity_type_for_result_kind("message"), ei.ENTITY_MESSAGE)
-
-    def test_distillation_maps_to_distillation(self):
-        self.assertEqual(ei.entity_type_for_result_kind("distillation"), ei.ENTITY_DISTILLATION)
 
     def test_concrete_resource_kinds_map_to_resource(self):
         for kind in ("resource", "workflow", "article", "transcript", "blog_post", "repo", "guide"):
@@ -64,11 +60,10 @@ class ResultKindMappingTests(unittest.TestCase):
         self.assertTrue(ei.result_kind_is_resource("workflow"))
         self.assertTrue(ei.result_kind_is_resource("article"))
         self.assertFalse(ei.result_kind_is_resource("message"))
-        self.assertFalse(ei.result_kind_is_resource("distillation"))
         self.assertFalse(ei.result_kind_is_resource(""))
 
     def test_entity_types_complete(self):
-        self.assertEqual(set(ei.ENTITY_TYPES), {"message", "resource", "distillation"})
+        self.assertEqual(set(ei.ENTITY_TYPES), {"message", "resource"})
 
     def test_cite_kind_maps_one_to_one(self):
         for cite_kind in ei.CITE_ITEM_KINDS:

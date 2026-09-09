@@ -1,6 +1,6 @@
 # Hivemind knowledge backend — simplified implementation plan
 
-Status: updated by the host under the user's scope/review changes. Planning only; implementation is not authorized. Source baseline: abe41fdf72df3bbcfe45087eae64ccf50a1bb809. Previous plan/reviews are historical under archive/ and findings/; they do not certify this update or any executable code.
+Status: delivery implementation complete locally; final holistic review pending. Source baseline and candidate SHAs are recorded in the Megado evidence packet. Previous plan/reviews are historical under archive/ and findings/; they do not certify the delivery candidate.
 
 ## Outcome
 Agents and humans create resources and propose revisions through the same contribution API. An editor accepts exact content. Guides, workflows, articles and focused answers share one resource lifecycle; distillation becomes provenance rather than a separate entity. Evidence records what was reported or observed about an exact revision or message snapshot. Existing search continues to work with this model.
@@ -62,7 +62,7 @@ At a separately authorized deployment, briefly pause affected writers, export kn
 
 ## Repository map
 
-- New migration after current 037, e.g. `schema/038_knowledge_resources.sql`; do not rewrite historical migrations.
+- New migrations after current 038, including `schema/039_knowledge_model_delivery.sql`; historical migrations remain unchanged.
 - `supabase/functions/contribute/{protocol.ts,index.ts,protocol_test.ts}` and the retired `contribute-resource` endpoint.
 - `executors/{_common.py,entity_identity.py}`, contribution/search/get-item executors and all three ingestion executors.
 - Existing `postgres_backfill.py`, `embedding_jobs.py`, `embedding_backfill.py`, `canonical_representations.py`, `lexical_documents.py`, `lexical_contract.py`, and affected runtime/rehearsal callers. Update only for the new data contract; historical benchmark documents stay historical.
@@ -100,7 +100,7 @@ After findings, the coordinator dispatches clear corrections, runs affected test
 
 Focused implementation tests continue throughout. Required proof: approval/diff/auth/immutability and competing acceptance; pinned evidence/snapshot survival; narrow reference parsing and ownership; published-only lexical/semantic discovery and stale jobs; conversion fidelity. Reuse a small seeded scenario, real local DB transactions and deterministic vectors. Run the broad affected Python/Deno/DB suite once at final integration; repeat only affected checks after fixes.
 
-This update changes planning/coordination documents only. No implementation, runtime install, product tests, migration or deployment has occurred.
+This delivery updates the active plan/status documents with implementation receipts. Local disposable migrations/tests ran; no production migration, deployment, database cutover, or live corpus write occurred.
 
 ## Artifact-based review packets
 

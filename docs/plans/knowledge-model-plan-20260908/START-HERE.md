@@ -1,20 +1,20 @@
 # Hivemind knowledge-model planning handover
 
 This branch contains the existing Hivemind project at the handover base plus a
-portable copy of the current planning contract. The plan is planning-only:
-implementation, tests, migrations, production cutover, deployment, and corpus
-writes have not started.
+portable copy of the current planning contract. The authorized delivery run
+implemented and validated T1–T10 locally; production cutover, deployment, and
+corpus writes remain out of scope.
 
-The handover recipient is explicitly instructed to execute the planned T1–T10
-implementation and the configured review stages after pulling this branch. Do
-not request a redundant implementation approval. Keep production deployment,
-database cutover, corpus writes, and publication outside this handover's scope.
+The delivery run executed T1–T10 and the configured foundation review. Do not
+request another implementation approval. The remaining run gate is the final
+holistic review. Keep production deployment, database cutover, corpus writes,
+and publication outside this handover's scope.
 
 Read in this order:
 
 1. `northstar.md` for the intended end state and anti-patterns.
 2. `agent_goal.md` and `status.md` for scope, authorization, counters, and the
-   current NOT_RUN state.
+   current delivery/review state.
 3. `plan.md`, `tasklist.md`, and `implementation-criteria.md` for the product
    contract and acceptance proof.
 4. `run.yaml` for the declared roles and review budgets. Normal implementation
@@ -45,14 +45,13 @@ Agents without Codex should read
 `~/.local/share/poms-skills/megado/SKILL.md` directly and follow that skill's
 role, custody, review, and evidence instructions.
 
-Before implementation, recheck source drift against this branch, inspect the
-current local tool prerequisites, and preserve any unrelated dirty work. Before
-executing T1, change `run.yaml` from `mode: planning_only` to the accepted
-execution mode `mode: delivery`, preserving all role bindings, review stages,
-budgets, and counters. Then follow `run.yaml` and execute T1–T10. This is the
-activation transition for the explicit recipient instruction, not a new gate.
+The delivery run rechecked source drift and prerequisites, changed `run.yaml`
+to `mode: delivery`, and preserved the declared role bindings, stages, budgets,
+and counters. Follow the receipts under `.otto/runs/` and the final review
+packet for the current certification state. This activation transition was not
+a production deployment or database cutover.
 
-The original local receipts, raw logs, exploratory briefs, and archives were
-deliberately not copied. They are local process history, not implementation
-proof. The current status distinguishes historical planning exploration from
-future implementation counters and evidence.
+The delivery run stores receipts, review packets, and evidence under
+`.otto/runs/knowledge-model-plan-20260908-delivery/`. The current status
+distinguishes historical planning exploration from executable implementation
+evidence.

@@ -492,17 +492,17 @@ class MainDryRunTests(unittest.TestCase):
                     output = json.loads(mock_stdout.getvalue())
                     self.assertIs(output["dry_run"], True)
                     self.assertIn("envelope", output)
-                    self.assertEqual(output["envelope"]["action"], "add_resource")
+                    self.assertEqual(output["envelope"]["action"], "submit_resource")
                     self.assertEqual(output["envelope"]["data"]["kind"], "article")
-                    self.assertEqual(output["envelope"]["data"]["source"], "web")
+                    self.assertEqual(output["envelope"]["data"]["origin_source"], "web")
                     self.assertEqual(output["envelope"]["data"]["title"], "Test Article")
                     self.assertIn("Body text here", output["envelope"]["data"]["body"])
                     self.assertEqual(
-                        output["envelope"]["data"]["url"],
+                        output["envelope"]["data"]["provenance"]["url"],
                         "https://example.com/article",
                     )
                     self.assertEqual(
-                        output["envelope"]["data"]["external_id"],
+                        output["envelope"]["data"]["origin_external_id"],
                         "https://example.com/article",
                     )
 
@@ -906,11 +906,10 @@ class MainRealSendTests(unittest.TestCase):
                     with unittest.mock.patch("sys.stdout", new_callable=io.StringIO):
                         main(["--url", "https://example.com/article"])
             self.assertEqual(
-                captured_payload["data"]["external_id"],
+                captured_payload["data"]["origin_external_id"],
                 "https://example.com/article",
             )
             self.assertEqual(
-                captured_payload["data"]["url"],
+                captured_payload["data"]["provenance"]["url"],
                 "https://example.com/article",
             )
-

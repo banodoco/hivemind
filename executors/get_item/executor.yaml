@@ -5,28 +5,18 @@
   "kind": "external",
   "version": "2.0",
   "short_description": "Fetch a single full row from the Hivemind corpus by kind and id.",
-  "description": "Retrieves an untruncated row from unified_feed by item_kind and item_id. For distillations, also fetches its distillation_cites. For messages and resources, also fetches distillations that cite the item.",
+  "description": "Retrieves a full message, current stable resource, or exact pinned resource revision and its knowledge-reference context.",
   "keywords": [
     "hivemind",
     "get",
     "fetch",
     "corpus",
-    "distillation",
     "cite"
   ],
   "inputs": [
-    {
-      "name": "kind",
-      "type": "string",
-      "required": true,
-      "description": "Item kind: message | resource | distillation."
-    },
-    {
-      "name": "id",
-      "type": "number",
-      "required": true,
-      "description": "Item id."
-    }
+    {"name": "kind", "type": "string", "required": true, "description": "Item kind: message | resource | revision."},
+    {"name": "id", "type": "string", "required": true, "description": "Decimal ID, kept as text at JSON boundaries."},
+    {"name": "revision_id", "type": "string", "required": false, "description": "Exact revision to fetch for a resource."}
   ],
   "outputs": [
     {
@@ -44,9 +34,12 @@
       "{kind}",
       "--id",
       "{id}",
+      "--revision-id",
+      "{revision_id}",
       "--out",
       "{out}/item.json"
-    ]
+    ],
+    "input_args": [{"input": "revision_id", "flag": "--revision-id", "optional": true}]
   },
   "cache": {
     "mode": "none"

@@ -1,7 +1,3 @@
-// Active knowledge-model protocol tests.
-//
-// Run: deno test supabase/functions/contribute/protocol_test.ts
-
 import {
   buildJsonDiff,
   buildTextDiff,

@@ -1,4 +1,4 @@
-"""Task 1.2 lexical-document helper — resource / distillation / workflow Python.
+"""Task 1.2 lexical-document helper — resources / workflow Python.
 
 This module is the **bridge** between a Hivemind source row and the chunk-aware
 lexical storage created by ``schema/003_lexical_resource_documents.sql``. It
@@ -366,7 +366,6 @@ def drop_workflow_python(item_id: str, store: LexicalDocumentStore) -> None:
 # (service-role RLS bypass => eligibility must be explicit in candidate SQL).
 # They are surfaced here so task 1.7/1.9 build candidate SQL from one place.
 
-DISTILLATION_STATUS_PREDICATE = LC.DISTILLATION_ELIGIBLE  # status IN ('pending','approved')
 WORKFLOW_PYTHON_ELIGIBLE_PREDICATE = LC.WORKFLOW_PYTHON_ELIGIBLE
 
 

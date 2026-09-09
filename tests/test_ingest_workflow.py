@@ -171,10 +171,10 @@ class BuildEnvelopeTests(unittest.TestCase):
             url=None,
             external_id="x.json",
         )
-        self.assertEqual(env["action"], "add_resource")
+        self.assertEqual(env["action"], "submit_resource")
         data = env["data"]
         self.assertEqual(data["kind"], "workflow")
-        self.assertEqual(data["source"], "comfyui")
+        self.assertEqual(data["origin_source"], "comfyui")
         self.assertEqual(data["title"], "Test WF")
         self.assertEqual(data["metadata"]["node_count"], 11)
         self.assertIn("sd_xl_base_1.0.safetensors", data["metadata"]["models"])
@@ -221,7 +221,7 @@ class MainDryRunTests(unittest.TestCase):
                 self.assertIs(output["dry_run"], True)
                 data = output["envelope"]["data"]
                 self.assertEqual(data["kind"], "workflow")
-                self.assertEqual(data["source"], "comfyui")
+                self.assertEqual(data["origin_source"], "comfyui")
                 self.assertEqual(data["metadata"]["node_count"], 11)
 
     def test_dry_run_no_key_needed(self):

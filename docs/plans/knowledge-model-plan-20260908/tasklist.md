@@ -1,4 +1,4 @@
-# Simplified execution tasklist — NOT AUTHORIZED TO EXECUTE
+# Simplified execution tasklist — delivery run
 
 Role assignments and budgets are defined once in [run.yaml](./run.yaml). Luna coordinates/implements/does normal review; Sol supplies XHARD work and oracle judgment; Astra performs final holistic review. This replaces the prior host-as-oracle/final-only arrangement under the user's request to revisit the plan. Product scope and 5–8 engineering-day estimate remain unchanged.
 
@@ -55,4 +55,4 @@ Fixtures: <=100 resources, <=1000 references, small text/JSON data and determini
 
 ## Execution boundary
 
-This tasklist is the future implementation scope, not authorization to execute. No code, tests, installation, migration or deployment in the planning update. Later implementation should recheck source drift and inventory once. Production deployment/cutover remains separately authorized. No huge-run classification, cumulative reviews or packet-review gates.
+This tasklist is the active delivery scope for the authorized run. T1–T10 were executed in the Megado delivery worktree; production deployment/cutover remains separately out of scope. No huge-run classification, cumulative reviews or packet-review gates were added.

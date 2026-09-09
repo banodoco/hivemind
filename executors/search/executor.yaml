@@ -3,25 +3,25 @@ id: hivemind.search
 name: Search
 kind: external
 version: '2.0'
-short_description: Search the Hivemind corpus (messages, resources, distillations) with per-token matching and client-side ranking.
-description: 'Searches the raw corpus tables (message_feed, external_resources, distillations) in parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014) on text search. Filters: per-token ILIKE predicates, kind/source/date/token gates, pagination.'
+short_description: Search Discord messages and accepted current resource heads with per-token matching and client-side ranking.
+description: 'Searches message_feed and resources joined to their current accepted resource_revisions with per-token ILIKE predicates. Pending and historical revisions are excluded; text search never uses unified_feed. Filters include kind/source/date/channel/author/thread and pagination.'
 keywords:
 - hivemind
 - search
 - corpus
 - message_feed
-- external_resources
+- resources
 - postgrest
-- distillation
+- resource_revisions
 inputs:
 - name: query
   type: string
   required: true
-  description: Search query (per-token ilike-matched across messages, resources, distillations).
+  description: Search query (per-token matched across messages and accepted current resource revisions).
 - name: kinds
   type: string
   required: false
-  description: Comma-separated kind filter (message,article,workflow,transcript,distillation,...).
+  description: Comma-separated kind filter (message,resource,article,workflow,transcript,...).
 - name: sources
   type: string
   required: false

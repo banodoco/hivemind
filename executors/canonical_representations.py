@@ -1,8 +1,7 @@
 """Canonical semantic representations + hashes for every entity/representation type.
 
 Plan task 2.5. This module is the embedding-side source of truth for "what text
-gets hashed and embedded" for messages, resources (incl. workflows), and
-distillations. It enforces the frozen workflow Python precedence, secret-state
+gets hashed and embedded" for messages and resources (incl. workflows). It enforces the frozen workflow Python precedence, secret-state
 exclusion, no-duplication, and contract versioning (plan AD-4; task 0.8 freeze).
 
 Canonical semantic text per (entity, representation) — frozen, mirrors the lexical
@@ -14,7 +13,6 @@ documents so lexical and semantic search run over the SAME content:
 | non-workflow resource / prose | title, then body, then stable textual tags            |
 | workflow / prose            | title, body-with-python-blocks-removed, projected workflow_semantics |
 | workflow / workflow_python  | authoritative Python (payload.python_source > body block > recoverable) |
-| distillation / prose        | question, then conditions, then answer                  |
 
 ONE normalization, ONE hash. All text is hashed with
 :func:`executors.workflow_representation.representation_hash` (frozen task-0.8
@@ -70,7 +68,6 @@ __all__ = [
     "WorkflowPythonStatus",
     "canonical_message_text",
     "canonical_resource_text",
-    "canonical_distillation_text",
     "canonical_workflow_prose_text",
     "build_representations",
     "workflow_python_status",
@@ -123,20 +120,6 @@ def canonical_resource_text(
     return _join_nonempty([_coerce_str(title), _coerce_str(body), _coerce_str(tags)])
 
 
-def canonical_distillation_text(
-    question: Any,
-    conditions: Any,
-    answer: Any,
-) -> str:
-    """distillation / prose = question, then conditions, then answer (AD-4).
-
-    Status/confidence influence weighting but never enter the search text (AD-4),
-    so they are deliberately absent here.
-    """
-
-    return _join_nonempty([_coerce_str(question), _coerce_str(conditions), _coerce_str(answer)])
-
-
 def canonical_workflow_prose_text(row: dict[str, Any]) -> str:
     """workflow / prose — delegated to the frozen :func:`wr.build_workflow_prose`.
 
@@ -159,7 +142,7 @@ class CanonicalRepresentation:
 
     ``text`` is the canonical semantic text; ``representation_hash`` is the
     frozen SHA-256 over it. For a single-chunk representation (the normal case
-    for messages/distillations/short resources) the chunk hash equals the
+    for messages and short resources) the chunk hash equals the
     representation hash; multi-chunk is task 2.6. ``available=False`` only marks
     an explicit absence (e.g. an unavailable workflow_python is not returned at
     all, but a representation that exists with empty text is still hashable).
@@ -209,7 +192,7 @@ def build_representations(
     """Return every canonical representation for *row* under ``entity_type``.
 
     Rules (plan AD-4, frozen):
-      * message / distillation / non-workflow resource -> one ``prose`` representation.
+      * message / non-workflow resource -> one ``prose`` representation.
       * workflow -> a ``prose`` representation plus a ``workflow_python``
         representation ONLY when authoritative Python is available AND safe
         (quarantined Python is excluded — never returned, hashed, or embedded).
@@ -229,12 +212,6 @@ def build_representations(
     if entity_type == ei.ENTITY_MESSAGE:
         text = canonical_message_text(row.get("content"))
         return [_representation(ei.ENTITY_MESSAGE, string_id, REP_PROSE, text)]
-
-    if entity_type == ei.ENTITY_DISTILLATION:
-        text = canonical_distillation_text(
-            row.get("question"), row.get("conditions"), row.get("answer")
-        )
-        return [_representation(ei.ENTITY_DISTILLATION, string_id, REP_PROSE, text)]
 
     # entity_type == resource
     kind = (row.get("kind") or "").strip()

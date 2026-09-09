@@ -1,9 +1,9 @@
-Phase: COMPLETE — planning revisit only. Execution NOT STARTED.
-Authoritative configuration: run.yaml. Prior host-oracle/final-only policy superseded by latest user-requested revisit under current defaults; product scope unchanged.
+Phase: DELIVERY — approved; implementation and correction validation complete; review and oracle ceilings exhausted.
+Authoritative configuration: run.yaml (mode: delivery). Product scope unchanged.
 Coordinator Luna; normal worker/reviewer Luna; XHARD worker/reviewer and oracle Sol; final reviewer Astra. Reasoning settings are in run.yaml.
-Review stages: foundation_completion after C1 (max 2 rounds), final after T10 (max 3); max 5 overall. Oracle max 3 calls. All counters start at zero for FUTURE implementation, not a reset of an active run; earlier calls were planning/exploration under prior scope.
-Counters: foundation_completion 0/2; final 0/3; reviews total 0/5; oracle 0/3. Max combined review/oracle calls 8, stop early on success.
-Next: user may authorize implementation. Recheck source drift and local tooling once before execution. No source changes/tests/installs/migration/deployment performed here. Estimate 5–8 engineering days.
+Review stages: foundation_completion after C1 (max 2 rounds), final after T10 (max 3); max 5 overall. Oracle max 3 calls.
+Counters: foundation_completion 2/2 PASS; final 3/3 used (round 3 REWORK, correction closed); reviews total 5/5; oracle 3/3 used (final independent approval PASS). Max combined review/oracle calls 8.
+Delivery candidate: `9de4251` (`b17e70efb624e8076e27508aa7807b77a45a7459`). Implementation and local validation are complete. Production deployment, database cutover, and live corpus writes did not occur.
 Decision requests/rulings will be recorded here under stable IDs; nothing pending.
 
-Packet assembly follows review-contract.md + run.yaml scope + implementation-criteria.md (all NOT_RUN). No review packet with executable evidence can exist before implementation. Review counters remain 0/5 and oracle 0/3.
+Packet assembly follows review-contract.md + run.yaml scope + implementation-criteria.md. Foundation evidence is complete. Astra round 3 identified seven rework findings; the correction receipt records their closure and executable evidence. The final review ceiling prevents a fourth final disposition; the third and final independent Sol oracle returned PASS. No remaining in-scope blocker is recorded.

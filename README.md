@@ -1,294 +1,75 @@
-# Hivemind — the open-source AI art ecosystem's collective intelligence <img src="assets/mascot/mascot.png" align="right" width="150px">
+# Hivemind
 
-A drop-in skill that lets a coding agent (Claude Code, Codex, etc.) search the
-**Banodoco Discord message feed** — a public, read-only PostgREST mirror of
-the Banodoco server. Banodoco is where a lot of the practitioners working on
-generative video & image tooling (Wan, Wan Animate, VACE, LTX, ComfyUI,
-Kijai's nodes, SCAIL, InfiniteTalk, training, etc.) actually talk to each
-other. This skill teaches your agent how to query it.
+Hivemind is a shared knowledge corpus with a public read path and a locked
+write path. Messages remain the source-custodied Discord layer. All authored
+knowledge is a stable `resources` identity with immutable full-content
+`resource_revisions`; only an accepted revision is the searchable current head.
 
-> The endpoint exposes the same data the Discord shows — public messages,
-> attributed by display name. Be respectful when surfacing tips and credit
-> authors.
+## Read
 
----
-
-## v2: Unified Corpus Protocol
-
-Hivemind v2 upgrades the raw message feed into a **unified knowledge corpus**
-with a read path (public PostgREST against `unified_feed`) and a locked write
-path (Supabase edge function). The corpus combines:
-
-- **Messages** — the original Discord message feed (v1)
-- **Resources** — articles, transcripts, ComfyUI workflows, blog posts
-- **Distillations** — curated Q&A pairs with cited sources, submitted by agents
-  and reviewed by humans
-
-Everything is searchable: the pack's search executor queries the raw corpus
-tables (`message_feed`, `external_resources`, `distillations`) in parallel
-with per-token ILIKE predicates and ranks the merge client-side — the
-`unified_feed` UNION view is used only for kind-scoped single-row fetches
-(`get_item`), never for text search (its derived-view scan blows the anon
-role's 3s statement budget → HTTP 500 / SQLSTATE 57014). Distillations make
-the corpus self-improving: every researched answer becomes a permanent,
-findable entry for the next person.
-
----
-
-## Install targets
-
-### 1. Claude Code skill (the classic)
+Use the stdlib-only executors:
 
 ```bash
-git clone https://github.com/banodoco/hivemind /tmp/hivemind-skill-tmp \
-  && mkdir -p ~/.claude/skills \
-  && rm -rf ~/.claude/skills/hivemind \
-  && cp -r /tmp/hivemind-skill-tmp/skill ~/.claude/skills/hivemind \
-  && rm -rf /tmp/hivemind-skill-tmp \
-  && echo "Installed. Restart Claude Code, then try: /hivemind"
+python3 executors/search/run.py --query "wan animate workflow"
+python3 executors/search/run.py --query "lora" --kinds workflow --channel wan_comfyui
+python3 executors/get_item/run.py --kind resource --id 42
+python3 executors/get_item/run.py --kind resource --id 42 --revision-id 107
 ```
 
-Or run `bash install.sh` from a clone of this repo.
+`search` queries `message_feed` and `resources` with its accepted current
+revision relationship. Pending and historical revisions never rank. Resource
+IDs are stable; revision IDs are returned when an exact head is included.
+`unified_feed` is not a text-search surface. `refresh_media` is unchanged and
+media retention remains explicitly deferred.
 
-### 2. Astrid pack (executor-based)
+## Write
+
+Every write goes through `POST /functions/v1/contribute` with
+`X-Contributor-Key`. The active actions are:
+
+- `submit_resource`: initial full candidate content, returning pending resource/revision IDs and a diff.
+- `propose_revision`: full candidate content plus the accepted `resource_id`/`base_revision_id`.
+- `decide_revision`: editor-only `accepted`, `rejected`, or `withdrawn` decision.
+- `mark_canonical`: editor-only canonical guide marker.
+- `capture_message_snapshot`: trusted observation of a current message.
+- `submit_evidence`: immutable reported/observed evidence pinned to exact subjects.
+
+Use `python3 executors/contribute/run.py --type submit-resource --dry-run ...`
+or the corresponding `propose-revision`, `decide-revision`, `mark-canonical`,
+`capture-message`, and `evidence` types. IDs are decimal strings at JSON
+boundaries and every knowledge write has a caller-scoped idempotency token.
+
+The three ingestors keep their extraction and dry-run behavior but emit
+`submit_resource` envelopes: article, ComfyUI workflow, and YouTube transcript.
+The native payload remains in the revision; URLs remain ordinary provenance.
+
+## Editorial guidance
+
+Extend an existing resource when the method is the same and the candidate is a
+clear correction or improvement. Create a new resource when the method,
+artifact, or question is materially different. Split when one candidate mixes
+independently useful methods; consolidate only when a reviewer can preserve the
+source and evidence pins. Put conditions and competing methods in body,
+metadata, or evidence explicitly—do not silently flatten disagreements.
+
+An accepted `guide` may be marked canonical by an editor. Canonical marking is
+an editorial navigation signal, not proof that reported evidence is true.
+Evidence records retain basis (`reported` or `observed`), reporter identity,
+exact revision/message-snapshot subjects, sources, and supersession.
+
+## Conversion and proof
+
+`scripts/convert_legacy_knowledge.py` is the one direct conversion boundary.
+It supports export-only (default), disposable `--rehearse` rollback, and
+explicit local/test `--apply`; it performs no dual write and fabricates no
+evidence. Visibility maps to accepted/pending/rejected/withdrawn and old
+confidence is inert metadata. T7 freshness, T8 conversion, foundation, and
+integration proof run with:
 
 ```bash
-python3 -m astrid packs install https://github.com/banodoco/hivemind.git
+python3 tests/integration/run_knowledge_model.py --scenario all
+python3 -m unittest discover tests/
+deno test supabase/functions/contribute/knowledge_protocol_test.ts
 ```
 
-The pack exposes seven executors: `hivemind.search`, `hivemind.get_item`,
-`hivemind.refresh_media`, `hivemind.contribute`, `hivemind.ingest_article`,
-`hivemind.ingest_workflow`, `hivemind.ingest_youtube`. See `AGENTS.md` for the
-agent guide.
-(Requires Astrid with external Python-executor pack support, 2026-06-04+.)
-
-### 3. Codex / any agent (instruction-file copy)
-
-Copy `skill/SKILL.md` into your `AGENTS.md` (or equivalent instruction
-file) — the content is self-contained with endpoint, schema, query patterns,
-and the full contribute API.
-
-### 4. Pip package (editable dev install)
-
-The repo root is a Python package (`hivemind`), stdlib-only. Install
-editable so edits to the clone are live:
-
-```bash
-pip install -e .
-pyenv rehash   # only if you use pyenv — exposes the hivemind-search shim
-```
-
-Then, from any directory:
-
-```bash
-python3 -m hivemind.executors.search.run --query "wan animate" --limit 10
-hivemind-search --query "lora" --channel wan_chatter --limit 20   # console script
-python3 -c "import hivemind"                                       # package import
-```
-
-The console script mirrors `python3 executors/search/run.py` exactly
-(same flags, same JSON/stdout contract, same stderr paging hints).
-
-## Repository layout
-
-One repo, three products — the Astrid pack is contractually pinned to the
-repo root (`astrid packs install <git-url>` requires `pack.yaml` in a
-directory whose name equals the pack id, and the clone is named `hivemind`):
-
-| entry | belongs to | what it is |
-|---|---|---|
-| `skill/SKILL.md` | all agents | **The canonical playbook** — installed as the Claude skill, discovered by Astrid, copy-paste for anything else |
-| `pack.yaml`, `executors/`, `AGENTS.md`, `__init__.py` | Astrid pack | Manifest, seven stdlib-only executors, agent guide, package marker for `hivemind.executors.*` imports |
-| `schema/`, `supabase/` | backend | The corpus DDL and the `contribute` edge function (the only write path) |
-| `scripts/` | ops | Contributor-key issuance |
-| `tests/` | dev | 309 Python unit tests (mocked HTTP) + deno tests under `supabase/` |
-| `install.sh`, `assets/` | repo | Claude-skill installer, mascot |
-| `DESIGN.md` | docs | Architecture: layers, flywheel, deferred decisions |
-| `.astridignore` | Astrid pack | Keeps backend/assets/tests out of installed pack copies |
-
----
-
-## What you get
-
-### Read path
-
-- The endpoint URL + the public anon key (safe to commit — it's the
-  publishable key, RLS makes it read-only).
-- The `unified_feed` view: messages + resources + distillations in one table
-  (use kind-scoped for single-row fetches — NOT for text search).
-- Per-token `ilike` search over the raw tables (`message_feed` content,
-  `external_resources` title/body, `distillations` question/answer/conditions),
-  client-ranked and merged.
-- Get single items by kind + id with full citation context.
-- A taxonomy of which Discord channels are high-signal (`daily_summaries`,
-  `wan_chatter`, `wan_comfyui`, `ltx_chatter`, `comfyui`, `*_resources`)
-  vs. background noise.
-- A short list of power-users to weight (Kijai, Ablejones, djbfilmz,
-  42hub, BNDC the summary bot).
-- PostgREST query patterns the agent can use directly: `ilike` substring
-  search, `in.(…)` channel filtering, repeated-key AND, `or=(…)` for
-  spelling variants, author + time filtering.
-- Gotchas — most importantly that `fts` (full-text search) **times out**
-  on this table, so use `ilike` only.
-
-### Write path (contribute API)
-
-- `POST /functions/v1/contribute` — the single write entrypoint.
-- Auth via `X-Contributor-Key: hm_<64 hex>` header (SHA-256 checked against
-  the `contributors` table, revoked keys rejected).
-- Two actions:
-  - `add_resource` — submit articles, transcripts, workflows.
-  - `submit_distillation` — submit Q&A with ≥1 cited source. Duplicate
-    detection via `pg_trgm` similarity (>0.6 threshold), `supersedes_id`
-    for replacing outdated answers.
-- Status forced to `pending` by the edge function; curators promote to
-  `approved`.
-- Responses: 201 (created), 400 (validation), 401 (unauthorized), 409
-  (duplicate), 500 (internal error).
-
-### Flywheel loop
-
-1. **Search** distillations first on the user's question.
-2. **Hit** → relay the answer with its cites.
-3. **Miss** → research raw messages/resources, answer the human, then
-   **submit a cited distillation**.
-4. The next person who asks gets it immediately.
-
-### Worth-it criteria for distillations
-
-Before submitting, check:
-- The question is generalizable (not a one-off personal request).
-- You did real research effort (surfaced sources, compared answers).
-- You have at least one cite.
-- If a similar question exists, supersede it rather than duplicating.
-
-### Contribute curl example
-
-```bash
-curl -s -X POST "$SUPABASE_URL/functions/v1/contribute" \
-  -H "Content-Type: application/json" \
-  -H "X-Contributor-Key: hm_$(cat ~/.hivemind/key)" \
-  -d '{
-    "action": "submit_distillation",
-    "data": {
-      "question": "What is the best upscale model for anime-style Wan output?",
-      "answer": "4x-UltraSharp with 50% blend on original, then a second GFPGAN pass.",
-      "confidence": "high",
-      "conditions": "for anime-style video, 1080p target",
-      "cites": [
-        {"item_kind": "message", "item_id": 88123},
-        {"item_kind": "resource", "item_id": 17}
-      ]
-    }
-  }'
-```
-
----
-
-## Executor inventory
-
-| Executor | CLI | Description |
-|---|---|---|
-| `search` | `python3 executors/search/run.py --query "..."` | Per-token ilike search over raw tables, client-ranked; never unified_feed |
-
-Filters: `--kinds message|workflow|distillation` (or a mix), `--sources`,
-`--since`, `--channel <name>`, `--author <name>` (messages only), and
-`--thread <snowflake>` (index-backed thread surface). Ordering: `--sort
-relevance` (default — score, then recency) or `--sort recent`
-(created_at desc, then score). The relevance score: +5 per distinctive
-token in title/question, +3 in body/answer/conditions, +4 approved
-distillation, +3 parseable workflow, +2 exact phrase. Page any query with
-`--limit N --offset M`. Ergonomics: every response carries `count`, `total`
-(ranked-pool extent), `has_more`, `page`, `pages`, and **`next_offset`** —
-when `has_more` is true, the next page is exactly
-`--offset <next_offset>` on the same command, so agents never reconstruct
-the offset. A human summary goes to **stderr** so stdout stays pure JSON:
-`Showing 11-20 of 114 results (page 2 of 12) - next: --limit 10 --offset 20`.
-`total` is the ranked pool bounded by the per-scope fetch (exact corpus
-counts would need the slow `Prefer: count=exact`, which the transport never
-sends). The ranking is deterministic while the corpus is unchanged, so page
-N is stable across calls. Examples:
-
-```bash
-python3 executors/search/run.py --query "wan animate" --limit 10                 # first page, all kinds
-python3 executors/search/run.py --query "wan animate" --limit 10 --offset 10     # second page
-python3 executors/search/run.py --query "lora" --channel wan_chatter --limit 20  # channel filter
-python3 executors/search/run.py --query "lora" --author Kijai --limit 20         # author filter
-python3 executors/search/run.py --query "context" --thread 1175229360781938718   # thread filter
-```
-| `get_item` | `python3 executors/get_item/run.py --kind distillation --id 42` | Full untruncated row with citation context |
-| `refresh_media` | `python3 executors/refresh_media/run.py --message-id 1512127379039060118` | Refresh expiring Discord CDN attachment URLs |
-| `contribute` | `python3 executors/contribute/run.py --type resource ...` | Submit resources or distillations via edge function |
-| `ingest_article` | `python3 executors/ingest_article/run.py --url https://...` | Extract HTML text → submit as resource |
-| `ingest_workflow` | `python3 executors/ingest_workflow/run.py --path workflow.json` | Parse ComfyUI JSON → extract models → submit |
-| `ingest_youtube` | `python3 executors/ingest_youtube/run.py --url https://...` | yt-dlp captions → submit transcript resource |
-
-All executors are stdlib-only Python. See `AGENTS.md` for usage guidance and
-`DESIGN.md` for architecture details.
-
----
-
-## Full Dataset on Huggingface
-
-Hivemind is for querying the live public message feed from an agent. If you want
-to train on the full archive or grab the whole dataset directly, use the
-Hugging Face dataset:
-
-https://huggingface.co/datasets/Banodoco/discord-archive
-
-That dataset contains the exported Discord archive with opted-out authors
-excluded.
-
----
-
-## Example prompts that will trigger the skill
-
-- "What does Banodoco say about Wan Animate best practices?"
-- "Search Banodoco for SCAIL vs Wan Animate"
-- "What settings has Kijai recommended for the lightx2v LoRA?"
-- "Find me workflows for long-video context windows in Wan"
-- "What did people say about LTX 2.3 last week?"
-
----
-
-## Endpoint
-
-```
-GET https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed
-Header: apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx
-```
-
-The `unified_feed` view is at the same base (kind-scoped single-row fetches
-only — see the search-executor note above):
-
-```
-GET https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/unified_feed
-```
-
-Smoke-test a raw search surface (per-token OR on message content — the fast
-shape; `order=created_at.desc` bounds the pool):
-
-```bash
-curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed?select=message_id,content,author_name,channel_name,created_at&limit=5&order=created_at.desc&or=(content.ilike.*wan*,content.ilike.*animate*)" \
-  -H "apikey: sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx" | python3 -m json.tool
-```
-
----
-
-## Further reading
-
-- **[hivemind/SKILL.md](hivemind/SKILL.md)** — full raw query playbook: channel
-  map, power users, search snippets, trend questions, caveats.
-- **[AGENTS.md](AGENTS.md)** — agent guide: when to use each executor, flywheel
-  loop, key constraints.
-- **[DESIGN.md](DESIGN.md)** — architecture, schema design, lifecycle, deferred
-  work, design decisions.
-- **[skill/SKILL.md](skill/SKILL.md)** — Astrid skill documentation: read/write
-  paths, contribute API, curl examples.
-
----
-
-## License
-
-MIT. The data the endpoint serves is public Discord content authored by
-Banodoco members — credit them when you surface their tips.
+The real-DB runner refuses non-disposable URLs and uses small fixtures.
