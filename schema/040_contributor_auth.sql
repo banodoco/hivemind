@@ -154,7 +154,7 @@ on conflict (key_hash) do nothing;
 create or replace function public.hivemind_resolve_contributor_key(p_key text)
 returns table(contributor_id bigint, auth_user_id uuid, is_editor boolean)
 language plpgsql security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   digest_hex text;
@@ -249,7 +249,7 @@ revoke all on table public.contributor_auth_requests from public, anon, authenti
 
 create or replace function public.hivemind_secret_hash(p_secret text)
 returns text language sql immutable strict
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$ select encode(digest(convert_to(p_secret, 'utf8'), 'sha256'), 'hex') $$;
 
 create or replace function public.hivemind_auth_create_request(
@@ -373,7 +373,7 @@ create or replace function public.hivemind_auth_redeem_request(
   p_request_token text, p_poll_secret text
 ) returns jsonb
 language plpgsql security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare r public.contributor_auth_requests%rowtype; key_value text; key_id uuid;
 begin
