@@ -115,11 +115,14 @@ From a clean clone, inspect the branch and then the immutable plan closure:
 git clone https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
 git fetch --no-tags origin handover/shared-contributor-auth-20260909
-git switch --detach d9709c859a7762d8bd31af96a7140cca8664b2b4
 sed -n '1,220p' docs/plans/shared-contributor-auth-20260909/START-HERE.md
 # Optional parser check; PyYAML is only a handover-validation prerequisite.
 python3 -c 'import yaml; yaml.safe_load(open("docs/plans/shared-contributor-auth-20260909/run.yaml"))'
 ```
+
+The copy-paste command that checks out the immutable closure SHA is kept in
+`assets/handover-message.md` on the final handover tip, so this provenance
+record does not create a self-referential commit hash.
 
 The receiving agent must report readiness from this package, retain
 `planning_only`, and preserve the role, stage, budget, and counter values in
