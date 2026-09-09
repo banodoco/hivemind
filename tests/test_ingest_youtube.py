@@ -295,7 +295,11 @@ class MainRealSendTests(unittest.TestCase):
                 with unittest.mock.patch("sys.stdout", new_callable=io.StringIO) as out:
                     ret = main(["--url", "https://youtu.be/x"])
                     self.assertEqual(ret, 1)
-                    self.assertIn("contributor key required", json.loads(out.getvalue())["error"])
+                    self.assertEqual(json.loads(out.getvalue()), {
+                        "error": "login_required",
+                        "detail": "contributor credentials are required for writes",
+                        "recovery_command": "hivemind auth login",
+                    })
 
 
 if __name__ == "__main__":

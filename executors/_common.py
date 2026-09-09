@@ -370,6 +370,15 @@ def truncate_body(
 # ---------------------------------------------------------------------------
 
 
+def login_required_error() -> dict[str, str]:
+    """Return the stable, non-secret error for an unauthenticated write."""
+    return {
+        "error": "login_required",
+        "detail": "contributor credentials are required for writes",
+        "recovery_command": "hivemind auth login",
+    }
+
+
 def format_error(status: int, body: dict[str, Any]) -> str:
     """Map a contribute API error response to a human-readable message.
 
@@ -386,7 +395,10 @@ def format_error(status: int, body: dict[str, Any]) -> str:
         detail = body.get("detail", "bad request")
         return f"400 validation error: {detail}"
     if status == 401:
-        return "401 unauthorized — contributor key is missing, invalid, or revoked"
+        return (
+            "401 unauthorized — contributor key is missing, invalid, or revoked; "
+            "run hivemind auth login"
+        )
     if status == 409:
         existing_id = body.get("existing_id", "?")
         detail = body.get("detail", "duplicate")
