@@ -79,7 +79,11 @@ and reviewer route. The declared model bindings are retained exactly in
 `run.yaml`: Luna for coordinator/normal worker/normal reviewer, Sol for the
 XHARD slots, Astra for oracle/final reviewer. Availability of each model and
 native capability is a recipient prerequisite; this handover does not silently
-substitute a model. Planning mode invokes none of them.
+substitute a model. The preparer found the native `codex` CLI on PATH and
+matching Luna, Sol, and Astra identifiers in the local Codex configuration; no
+model was reported missing. No model was invoked while packaging this
+planning-only handover, so live quota/provider availability remains an explicit
+recipient check rather than execution evidence.
 
 ## Included and omitted records
 
