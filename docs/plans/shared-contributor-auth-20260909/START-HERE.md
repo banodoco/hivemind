@@ -42,4 +42,5 @@ this run.
 The delivery run preserves the declared roles, review stages, budgets, and
 counters. T1 source custody/reconciliation and the T2/T3 oracle decisions are
 recorded in [provenance.md](provenance.md) and the delivery status. The final
-Astrid review remains the next gate after T8.
+Astrid review ran at the declared `3 / 3` limit; its pre-fix P2 is recorded with
+the host-verified correction in `post-final-review-fix-evidence.md`.
