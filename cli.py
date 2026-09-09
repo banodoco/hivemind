@@ -45,6 +45,25 @@ def _error_body(exc: urllib.error.HTTPError) -> dict[str, Any]:
         return {}
 
 
+def _attempt_request_cleanup(request_token: str, poll_secret: str) -> str:
+    """Revoke a key that may have been issued before the client lost it."""
+    try:
+        result = auth_post({
+            "action": "cleanup",
+            "request_token": request_token,
+            "poll_secret": poll_secret,
+        })
+    except urllib.error.HTTPError as exc:
+        return f"failed_http_{exc.code}"
+    except Exception:  # pragma: no cover - defensive boundary around recovery
+        return "failed"
+    if result.get("status") == "cleaned_up" and result.get("revoked") is True:
+        return "revoked_issued_key"
+    if result.get("status") == "cleanup_not_needed":
+        return "not_needed"
+    return "unconfirmed"
+
+
 def _login(args: argparse.Namespace) -> int:
     request_token = secrets.token_urlsafe(32)
     poll_secret = secrets.token_urlsafe(32)
@@ -97,8 +116,20 @@ def _login(args: argparse.Namespace) -> int:
                 if not isinstance(key, str):
                     raise ValueError("broker did not return a key")
                 path = write_contributor_key(key)
-            except (urllib.error.HTTPError, ValueError, OSError) as exc:
-                _json({"error": "broker_redeem_failed", "detail": str(exc) if isinstance(exc, ValueError) else "redemption failed"})
+            except (urllib.error.HTTPError, ValueError, OSError):
+                cleanup = _attempt_request_cleanup(request_token, poll_secret)
+                _json({
+                    "error": "broker_redeem_failed",
+                    "cleanup": cleanup,
+                    "detail": (
+                        "redemption or local key persistence failed; a secret-bound cleanup "
+                        "was attempted and no key or polling secret is shown"
+                    ),
+                    "guidance": (
+                        "retry login; if cleanup is not revoked_issued_key or not_needed, "
+                        "use `hivemind auth revoke` if a key was saved elsewhere or contact an operator"
+                    ),
+                })
                 return 1
             _json({"ok": True, "status": "authenticated", "key_file": path})
             return 0

@@ -1,11 +1,15 @@
 # Status — shared contributor authentication
 
-State: **delivery run active; T1 source custody/reconciliation complete; T2/T3
-released by D3; implementation in progress**.
+State: **delivery implementation complete locally; awaiting final Astrid
+integrated review**.
 
-Mode: `delivery`. Product changes are being made only in the isolated delivery
-worktrees. No product tests, review stages, PR, merge, deployment, or
-production operation has occurred.
+Correction-round contract: unlinked legacy contributor rows and key hashes are
+retained for audit and report `claim_pending`; they cannot authenticate writes
+until an explicit operator claim binds a verified Supabase Auth identity.
+
+Mode: `delivery`. Product changes are retained only in the isolated delivery
+worktrees. No PR, merge, deployment, cutover, or production operation has
+occurred.
 
 Estimate: 5–7 focused engineering days, plus 1–2 focused days of integration
 contingency for the shared OAuth/broker, static host route, and key migration.
@@ -41,12 +45,13 @@ do not overwrite preview. Arca Gidan is `1c1fbadce8868ed3ae806bc8ca28a65ea67a613
 and remains read-only reference material. The shared Supabase checkout is
 read-only identity evidence, not the migration owner. No original checkout
 source was modified or discarded. The received current SHAs and worktree
-branches are recorded in `provenance.md`. Astrid's current auth seam still
-pins Hivemind to the old local SHA `50ff509…`, a concrete follow-up for the
-later T6 reconciliation after T2/T3.
+branches are recorded in `provenance.md`. Astrid's auth seam was reconciled
+during T6 to the final local Hivemind delivery SHA recorded in `provenance.md`;
+remote publication is still required before Astrid can install it from GitHub.
 
-Tests: **NOT RUN**. Review counters: 0 intermediate, 0 final. Oracle calls: 3
-of 3.
+Tests: focused correction-round checks are recorded in
+`correction-round-2-evidence.md`; final integrated review pending.
+Review counters: 2 intermediate, 0 final. Oracle calls: 3 of 3.
 
 Oracle decision D1 (Astra, 2026-09-09): **BLOCKED at the time**. The supplied repositories
 show Arca's client-side `members.auth_user_id` write path and Hivemind's
@@ -65,29 +70,29 @@ Hivemind pin an explicit T6 deliverable. D3 (Astra, 2026-09-09) adopts direct
 contributor binding to shared `auth.users.id`, rejects a required `members`
 admission gate, and releases T2/T3.
 
-Next action: implement T2/T3 in the isolated worktrees under D3, preserve the
-first review boundary after T3 (schema/broker contract, maximum two rounds),
-and preserve the final boundary after T8 (maximum three rounds), as declared
-in `run.yaml`.
+Next action: run the declared final integrated review after T8 with the
+configured Astra final reviewer, then record the verdict and local delivery
+SHAs. Preserve the review limits and all role/stage/budget/counter values in
+`run.yaml`.
 
-Key implementation detail: Banodoco currently has no `/connect` route. The
-future static page must be allowlisted in `deploy/public-files.json`, use the
-pinned browser SDK, preserve request identity in `sessionStorage` through the
-fixed callback, show machine/code, and require explicit approval. Declare the
-exact Banodoco CORS origin and Supabase redirect allowlist only for a future
-authorized environment; live proof is pending that environment. The current
+Key implementation detail: Banodoco's `/connect/` route is now allowlisted in
+`deploy/public-files.json` and uses the dependency-free direct PKCE/Auth REST
+flow against the pinned Hivemind Supabase project. It preserves request
+identity in `sessionStorage` through the fixed callback, shows machine/code,
+and requires explicit approval. The exact origin and redirect defaults are
+checked in, while live environment validation remains pending authorization.
+The current
 `issue_contributor_key.py` helper generates/prints legacy key SQL;
 `_common.resolve_contributor_key` and `edge_post` are reusable seams, but raw
 key printing must not enter the broker. Hivemind's active model is immutable
 resources/revisions/message snapshots/evidence; no retired presentation model
-is in scope. No product edits or product tests have occurred in this delivery
-run; no PR, merge, deployment, or production work is authorized by the current
-instruction.
+is in scope. Product edits and local verification are recorded in
+`correction-round-2-evidence.md`; no PR, merge, deployment, or production work
+is authorized by the current instruction.
 
 Planning provenance: Luna High performed the source census, reuse exploration,
 and artifact drafting through native subagents; the host adjudicated scope and
 corrected stale-source assumptions. Delivery preflight confirmed Luna, Sol,
-and Astra bindings without substitution. These were factual/preflight
-assignments, not independent implementation reviews. The configured review
-counters remain zero; all three configured oracle calls have been consumed for
-D1, D2, and D3.
+and Astra bindings without substitution. The first review boundary consumed
+both configured rounds; the final Astra review remains required. All three
+configured oracle calls have been consumed for D1, D2, and D3.

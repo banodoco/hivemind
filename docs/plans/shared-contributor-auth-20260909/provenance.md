@@ -12,8 +12,9 @@ tests, deployment, or production operations occurred.
 - Receiving mode: `delivery` (explicitly updated by the user on 2026-09-09).
 - Destination remote: `origin` — `https://github.com/banodoco/hivemind.git`.
 - Base branch: `main`.
-- Publication target: public `main`; publication is limited to the selected
-  documentation artifacts.
+- Publication target: none in this run. The implementation is retained in
+  isolated local worktrees; PR creation, merge, deployment, and cutover remain
+  outside the current authorization.
 - Historical source baseline: `origin/main` at
   `e93f7e37bcc49b21b47a715ba6ffc8ce239609f8`.
 - Recipient source record: start from the current `origin/main`, record its
@@ -25,9 +26,9 @@ tests, deployment, or production operations occurred.
   `handoff-agent-note.txt`). Those files are deliberately excluded from the
   source baseline and preserved in the original checkout.
 
-The package was assembled from a clean Hivemind checkout based on the recorded
-remote baseline. The additions are documentation-only; no product source was
-changed or selected as a new artifact.
+The package was assembled from clean current-main checkouts based on the
+recorded remote baselines. Product implementation is isolated to the delivery
+worktrees; the original checkouts remain untouched.
 
 ## Delivery source receipt — 2026-09-09
 
@@ -38,9 +39,9 @@ outside the current authorization.
 
 | Component | Received `origin/main` SHA | Delivery worktree/branch | Reconciliation against historical pin |
 | --- | --- | --- | --- |
-| Hivemind | `9253c10cc2ddb6a12e4afeb41d10d94b83bf50f6` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/hivemind` / `otto/shared-contributor-auth-20260909` | Historical `e93f7e37…` differs only by the handover/package documentation commits listed by `git diff --stat`; no schema, function, CLI, executor, or product-source delta was found. |
+| Hivemind | `9253c10cc2ddb6a12e4afeb41d10d94b83bf50f6` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/hivemind` / `otto/shared-contributor-auth-20260909` | Historical `e93f7e37…` was reconciled before implementation. The final correction-round delivery commit is recorded below and contains the Hivemind schema, broker, CLI, rating-writer closure, rehearsal, and v2 pack updates. |
 | Banodoco website | `f91eca9c748531957a2740707aee753ba674e17a` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/banodoco-website` / `otto/shared-contributor-auth-20260909` | Matches the historical deployed/origin `main` pin. The separate preview evidence `d18eb465…` remains preserved and is not overwritten. |
-| Astrid | `8150c3b70887495f0fae4a55c1ac70085a900550` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/astrid` / `otto/shared-contributor-auth-20260909` | Historical `3e1a8c83…` is an ancestor. Current `main` adds substantial unrelated runtime/docs work; the relevant auth seam still pins Hivemind to local dirty SHA `50ff509240c5582a7335dc71920533b59be7792c` in `astrid/core/pack/source_setup.py:35-36`, which does not match received Hivemind and must be updated only after T2/T3 stabilize. |
+| Astrid | `8150c3b70887495f0fae4a55c1ac70085a900550` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/astrid` / `otto/shared-contributor-auth-20260909` | Historical `3e1a8c83…` is an ancestor. Current `main` adds substantial unrelated runtime/docs work; the delivery seam pins Hivemind to the final local delivery commit recorded below and requires remote publication before remote installation. |
 | Arca Gidan | `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135` | read-only checkout | Matches the historical reference pin; no product changes are planned. |
 | brain-of-bndc | `bcf8d14964113743ccbbaab793dab1a410469990` | read-only checkout | Its planning record identifies the sibling `banodoco-workspace` repository as the authoritative Supabase migration root. |
 | banodoco-workspace | `eedae0b1c90d00b9d7c61ddc64f1cc690d2947cb` | read-only checkout | Authoritative shared identity evidence: `members.auth_user_id`, Discord resolver/trigger/backfill, and separate `public.admins` authority. No changes are planned in this repository. |
@@ -58,14 +59,19 @@ material only and receives no product changes.
 
 Additional current-main reconciliation findings are recorded in the delivery
 census. The separate contributor-key-gated
-`supabase/functions/submit-vibecomfy-rating/index.ts:261-333` writer is not
-one of the six knowledge actions named in the plan and must receive an oracle
-scope disposition before T5/C7 is frozen. Astrid's current managed-pack
-admission requires schema v2, while the received Hivemind `pack.yaml` remains
-schema v1; the unavailable Astrid default pin `50ff509…` cannot be used as an
-implementation source. Banodoco's fail-closed `deploy/public-files.json` and
-`tools/package-public.py:121-150` also require the complete `/connect/` asset
-closure, and the current static site has no browser-Supabase seam.
+`supabase/functions/submit-vibecomfy-rating/index.ts:261-333` writer was not
+one of the six knowledge actions named in the plan; D2 resolved it into the
+shared-auth closure. Astrid's current managed-pack admission required schema
+v2, so the delivery raises Hivemind's pack contract and pins it to the local
+delivery commit. Banodoco's fail-closed `deploy/public-files.json` and
+`tools/package-public.py:121-150` required the complete `/connect/` asset
+closure, which is now covered by the static page, PKCE flow, and packaging
+checks.
+
+Final local delivery receipt (before any remote publication): the correction
+round is committed in Hivemind and the corresponding exact SHA is consumed by
+Astrid's local pin. Banodoco and Astrid remain unpublished delivery worktrees
+until a separate authorization.
 
 ## Source and dependency pins
 

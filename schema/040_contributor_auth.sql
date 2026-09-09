@@ -12,6 +12,17 @@
 -- retained as historical source state but is never read by the protected
 -- lookup functions or edge functions.  This migration is intended to run as
 -- one transaction (the Supabase migration runner supplies the transaction).
+--
+-- Ordering: apply after the base contributors table and Supabase auth.users
+-- exist, and before deploying the contributor-auth edge revision that calls
+-- these RPCs.  The request/key association below is additive and must be
+-- applied before enabling CLI cleanup of a lost redemption response.
+-- Rollback: first roll back the edge/CLI callers, then revoke the service-role
+-- grants for these RPCs if needed.  Do not delete contributor rows, legacy
+-- api_key_hash values, key rows, or request audit rows as a rollback shortcut;
+-- this migration preserves those records and a forward reconciliation is the
+-- safe recovery path.  On a disposable database, drop the additive objects by
+-- tearing down the database, never by deleting production audit history.
 
 create extension if not exists pgcrypto;
 
@@ -203,6 +214,28 @@ create table if not exists public.contributor_auth_requests (
 
 create index if not exists contributor_auth_requests_expiry_idx
   on public.contributor_auth_requests (expires_at);
+
+alter table public.contributor_auth_requests
+  add column if not exists issued_key_id uuid;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+     where conname = 'contributor_auth_requests_issued_key_fkey'
+       and conrelid = 'public.contributor_auth_requests'::regclass
+  ) then
+    alter table public.contributor_auth_requests
+      add constraint contributor_auth_requests_issued_key_fkey
+      foreign key (issued_key_id) references public.contributor_keys(id);
+  end if;
+end
+$$;
+
+create unique index if not exists contributor_auth_requests_issued_key_idx
+  on public.contributor_auth_requests (issued_key_id)
+  where issued_key_id is not null;
+
 alter table public.contributor_auth_requests enable row level security;
 revoke all on table public.contributor_auth_requests from public, anon, authenticated;
 
@@ -352,9 +385,44 @@ begin
   if key_id is null then
     raise exception 'approved contributor unavailable' using errcode = '42501';
   end if;
-  update public.contributor_auth_requests set consumed_at = now() where id = r.id;
+  update public.contributor_auth_requests
+     set consumed_at = now(), issued_key_id = key_id
+   where id = r.id;
   -- key_value exists only as a local return value; it is never persisted.
   return jsonb_build_object('status', 'redeemed', 'key', key_value, 'key_id', key_id::text);
+end;
+$$;
+
+-- Recovery for a client that may have lost the successful redemption response
+-- after the transaction committed.  The poll secret is the same local
+-- capability used for redemption; the request must already be consumed, and
+-- this function only revokes its recorded key.  It never inserts or mints a
+-- replacement key and is idempotent after the first successful cleanup.
+create or replace function public.hivemind_auth_cleanup_request(
+  p_request_token text, p_poll_secret text
+) returns jsonb
+language plpgsql security definer
+set search_path = public, pg_temp
+as $$
+declare r public.contributor_auth_requests%rowtype; changed integer;
+begin
+  select * into r from public.contributor_auth_requests
+   where request_token_hash = public.hivemind_secret_hash(p_request_token)
+   for update;
+  if not found or r.poll_secret_hash <> public.hivemind_secret_hash(p_poll_secret)
+     or r.consumed_at is null then
+    raise exception 'broker request unavailable' using errcode = '42501';
+  end if;
+  update public.contributor_keys
+     set revoked_at = coalesce(revoked_at, now())
+   where id = r.issued_key_id
+     and revoked_at is null;
+  get diagnostics changed = row_count;
+  return jsonb_build_object(
+    'status', case when changed > 0 then 'cleaned_up' else 'cleanup_not_needed' end,
+    'revoked', changed > 0,
+    'key_id', r.issued_key_id::text
+  );
 end;
 $$;
 
@@ -399,12 +467,15 @@ set search_path = public, pg_temp
 as $$
 declare r record;
 begin
-  select k.id, k.created_at, k.last_used_at, k.revoked_at, c.revoked_at as contributor_revoked
+  select k.id, k.created_at, k.last_used_at, k.revoked_at, c.revoked_at as contributor_revoked,
+         c.auth_user_id
     into r from public.contributor_keys k
     join public.contributors c on c.id = k.contributor_id
    where k.key_hash = public.hivemind_secret_hash(p_key);
   if not found then return jsonb_build_object('status', 'unknown'); end if;
-  return jsonb_build_object('status', case when r.revoked_at is null and r.contributor_revoked is null then 'active' else 'revoked' end,
+  return jsonb_build_object('status', case when r.revoked_at is not null or r.contributor_revoked is not null then 'revoked'
+                                           when r.auth_user_id is null then 'claim_pending'
+                                           else 'active' end,
                             'key_id', r.id::text, 'created_at', r.created_at,
                             'last_used_at', r.last_used_at, 'revoked_at', r.revoked_at);
 end;
@@ -422,6 +493,7 @@ begin
     'hivemind_auth_poll_request(text,text)',
     'hivemind_auth_approve_request(text,text,uuid)',
     'hivemind_auth_redeem_request(text,text)',
+    'hivemind_auth_cleanup_request(text,text)',
     'hivemind_auth_revoke_request(text,text)',
     'hivemind_auth_revoke_key(text)',
     'hivemind_auth_key_status(text)'

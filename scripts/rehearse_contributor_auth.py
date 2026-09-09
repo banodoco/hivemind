@@ -49,6 +49,14 @@ insert into public.contributors (name, kind, api_key_hash) values
         cluster.psql_file(MIGRATION)
         blocked_rc, blocked = cluster.psql("select count(*) from hivemind_resolve_contributor_key('hm_' || repeat('a', 64));")
         assert blocked_rc == 0 and blocked.strip() == "0", blocked
+        pending_rc, pending = cluster.psql(
+            "select hivemind_auth_key_status('hm_' || repeat('a', 64))->>'status';"
+        )
+        assert pending_rc == 0 and pending.strip() == "claim_pending", pending
+        retained_rc, retained = cluster.psql(
+            "select count(*) from contributor_keys where contributor_id = 1;"
+        )
+        assert retained_rc == 0 and retained.strip() == "1", retained
         cluster.psql("select hivemind_claim_contributor('postgres', 1, '11111111-1111-4111-8111-111111111111');", capture=False)
         resolved_rc, resolved = cluster.psql("select contributor_id from hivemind_resolve_contributor_key('hm_' || repeat('a', 64));")
         assert resolved_rc == 0 and resolved.strip() == "1", resolved
@@ -150,10 +158,18 @@ insert into public.contributors (name, kind, api_key_hash) values
         )
         issued_key = issued_key.strip()
         assert key_rc == 0 and issued_key.startswith("hm_"), issued_key
+        cleanup_rc, cleanup = cluster.psql(
+            f"select hivemind_auth_cleanup_request('{revoke_request}', '{revoke_poll}')->>'status';"
+        )
+        assert cleanup_rc == 0 and cleanup.strip() == "cleaned_up", cleanup
+        cleanup_replay_rc, cleanup_replay = cluster.psql(
+            f"select hivemind_auth_cleanup_request('{revoke_request}', '{revoke_poll}')->>'status';"
+        )
+        assert cleanup_replay_rc == 0 and cleanup_replay.strip() == "cleanup_not_needed", cleanup_replay
         revoked_rc, revoked = cluster.psql(
             f"select hivemind_auth_revoke_key('{issued_key}')->>'revoked';"
         )
-        assert revoked_rc == 0 and revoked.strip() == "true", revoked
+        assert revoked_rc == 0 and revoked.strip() == "false", revoked
         status_rc, status = cluster.psql(
             f"select hivemind_auth_key_status('{issued_key}')->>'status';"
         )
@@ -162,6 +178,27 @@ insert into public.contributors (name, kind, api_key_hash) values
             f"select count(*) from hivemind_resolve_contributor_key('{issued_key}');"
         )
         assert resolved_revoked_rc == 0 and resolved_revoked.strip() == "0", resolved_revoked
+
+        per_key_request = secrets.token_urlsafe(32)
+        per_key_poll = secrets.token_urlsafe(32)
+        per_key_approval = secrets.token_hex(8).upper()
+        cluster.psql(
+            f"select hivemind_auth_create_request('{per_key_request}', '{per_key_poll}', '{per_key_approval}', 'per-key', 600);",
+            capture=False,
+        )
+        cluster.psql(
+            f"select hivemind_auth_approve_request('{per_key_request}', '{per_key_approval}', '22222222-2222-4222-8222-222222222222');",
+            capture=False,
+        )
+        per_key_rc, per_key = cluster.psql(
+            f"select hivemind_auth_redeem_request('{per_key_request}', '{per_key_poll}')->>'key';"
+        )
+        per_key = per_key.strip()
+        assert per_key_rc == 0 and per_key.startswith("hm_"), per_key
+        per_key_revoke_rc, per_key_revoke = cluster.psql(
+            f"select hivemind_auth_revoke_key('{per_key}')->>'revoked';"
+        )
+        assert per_key_revoke_rc == 0 and per_key_revoke.strip() == "true", per_key_revoke
         time.sleep(0.01)
         print("contributor auth disposable migration/redeem rehearsal passed")
         return 0

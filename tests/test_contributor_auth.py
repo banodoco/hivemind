@@ -92,6 +92,27 @@ class CliTests(unittest.TestCase):
             if call.args[0].get("action") != "create":
                 self.assertNotIn("poll_secret", call.args[0].get("approval_url", ""))
 
+    def test_login_attempts_redacted_cleanup_after_local_persistence_failure(self):
+        poll_secret = "poll-secret-that-must-not-be-printed"
+        responses = [
+            {"approval_url": "https://www.banodoco.ai/connect/?request=opaque&approval_code=ABCD1234"},
+            {"status": "approved"},
+            {"status": "redeemed", "key": KEY},
+            {"status": "cleaned_up", "revoked": True, "key_id": "key-id"},
+        ]
+        with mock.patch("cli.auth_post", side_effect=responses) as post, \
+             mock.patch("cli.webbrowser.open", return_value=True), \
+             mock.patch("cli.write_contributor_key", side_effect=OSError("disk full")), \
+             mock.patch("sys.stdout", new_callable=io.StringIO) as output:
+            self.assertEqual(auth_main(["auth", "login", "--interval", "0", "--timeout", "1"]), 1)
+        rendered = output.getvalue()
+        self.assertNotIn(KEY, rendered)
+        self.assertNotIn(poll_secret, rendered)
+        result = json.loads(rendered.splitlines()[-1])
+        self.assertEqual(result["cleanup"], "revoked_issued_key")
+        self.assertIn("retry login", result["guidance"])
+        self.assertEqual(post.call_args_list[-1].args[0]["action"], "cleanup")
+
 
 class MigrationContractTests(unittest.TestCase):
     @classmethod
@@ -113,6 +134,32 @@ class MigrationContractTests(unittest.TestCase):
         self.assertIn("consumed_at is not null", self.sql)
         self.assertIn("set consumed_at = now()", self.sql)
         self.assertIn("contributor_keys_hash_key unique", self.sql)
+
+    def test_unlinked_legacy_keys_are_auditable_but_not_write_credentials(self):
+        self.assertIn("issued_key_id uuid", self.sql)
+        self.assertIn("hivemind_auth_cleanup_request(text,text)", self.sql)
+        self.assertIn("when r.auth_user_id is null then 'claim_pending'", self.sql)
+        self.assertIn("and c.auth_user_id is not null", self.sql)
+
+
+class EdgeContractTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.edge = (REPO / "supabase" / "functions" / "contributor-auth" / "index.ts").read_text(encoding="utf-8")
+        cls.protocol = (REPO / "supabase" / "functions" / "contributor-auth" / "protocol.ts").read_text(encoding="utf-8")
+
+    def test_edge_has_exact_cors_preflight_and_json_response_path(self):
+        self.assertIn('"https://www.banodoco.ai"', self.protocol)
+        self.assertIn('request.method === "OPTIONS"', self.edge)
+        self.assertIn('"access-control-allow-origin"', self.edge)
+        self.assertIn('"content-type": "application/json; charset=utf-8"', self.edge)
+        self.assertNotIn('access-control-allow-origin", "*"', self.edge)
+
+    def test_edge_requires_non_anonymous_discord_identity_without_members_gate(self):
+        self.assertIn("verifiedDiscordUserId", self.edge)
+        self.assertIn("is_anonymous === true", self.protocol)
+        self.assertIn('identity.provider === "discord"', self.protocol)
+        self.assertNotIn("members", self.edge)
 
 
 if __name__ == "__main__":

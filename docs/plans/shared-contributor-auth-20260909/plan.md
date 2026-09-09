@@ -20,8 +20,8 @@ Hivemind contributor principal is intentionally narrower: it binds directly to
 the shared Supabase `auth.users.id`, and a mapped `members` row is not an
 admission requirement. `members.auth_user_id` is an optional Discord/profile
 association only. Do not substitute the retired `ag_user_identities` path.
-Banodoco's static page uses a pinned Supabase browser SDK and the existing
-shared Supabase session identity; Arca's implementation is read-only reference
+Banodoco's static page uses a pinned, dependency-free Supabase Auth REST/PKCE
+browser flow and the existing shared Supabase session identity; Arca's implementation is read-only reference
 material and receives no product changes. Hivemind owns its contributor
 identity and adds the direct auth UUID to `contributors`. Existing contributor
 rows and IDs remain stable. A `contributor_keys` table holds one hash per
@@ -30,7 +30,10 @@ and `revoked_at`;
 raw keys are never stored. Existing valid and revoked legacy hashes are
 deduplicated/conflict-checked, then copied in one direct transaction preserving
 their state. After migration, new lookup uses `contributor_keys`; no parallel
-dual-read compatibility shim is planned.
+dual-read compatibility shim is planned. An unlinked legacy row/key remains
+available for audit and status inspection as `claim_pending`, but cannot
+authenticate a write until an operator binds the contributor row to a verified
+Auth identity.
 
 The completed source census found the current editor representation in
 `contributors.is_editor` and the schema functions `decide_revision` and
@@ -65,10 +68,12 @@ is lost, the client receives clear cleanup/restart semantics with bounded retry
 or a new request; polling cannot mint unlimited credentials. Key material is
 never logged or persisted server-side in plaintext.
 
-Declare the exact `https://www.banodoco.ai` CORS origin and fixed Supabase
-redirect-allowlist callback in configuration for a future authorized
-environment only; do not deploy or mutate live configuration in this planning
-run. Keep the existing Hivemind GitHub CTA; the CLI-generated URL is sufficient.
+The broker allows only the exact `https://www.banodoco.ai` origin (plus
+loopback for disposable rehearsal) and the fixed Supabase redirect callback is
+`https://www.banodoco.ai/connect/`. These are checked-in delivery defaults;
+live Supabase redirect/CORS configuration still requires a separately
+authorized environment change. Keep the existing Hivemind GitHub CTA; the
+CLI-generated URL is sufficient.
 
 The CLI should expose a shared command surface such as `hivemind auth login`,
 `hivemind auth status`, and `hivemind auth logout` with an explicit local
@@ -121,9 +126,11 @@ multiple device keys, hashed lookup, revocation, and useful lifecycle
 timestamps. A direct transactional migration deduplicates/conflict-checks and
 copies both valid and revoked legacy hashes, then the new lookup path is used;
 there is no dual-read shim. Existing contributor IDs, attribution, editor
-fields/status, and every still-valid legacy key continue to work. Proof: SQL
-fixture migration checks counts, hashes, revoked behavior, foreign keys,
-uniqueness, and legacy-key contribution.
+fields/status, and legacy key rows continue to be retained. An unlinked legacy
+key is `claim_pending` and cannot authenticate a write; after an explicit
+operator claim, the same key can authenticate under its preserved contributor.
+Proof: SQL fixture migration checks counts, hashes, claim-pending blocking,
+post-claim resolution, revoked behavior, foreign keys, and uniqueness.
 
 ### C3 — Secure broker exchange
 
