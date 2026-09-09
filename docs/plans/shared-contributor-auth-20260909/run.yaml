@@ -1,0 +1,28 @@
+mode: planning_only
+roles:
+  coordinator: {model: gpt-5.6-luna, reasoning: medium}
+  worker_normal: {model: gpt-5.6-luna, reasoning: high}
+  worker_xhard: {model: gpt-5.6-sol, reasoning: high}
+  reviewer_normal: {model: gpt-5.6-luna, reasoning: medium}
+  reviewer_xhard: {model: gpt-5.6-sol, reasoning: high}
+  oracle: {model: gpt-6-astra, reasoning: medium}
+  final_reviewer: {model: gpt-6-astra, reasoning: medium}
+oracle:
+  max_calls: 3
+review_stages:
+  - id: schema_broker_contract
+    after: T3
+    reviewer_role: reviewer_normal
+    lens: completion
+    scope_tasks: [T1, T2, T3]
+    criteria_source: plan.md
+    criteria: [C2, C3, C4, C8]
+    max_rounds: 2
+  - id: final_integrated
+    after: T8
+    reviewer_role: final_reviewer
+    lens: completion_and_strategy
+    scope_tasks: [T1, T2, T3, T4, T5, T6, T7, T8]
+    criteria_source: plan.md
+    criteria: [C1, C2, C3, C4, C5, C6, C7, C8, C9]
+    max_rounds: 3
