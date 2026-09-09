@@ -399,6 +399,9 @@ def format_error(status: int, body: dict[str, Any]) -> str:
             "401 unauthorized — contributor key is missing, invalid, or revoked; "
             "run hivemind auth login"
         )
+    if status == 403:
+        detail = body.get("detail", "editor authorization required")
+        return f"403 forbidden — {detail}"
     if status == 409:
         existing_id = body.get("existing_id", "?")
         detail = body.get("detail", "duplicate")

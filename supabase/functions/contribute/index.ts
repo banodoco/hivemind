@@ -51,7 +51,16 @@ async function callRpc(base: string, serviceKey: string, id: number, action: Kno
   });
   if (response.ok) return json(await response.json(), action === "decide_revision" || action === "mark_canonical" ? 200 : 201);
   const e = await errorBody(response);
-  if (e.code === "42501") return json({ error: "unauthorized" }, 401);
+  if (e.code === "42501") {
+    // Authentication failures happen before the knowledge RPC is called and
+    // are handled above by contributorId(). The decision/canonical RPCs use
+    // the same SQLSTATE for their editor gate; report that as authorization
+    // failure rather than making a logged-in contributor chase a new key.
+    if (action === "decide_revision" || action === "mark_canonical") {
+      return json({ error: "forbidden", detail: "editor authorization required" }, 403);
+    }
+    return json({ error: "unauthorized" }, 401);
+  }
   if (["40001", "55000", "23505"].includes(e.code ?? "")) return json({ error: "conflict", detail: e.message ?? "revision conflict" }, 409);
   if (["22023", "23503", "23514"].includes(e.code ?? "")) return validation(e.message ?? "invalid knowledge-model request");
   throw new Error(`knowledge RPC failed: ${response.status}`);
