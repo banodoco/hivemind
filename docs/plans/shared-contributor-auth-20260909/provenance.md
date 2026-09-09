@@ -39,9 +39,9 @@ outside the current authorization.
 
 | Component | Received `origin/main` SHA | Delivery worktree/branch | Reconciliation against historical pin |
 | --- | --- | --- | --- |
-| Hivemind | `9253c10cc2ddb6a12e4afeb41d10d94b83bf50f6` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/hivemind` / `otto/shared-contributor-auth-20260909` | Historical `e93f7e37…` was reconciled before implementation. Local delivery commit `f5a25b5807891ddb16c7bae8964fb1b5c990ef6c` contains the final Hivemind schema, broker, CLI, rating-writer closure, rollback hardening, rehearsal, and v2 pack updates. |
+| Hivemind | `9253c10cc2ddb6a12e4afeb41d10d94b83bf50f6` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/hivemind` / `otto/shared-contributor-auth-20260909` | Historical `e93f7e37…` was reconciled before implementation. Local delivery commit `a4c6610cba1032adb3b4bec541ccf821afba6ba8` contains the final Hivemind schema, broker, CLI, rating-writer closure, rollback hardening, login-recovery contract, rehearsal, and v2 pack updates. |
 | Banodoco website | `f91eca9c748531957a2740707aee753ba674e17a` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/banodoco-website` / `otto/shared-contributor-auth-20260909` | Matches the historical deployed/origin `main` pin. The separate preview evidence `d18eb465…` remains preserved and is not overwritten. |
-| Astrid | `8150c3b70887495f0fae4a55c1ac70085a900550` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/astrid` / `otto/shared-contributor-auth-20260909` | Historical `3e1a8c83…` is an ancestor. Current `main` adds substantial unrelated runtime/docs work; the delivery seam pins Hivemind to `f5a25b5807891ddb16c7bae8964fb1b5c990ef6c` and requires remote publication before remote installation. |
+| Astrid | `8150c3b70887495f0fae4a55c1ac70085a900550` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/astrid` / `otto/shared-contributor-auth-20260909` | Historical `3e1a8c83…` is an ancestor. Current `main` adds substantial unrelated runtime/docs work; the delivery seam pins Hivemind to `a4c6610cba1032adb3b4bec541ccf821afba6ba8` and requires remote publication before remote installation. |
 | Arca Gidan | `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135` | read-only checkout | Matches the historical reference pin; no product changes are planned. |
 | brain-of-bndc | `bcf8d14964113743ccbbaab793dab1a410469990` | read-only checkout | Its planning record identifies the sibling `banodoco-workspace` repository as the authoritative Supabase migration root. |
 | banodoco-workspace | `eedae0b1c90d00b9d7c61ddc64f1cc690d2947cb` | read-only checkout | Authoritative shared identity evidence: `members.auth_user_id`, Discord resolver/trigger/backfill, and separate `public.admins` authority. No changes are planned in this repository. |
@@ -69,9 +69,11 @@ closure, which is now covered by the static page, PKCE flow, and packaging
 checks.
 
 Final local delivery receipt (before any remote publication): Hivemind product
-commit `f5a25b5807891ddb16c7bae8964fb1b5c990ef6c` is consumed by Astrid's local
-pin. Banodoco and Astrid remain unpublished delivery worktrees until a separate
-authorization.
+commit `a4c6610cba1032adb3b4bec541ccf821afba6ba8` is consumed by Astrid's local
+pin. The final Astrid review inspected the preceding candidate and returned
+NEEDS_CHANGES; the post-review login-recovery correction is host-verified and
+the declared final-review budget is exhausted. Banodoco and Astrid remain
+unpublished delivery worktrees until a separate authorization.
 
 ## Source and dependency pins
 

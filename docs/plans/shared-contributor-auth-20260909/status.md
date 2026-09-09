@@ -1,7 +1,7 @@
 # Status — shared contributor authentication
 
-State: **delivery implementation complete locally; awaiting final Astrid
-integrated review**.
+State: **delivery implementation complete locally; final Astrid review found one
+P2 on the pre-fix candidate, which is corrected and locally verified**.
 
 Correction-round contract: unlinked legacy contributor rows and key hashes are
 retained for audit and report `claim_pending`; they cannot authenticate writes
@@ -49,9 +49,15 @@ branches are recorded in `provenance.md`. Astrid's auth seam was reconciled
 during T6 to the final local Hivemind delivery SHA recorded in `provenance.md`;
 remote publication is still required before Astrid can install it from GitHub.
 
-Tests: focused correction-round checks are recorded in
-`correction-round-3-evidence.md`; final integrated review pending.
-Review counters: 2 intermediate, 0 final. Oracle calls: 3 of 3.
+Tests: correction-round checks are recorded in
+`correction-round-3-evidence.md`; the post-final-review correction and full
+suite are recorded in `post-final-review-fix-evidence.md`.
+Review counters: 2 intermediate, 3 final. Final Astrid verdict on the pre-fix
+candidate: **NEEDS_CHANGES**. Oracle calls: 3 of 3. The P2 recovery-guidance
+finding is fixed in local Hivemind commit
+`a4c6610cba1032adb3b4bec541ccf821afba6ba8`; the declared final-review budget
+is exhausted, so this correction is host-verified rather than relabeled as a
+new Astrid PASS.
 
 Oracle decision D1 (Astra, 2026-09-09): **BLOCKED at the time**. The supplied repositories
 show Arca's client-side `members.auth_user_id` write path and Hivemind's
@@ -70,10 +76,10 @@ Hivemind pin an explicit T6 deliverable. D3 (Astra, 2026-09-09) adopts direct
 contributor binding to shared `auth.users.id`, rejects a required `members`
 admission gate, and releases T2/T3.
 
-Next action: run the declared final integrated review after T8 with the
-configured Astra final reviewer, then record the verdict and local delivery
-SHAs. Preserve the review limits and all role/stage/budget/counter values in
-`run.yaml`.
+Next action: preserve the local delivery candidate and review receipt. Any
+publication, staging OAuth check, merge, deployment, or fresh review budget
+requires separate authorization; do not change the roles, stages, budgets, or
+counters in `run.yaml`.
 
 Key implementation detail: Banodoco's `/connect/` route is now allowlisted in
 `deploy/public-files.json` and uses the dependency-free direct PKCE/Auth REST
@@ -87,8 +93,8 @@ The current
 key printing must not enter the broker. Hivemind's active model is immutable
 resources/revisions/message snapshots/evidence; no retired presentation model
 is in scope. Product edits and local verification are recorded in
-`correction-round-3-evidence.md`; no PR, merge, deployment, or production work
-is authorized by the current instruction.
+`correction-round-3-evidence.md` and `post-final-review-fix-evidence.md`; no PR,
+merge, deployment, or production work is authorized by the current instruction.
 
 Planning provenance: Luna High performed the source census, reuse exploration,
 and artifact drafting through native subagents; the host adjudicated scope and
