@@ -7,7 +7,7 @@ handover branch:
 Project:  https://github.com/banodoco/hivemind.git
 Branch:   handover/shared-contributor-auth-20260909
 Baseline: e93f7e37bcc49b21b47a715ba6ffc8ce239609f8
-Closure:  4beedebb55cf9dfa8db53d12ff14ade27bd8bd68
+Closure:  d9709c859a7762d8bd31af96a7140cca8664b2b4
 Base:     main
 Mode:     planning_only
 ```
@@ -100,8 +100,8 @@ Start from a fresh checkout and inspect the package:
 git clone https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
 git fetch --no-tags origin handover/shared-contributor-auth-20260909
-git switch --detach 4beedebb55cf9dfa8db53d12ff14ade27bd8bd68
-git show --stat --oneline 4beedebb55cf9dfa8db53d12ff14ade27bd8bd68
+git switch --detach d9709c859a7762d8bd31af96a7140cca8664b2b4
+git show --stat --oneline d9709c859a7762d8bd31af96a7140cca8664b2b4
 sed -n '1,220p' docs/plans/shared-contributor-auth-20260909/START-HERE.md
 # Optional parser check; PyYAML is only a handover-validation prerequisite.
 python3 -c 'import yaml; yaml.safe_load(open("docs/plans/shared-contributor-auth-20260909/run.yaml"))'
