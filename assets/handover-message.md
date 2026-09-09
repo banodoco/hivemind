@@ -7,7 +7,7 @@ handover branch:
 Project:  https://github.com/banodoco/hivemind.git
 Branch:   handover/shared-contributor-auth-20260909
 Baseline: e93f7e37bcc49b21b47a715ba6ffc8ce239609f8
-Closure:  3487d079bce69780d73f6c5511b9f8bf6f8d55dc
+Closure:  4beedebb55cf9dfa8db53d12ff14ade27bd8bd68
 Base:     main
 Mode:     planning_only
 ```
@@ -60,7 +60,16 @@ Astrid `3e1a8c830fcb670b042ea6ce2f8f009ebb2ea91f`, Banodoco website
 newer (`c2c9bb2ab452b9c813b435278715dffa42e517eb`); the plan remains pinned to
 the inspected ancestor and is not silently upgraded. The handover was prepared
 from a clean Hivemind worktree based on remote `main`; the original dirty local
-checkout and its untracked notes are excluded.
+checkout and its untracked notes are excluded. The branch is a full repository
+checkout, but the handover additions are documentation-only and no product
+source was changed.
+
+The shared Supabase project and schema/configuration evidence are runtime
+dependencies. No fetchable public repository/ref for that evidence was
+identified in planning, so it remains an explicitly unverified local-only
+prerequisite. Before T2/T3, the future T1 census must locate and pin the
+authoritative source or record concrete operator-owned evidence and its access
+path.
 
 The Megado skill files were read from poms-skills commit
 `ef42515942adfb1683cde4b7b2d53d4e56dbe25e`:
@@ -91,18 +100,19 @@ Start from a fresh checkout and inspect the package:
 git clone https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
 git fetch --no-tags origin handover/shared-contributor-auth-20260909
-git switch --detach origin/handover/shared-contributor-auth-20260909
-git show --stat --oneline 3487d079bce69780d73f6c5511b9f8bf6f8d55dc
+git switch --detach 4beedebb55cf9dfa8db53d12ff14ade27bd8bd68
+git show --stat --oneline 4beedebb55cf9dfa8db53d12ff14ade27bd8bd68
 sed -n '1,220p' docs/plans/shared-contributor-auth-20260909/START-HERE.md
+# Optional parser check; PyYAML is only a handover-validation prerequisite.
 python3 -c 'import yaml; yaml.safe_load(open("docs/plans/shared-contributor-auth-20260909/run.yaml"))'
 ```
 
-The preparer found the native `codex` CLI and all declared Luna, Sol, and Astra
-identifiers in the local configuration; no capability or model was reported
-missing. No model was invoked during packaging, so before any future delivery
-work verify live provider/quota availability and report any missing capability
-or model; do not substitute silently. The shared Supabase project is runtime
-configuration and was not mutated here. Live OAuth, CORS, redirect allowlist,
+The preparer found native Codex tooling and used the configured Luna
+planning/factual-audit agents; no product review or oracle call was made. Live
+availability of every configured Luna, Sol, and Astra binding was not
+independently certified. Before future delivery, verify that prerequisite and
+report any missing capability or model; do not substitute silently. The shared
+Supabase project was not mutated here. Live OAuth, CORS, redirect allowlist,
 database migration, tests as product evidence, and deployment remain pending
 an authorized delivery environment.
 
