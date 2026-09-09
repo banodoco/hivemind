@@ -751,8 +751,11 @@ class MainRealSendTests(unittest.TestCase):
                     ret = main(["--url", "https://example.com"])
                     self.assertEqual(ret, 1)
                     output = json.loads(mock_stdout.getvalue())
-                    self.assertIn("error", output)
-                    self.assertIn("contributor key required", output["error"])
+                    self.assertEqual(output, {
+                        "error": "login_required",
+                        "detail": "contributor credentials are required for writes",
+                        "recovery_command": "hivemind auth login",
+                    })
 
     def test_fetch_http_error(self):
         import urllib.error

@@ -17,9 +17,10 @@ changes the existing editor decision rules.
 
 The browser flow is a static Banodoco `/connect/index.html` route served at
 `https://www.banodoco.ai/connect/`, packaged through `deploy/public-files.json`.
-It uses a pinned Supabase browser SDK and the existing shared Supabase session
-identity; Arca Gidan is read-only auth/identity reference material and receives
-no product changes. The CLI creates a short-lived approval request and keeps
+It uses a dependency-free direct Supabase Auth REST/PKCE flow and the existing
+shared Supabase session identity; Arca Gidan is read-only auth/identity
+reference material and receives no product changes. The CLI creates a
+short-lived approval request and keeps
 its polling secret locally. The page stores only the opaque request capability
 in `sessionStorage`, returns to the fixed `/connect/` callback, completes the
 session, and displays the requesting machine and code. A user must explicitly

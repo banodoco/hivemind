@@ -86,12 +86,12 @@
     "verdict": "blocked_not_representative",
     "blocker": "No representative selected-contract PostgreSQL cohort or production-like staging snapshot exists (Phase-0 access audit evidences only the live Banodoco project, which must not be mutated). Only deterministic fake vectors can be loaded locally -> run_class=local_volume_only."
   },
-  "manifest_hash": "0b4bb2fd64c7d63993227e5dba40579d64f0b9cabecb8329c07c476628969ac7",
+  "manifest_hash": "b72b454243429a4afcb1e64144d8d8fb29c76d594bb5b6136acc35c54a117622",
   "manifest_frozen_before_measurement": true,
   "environment": {
-    "pg_bindir": "/opt/homebrew/opt/postgresql@14/bin",
-    "server_version": "14.15 (Homebrew)",
-    "pgvector_extversion": "0.8.5",
+    "pg_bindir": "/opt/homebrew/opt/postgresql@17/bin",
+    "server_version": "17.11 (Homebrew)",
+    "pgvector_extversion": "0.8.6",
     "vector_dims": "384",
     "embedding_typmod": "vector(384)",
     "vector_dims_384_consistency_count": 23138,
@@ -162,23 +162,23 @@
     },
     "build": {
       "build_returncode": 0,
-      "wall_s": 1.041,
+      "wall_s": 1.569,
       "lock_timeout": "5s",
       "statement_timeout": "300s",
       "maintenance_work_mem": "512MB",
       "invalid_same_name_preexisted": false,
       "prebuild_capacity": {
-        "database_bytes": 99812131,
-        "table_total_bytes": 50569216,
+        "database_bytes": 98997939,
+        "table_total_bytes": 50888704,
         "selected_contract_vectors": 23138,
         "projected_index_gb": 1.976,
         "storage_gate_gb": 12,
-        "free_disk_gb": 12.792,
+        "free_disk_gb": 39.82,
         "total_disk_gb": 245.107,
         "safe_free_disk_margin_gb": 2.0,
         "hosted_quota_gb": "UNAVAILABLE (local isolated cluster)",
         "maintenance_work_mem_effective": "64MB",
-        "maintenance_work_mem_justification": "maintenance_work_mem=512MB (build-session override); effective_cluster_default=64MB; local_ram_gb=17.18; conservative for an m=16 HNSW build at the local rehearsal volume (23138 vectors); never raised above measured safe headroom.",
+        "maintenance_work_mem_justification": "maintenance_work_mem=512MB (build-session override); effective_cluster_default=64MB; local_ram_gb=8.59; conservative for an m=16 HNSW build at the local rehearsal volume (23138 vectors); never raised above measured safe headroom.",
         "query_gucs": {
           "hnsw.ef_search": {
             "effective": null,
@@ -200,8 +200,8 @@
         "abort": false,
         "abort_reason": null
       },
-      "progress_samples_count": 2,
-      "progress_last": "building index: loading tuples:5208/5785",
+      "progress_samples_count": 3,
+      "progress_last": "building index: loading tuples:5824/5824",
       "build_stderr_redacted": ""
     },
     "catalog": {
@@ -214,11 +214,11 @@
       "size_pretty": "42 MB"
     },
     "storage": {
-      "database_bytes": 143786787,
-      "table_total_bytes": 94543872,
-      "hnsw_index_bytes": 43974656,
+      "database_bytes": 142661299,
+      "table_total_bytes": 94552064,
+      "hnsw_index_bytes": 43663360,
       "hnsw_index_size_pretty": "42 MB",
-      "projected_full_corpus_index_gb": 2.444,
+      "projected_full_corpus_index_gb": 2.427,
       "projected_full_corpus_table_gb": 5.256,
       "storage_gate_gb": 12,
       "within_storage_gate": true
@@ -340,9 +340,9 @@
     "selection_rule": "lowest pre-registered ef_search passing every applicable quality, latency, security, coverage, and capacity gate; ties -> lower ef_search, then lower warm p95; if none passes, verdict stop. selected_ef_search is NULL here because representative quality cannot be proved from synthetic data.",
     "environment": {
       "run_class": "local_volume_only",
-      "pg_bindir": "/opt/homebrew/opt/postgresql@14/bin",
-      "server_version": "14.15 (Homebrew)",
-      "pgvector_extversion": "0.8.5",
+      "pg_bindir": "/opt/homebrew/opt/postgresql@17/bin",
+      "server_version": "17.11 (Homebrew)",
+      "pgvector_extversion": "0.8.6",
       "vector_dims": null
     }
   },

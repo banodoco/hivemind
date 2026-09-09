@@ -22,8 +22,11 @@ from __future__ import annotations
 import json
 import hashlib
 import os
+import re
 import sys
+import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Any
 
@@ -35,7 +38,9 @@ _DEFAULT_API_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1"
 _DEFAULT_ANON_KEY = "sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx"
 _DEFAULT_CONTRIBUTE_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/contribute"
 _DEFAULT_REFRESH_MEDIA_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/refresh-media-urls"
+_DEFAULT_AUTH_BROKER_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/contributor-auth"
 _BODY_TRUNCATION_LIMIT = 700
+_CONTRIBUTOR_KEY_RE = re.compile(r"^hm_[0-9a-f]{64}$")
 
 # ---------------------------------------------------------------------------
 # Environment resolution
@@ -55,19 +60,71 @@ def resolve_anon_key() -> str:
 def resolve_contributor_key() -> str | None:
     """Return the contributor key from the environment or standard key file."""
     env_key = os.environ.get("HIVEMIND_CONTRIBUTOR_KEY")
-    if env_key:
+    if env_key and env_key.strip():
         return env_key.strip()
 
-    home_dir = os.environ.get("HOME")
-    if not home_dir:
-        return None
-    key_path = os.path.join(home_dir, ".hivemind", "key")
+    key_path = contributor_key_path()
     try:
         with open(key_path, encoding="utf-8") as handle:
             file_key = handle.read().strip()
     except (FileNotFoundError, OSError):
         return None
     return file_key or None
+
+
+def hash_contributor_key(key: str) -> str:
+    """Return the storage digest for a strict contributor key."""
+    if not _CONTRIBUTOR_KEY_RE.fullmatch(key):
+        raise ValueError("contributor key must be hm_<64 lowercase hex chars>")
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
+def contributor_key_path(home: str | None = None) -> str:
+    """Return the local owner-only key path without reading its contents."""
+    root = home or os.environ.get("HOME")
+    if not root:
+        root = os.path.expanduser("~")
+    return os.path.join(root, ".hivemind", "key")
+
+
+def write_contributor_key(key: str, *, home: str | None = None) -> str:
+    """Atomically replace the local key with mode 0600 and return its path."""
+    if not _CONTRIBUTOR_KEY_RE.fullmatch(key):
+        raise ValueError("broker returned an invalid contributor key")
+    path = contributor_key_path(home)
+    directory = os.path.dirname(path)
+    os.makedirs(directory, mode=0o700, exist_ok=True)
+    os.chmod(directory, 0o700)
+    fd, temporary = tempfile.mkstemp(prefix=".key.", dir=directory, text=True)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(key + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        os.chmod(path, 0o600)
+    except Exception:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+        raise
+    return path
+
+
+def delete_local_contributor_key(*, home: str | None = None) -> bool:
+    """Delete only the local key file; server revocation is a separate action."""
+    try:
+        os.unlink(contributor_key_path(home))
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def resolve_auth_broker_url() -> str:
+    """Return the contributor-auth broker edge-function URL."""
+    return os.environ.get("HIVEMIND_AUTH_BROKER_URL", _DEFAULT_AUTH_BROKER_URL).rstrip("/")
 
 
 def resolve_contribute_url() -> str:
@@ -210,6 +267,27 @@ def public_edge_post(
     return _http_post(url.rstrip("/"), headers, json.dumps(payload).encode("utf-8"))
 
 
+def auth_post(
+    payload: dict[str, Any],
+    *,
+    broker_url: str | None = None,
+    anon_key: str | None = None,
+) -> dict[str, Any]:
+    """Call the contributor-auth broker without ever putting secrets in URLs."""
+    key = anon_key or resolve_anon_key()
+    headers = {
+        "Authorization": f"Bearer {key}",
+        "apikey": key,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    return _http_post(
+        (broker_url or resolve_auth_broker_url()).rstrip("/"),
+        headers,
+        json.dumps(payload).encode("utf-8"),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Envelope builders
 # ---------------------------------------------------------------------------
@@ -292,6 +370,15 @@ def truncate_body(
 # ---------------------------------------------------------------------------
 
 
+def login_required_error() -> dict[str, str]:
+    """Return the stable, non-secret error for an unauthenticated write."""
+    return {
+        "error": "login_required",
+        "detail": "contributor credentials are required for writes",
+        "recovery_command": "hivemind auth login",
+    }
+
+
 def format_error(status: int, body: dict[str, Any]) -> str:
     """Map a contribute API error response to a human-readable message.
 
@@ -308,7 +395,10 @@ def format_error(status: int, body: dict[str, Any]) -> str:
         detail = body.get("detail", "bad request")
         return f"400 validation error: {detail}"
     if status == 401:
-        return "401 unauthorized — contributor key is missing, invalid, or revoked"
+        return (
+            "401 unauthorized — contributor key is missing, invalid, or revoked; "
+            "run hivemind auth login"
+        )
     if status == 409:
         existing_id = body.get("existing_id", "?")
         detail = body.get("detail", "duplicate")

@@ -1,19 +1,20 @@
 # Handover provenance — shared contributor authentication
 
-This file records the portable handover contract and the exact source and
-skill identities inspected while preparing it. The records copied beside this
-file are planning evidence. They do not prove that product implementation,
-tests, deployment, or production operations occurred.
+This file records the portable handover contract, the exact source and skill
+identities inspected while preparing it, and the local delivery receipt. The
+local delivery commits and evidence below do not imply publication, deployment,
+or production operations.
 
 ## Contract
 
 - Project: Banodoco Hivemind (`https://github.com/banodoco/hivemind.git`).
 - Recipient: the next Megado coordinator or agent receiving this package.
-- Receiving mode: `planning_only`.
+- Receiving mode: `delivery` (explicitly updated by the user on 2026-09-09).
 - Destination remote: `origin` — `https://github.com/banodoco/hivemind.git`.
 - Base branch: `main`.
-- Publication target: public `main`; publication is limited to the selected
-  documentation artifacts.
+- Publication target: none in this run. The implementation is retained in
+  isolated local worktrees; PR creation, merge, deployment, and cutover remain
+  outside the current authorization.
 - Historical source baseline: `origin/main` at
   `e93f7e37bcc49b21b47a715ba6ffc8ce239609f8`.
 - Recipient source record: start from the current `origin/main`, record its
@@ -25,9 +26,56 @@ tests, deployment, or production operations occurred.
   `handoff-agent-note.txt`). Those files are deliberately excluded from the
   source baseline and preserved in the original checkout.
 
-The package was assembled from a clean Hivemind checkout based on the recorded
-remote baseline. The additions are documentation-only; no product source was
-changed or selected as a new artifact.
+The package was assembled from clean current-main checkouts based on the
+recorded remote baselines. Product implementation is isolated to the delivery
+worktrees; the original checkouts remain untouched.
+
+## Delivery source receipt — 2026-09-09
+
+The source was re-cloned into fresh directories and the original checkouts, if
+any, were not overwritten. Product mutation is isolated to the worktrees below.
+PR creation, merge, deployment, cutover, and production operations remain
+outside the current authorization.
+
+| Component | Received `origin/main` SHA | Delivery worktree/branch | Reconciliation against historical pin |
+| --- | --- | --- | --- |
+| Hivemind | `9253c10cc2ddb6a12e4afeb41d10d94b83bf50f6` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/hivemind` / `otto/shared-contributor-auth-20260909` | Historical `e93f7e37…` was reconciled before implementation. Local delivery commit `a4c6610cba1032adb3b4bec541ccf821afba6ba8` contains the final Hivemind schema, broker, CLI, rating-writer closure, rollback hardening, login-recovery contract, rehearsal, and v2 pack updates. |
+| Banodoco website | `f91eca9c748531957a2740707aee753ba674e17a` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/banodoco-website` / `otto/shared-contributor-auth-20260909` | Matches the historical deployed/origin `main` pin. Local delivery commit `e203553bfb5c927e99f9386155cabb90e6e7dc17` adds the packaged `/connect/` route and direct PKCE/Auth REST flow. The separate preview evidence `d18eb465…` remains preserved and is not overwritten. |
+| Astrid | `8150c3b70887495f0fae4a55c1ac70085a900550` | `.otto/worktrees/shared-contributor-auth-20260909-delivery/astrid` / `otto/shared-contributor-auth-20260909` | Historical `3e1a8c83…` is an ancestor. Current `main` adds substantial unrelated runtime/docs work; local delivery commit `1560b0e1b3df004a52c43b0d5602ec039fcdcdab` pins Hivemind to `a4c6610cba1032adb3b4bec541ccf821afba6ba8` and requires remote publication before remote installation. |
+| Arca Gidan | `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135` | read-only checkout | Matches the historical reference pin; no product changes are planned. |
+| brain-of-bndc | `bcf8d14964113743ccbbaab793dab1a410469990` | read-only checkout | Its planning record identifies the sibling `banodoco-workspace` repository as the authoritative Supabase migration root. |
+| banodoco-workspace | `eedae0b1c90d00b9d7c61ddc64f1cc690d2947cb` | read-only checkout | Authoritative shared identity evidence: `members.auth_user_id`, Discord resolver/trigger/backfill, and separate `public.admins` authority. No changes are planned in this repository. |
+| poms-skills | `ef42515942adfb1683cde4b7b2d53d4e56dbe25e` | detached read-only checkout | Matches the required Megado skill snapshot. |
+
+The current source census now includes the authoritative shared Supabase
+identity migrations. `brain-of-bndc` explicitly points to the sibling
+`banodoco-workspace/supabase/migrations/` root; the workspace checkout pins the
+`members.auth_user_id` foreign key/partial uniqueness, Discord identity
+resolver and guarded trigger/backfill, and the separate `public.admins`
+authority. D1's original evidence gap is superseded by D3. The implementation
+uses direct Hivemind contributor binding to shared `auth.users(id)`; a mapped
+`members` row is not an admission gate. Arca remains client-side reference
+material only and receives no product changes.
+
+Additional current-main reconciliation findings are recorded in the delivery
+census. The separate contributor-key-gated
+`supabase/functions/submit-vibecomfy-rating/index.ts:261-333` writer was not
+one of the six knowledge actions named in the plan; D2 resolved it into the
+shared-auth closure. Astrid's current managed-pack admission required schema
+v2, so the delivery raises Hivemind's pack contract and pins it to the local
+delivery commit. Banodoco's fail-closed `deploy/public-files.json` and
+`tools/package-public.py:121-150` required the complete `/connect/` asset
+closure, which is now covered by the static page, PKCE flow, and packaging
+checks.
+
+Final local delivery receipt (before any remote publication): Hivemind product
+commit `a4c6610cba1032adb3b4bec541ccf821afba6ba8` is consumed by Astrid's local
+pin. The final Astrid review inspected the preceding candidate and returned
+NEEDS_CHANGES; the post-review login-recovery correction is host-verified and
+the declared final-review budget is exhausted. The local Banodoco delivery tip
+is `e203553bfb5c927e99f9386155cabb90e6e7dc17`; the local Astrid delivery tip
+is `1560b0e1b3df004a52c43b0d5602ec039fcdcdab`. Both remain unpublished
+delivery worktrees until a separate authorization.
 
 ## Source and dependency pins
 
@@ -43,17 +91,15 @@ retains the exact refs used by the plan even where a dependency's current
 | Arca Gidan | `https://github.com/banodoco/arca-gidan.git` | `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135` | Read-only identity/auth reference; no product changes. |
 | poms-skills | `https://github.com/peteromallet/poms-skills.git` | `ef42515942adfb1683cde4b7b2d53d4e56dbe25e` | Skill source inspected for this handover and canonical Megado instructions. |
 
-The Hivemind, Banodoco, Arca, and poms-skills pins were reverified against
+The Hivemind, Banodoco, Arca, brain-of-bndc, banodoco-workspace, and poms-skills pins were reverified against
 their public `main` refs on 2026-09-09. Astrid's census pin was reverified as
 an existing commit and ancestor of its public `main`; its newer tip is
 reported above rather than substituted. The shared Supabase project and its
-schema/configuration evidence are runtime dependencies. No fetchable public
-repository/ref for that evidence was identified in the planning run, so it
-remains an explicitly unverified, local-only prerequisite. Before T2/T3 in a
-future delivery, T1 must locate and pin the authoritative Supabase
-schema/configuration source or record the concrete operator-owned evidence and
-its access path; this package does not silently manufacture that missing
-dependency.
+schema/configuration evidence are runtime dependencies. The authoritative
+public source is now pinned to `banodoco-workspace` `eedae0b1…`;
+`brain-of-bndc` `bcf8d149…` provides the cross-repository provenance. D3
+releases T2/T3 with direct `auth.users(id)` binding and no required member-row
+admission.
 
 ## Skill provenance and dependency install
 

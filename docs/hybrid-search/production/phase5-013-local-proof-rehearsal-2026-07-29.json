@@ -1,6 +1,6 @@
 {
   "task": "1.10/1.11 phase-3 latency fix (schema/013) — LOCAL-PROOF rehearsal",
-  "verdict_path": "/Users/peteromalley/Documents/banodoco-workspace/hivemind/docs/hybrid-search/production/phase5-013-local-proof-rehearsal-2026-07-29.json",
+  "verdict_path": "/Users/hannahomalley/Documents/Codex/2026-09-09/use-megado-to-inspect-the-shared/hivemind-auth/.otto/worktrees/shared-contributor-auth-20260909-delivery/hivemind/docs/hybrid-search/production/phase5-013-local-proof-rehearsal-2026-07-29.json",
   "applied_ok": true,
   "apply_error": "",
   "functional_assertions": [
@@ -229,11 +229,11 @@
     "interleaved": true,
     "index_scale_decoy_rows": 100000,
     "dense": {
-      "median_ms_012": 51.303,
-      "median_ms_013": 52.913,
-      "p95_ms_012": 51.99,
-      "p95_ms_013": 54.572,
-      "ratio_013_over_012": 1.031,
+      "median_ms_012": 47.968,
+      "median_ms_013": 47.982,
+      "p95_ms_012": 48.188,
+      "p95_ms_013": 50.486,
+      "ratio_013_over_012": 1.0,
       "gate_max_ratio": 1.25,
       "corpus_items": 120,
       "chunks_per_item": 60,
@@ -244,11 +244,11 @@
       "gate_pass": true
     },
     "sparse": {
-      "median_ms_012": 40.186,
-      "median_ms_013": 33.671,
-      "p95_ms_012": 40.7,
-      "p95_ms_013": 35.151,
-      "ratio_013_over_012": 0.838,
+      "median_ms_012": 37.735,
+      "median_ms_013": 30.477,
+      "p95_ms_012": 38.652,
+      "p95_ms_013": 31.338,
+      "ratio_013_over_012": 0.808,
       "trgm_index_in_real_plan": true,
       "trgm_evidence": {
         "method": "extracted_exact_inner_statement",

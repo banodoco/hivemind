@@ -309,7 +309,11 @@ class MainRealSendTests(unittest.TestCase):
                 ret = main(["--path", str(FIXTURE_SAMPLE_WORKFLOW)])
                 self.assertEqual(ret, 1)
                 output = json.loads(out.getvalue())
-                self.assertIn("contributor key required", output["error"])
+                self.assertEqual(output, {
+                    "error": "login_required",
+                    "detail": "contributor credentials are required for writes",
+                    "recovery_command": "hivemind auth login",
+                })
 
     def test_409_duplicate(self):
         import urllib.error
