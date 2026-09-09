@@ -167,6 +167,17 @@ class MigrationContractTests(unittest.TestCase):
         self.assertIn("set consumed_at = now()", self.sql)
         self.assertIn("contributor_keys_hash_key unique", self.sql)
 
+    def test_pgcrypto_calls_are_available_in_security_definer_functions(self):
+        for function in (
+            "hivemind_resolve_contributor_key",
+            "hivemind_auth_redeem_request",
+            "hivemind_secret_hash",
+        ):
+            start = self.sql.index(f"create or replace function public.{function}")
+            end = self.sql.index("$$;", start)
+            block = self.sql[start:end]
+            self.assertIn("set search_path = public, extensions, pg_temp", block)
+
     def test_unlinked_legacy_keys_are_auditable_but_not_write_credentials(self):
         self.assertIn("issued_key_id uuid", self.sql)
         self.assertIn("hivemind_auth_cleanup_request(text,text)", self.sql)
