@@ -1,10 +1,10 @@
 # Status — shared contributor authentication
 
-State: **planning complete; ready for an authorized delivery run**.
+State: **planning complete; documentation publication targeted to main; ready for an authorized delivery run**.
 
-Mode: `planning_only`. No implementation, source mutation, worktree,
-execution test, review invocation, commit, deployment preparation, or
-production operation has occurred.
+Mode: `planning_only`. No product implementation, source mutation,
+execution test, review invocation, deployment preparation, or production
+operation has occurred. The selected publication contains documentation only.
 
 Estimate: 5–7 focused engineering days, plus 1–2 focused days of integration
 contingency for the shared OAuth/broker, static host route, and key migration.
@@ -20,9 +20,11 @@ material and receives no product changes. The existing Hivemind GitHub CTA
 remains; CLI URLs are sufficient. This is direct user steering; no additional
 oracle call was made.
 
-Source census: **complete**. The authoritative delivery source is clean
+Source census: **complete**. The historical planning source pin is clean
 remote `main` at `e93f7e37bcc49b21b47a715ba6ffc8ce239609f8`,
-with remote `main` and `hivemind` agreeing. The original local checkout was
+with remote `main` and `hivemind` agreeing at census time. A recipient must
+record the actual current `origin/main` SHA and reconcile differences before
+freezing T1. The original local checkout was
 `50ff509240c5582a7335dc71920533b59be7792c`, ahead 3/behind 22 with untracked
 `briefing.md` and `handoff-agent-note.txt`; those untracked files remain
 preserved and are excluded from the authoritative baseline, without a claim
@@ -42,8 +44,9 @@ discarded.
 Tests: **NOT RUN**. Review counters: 0 intermediate, 0 final, 0 oracle calls.
 No review packet exists because planning mode dispatches no executable review.
 
-Next action: adopt T1's revised frozen source manifest in a newly authorized
-delivery run, then implement T2/T3. The intended first review
+Next action: from current `main`, record the received SHA, create a new work
+branch, reconcile the historical source manifest, and adopt T1 in a newly
+authorized delivery run; then implement T2/T3. The intended first review
 boundary is after T3 (schema/broker contract, maximum two rounds); the final
 integrated boundary is after T8 (maximum three rounds), as declared in
 `run.yaml`.

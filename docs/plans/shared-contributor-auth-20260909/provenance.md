@@ -12,22 +12,22 @@ tests, deployment, or production operations occurred.
 - Receiving mode: `planning_only`.
 - Destination remote: `origin` — `https://github.com/banodoco/hivemind.git`.
 - Base branch: `main`.
-- Publication visibility: public; publication is limited to this handover
-  branch and its selected documentation artifacts.
-- Handover branch: `handover/shared-contributor-auth-20260909`.
-- Source baseline: `origin/main` at
+- Publication target: public `main`; publication is limited to the selected
+  documentation artifacts.
+- Historical source baseline: `origin/main` at
   `e93f7e37bcc49b21b47a715ba6ffc8ce239609f8`.
+- Recipient source record: start from the current `origin/main`, record its
+  actual SHA in the delivery receipt, and reconcile differences against the
+  historical baseline before implementation.
 - Current source state: the original local `main` was dirty and divergent
   (`50ff509240c5582a7335dc71920533b59be7792c`, 3 commits ahead and 22 behind
   `origin/main`, with untracked `briefing.md` and
   `handoff-agent-note.txt`). Those files are deliberately excluded from the
   source baseline and preserved in the original checkout.
 
-The handover worktree was created cleanly from the recorded remote baseline.
-The branch is a full Hivemind repository checkout, while the handover additions
-are documentation-only; no product source was changed or selected as a new
-artifact. No push has been performed by the preparer; the root coordinator
-must audit the selected paths before any publication.
+The package was assembled from a clean Hivemind checkout based on the recorded
+remote baseline. The additions are documentation-only; no product source was
+changed or selected as a new artifact.
 
 ## Source and dependency pins
 
@@ -96,7 +96,7 @@ that prerequisite and report any missing model rather than substitute silently.
 Included under this directory are `START-HERE.md`, `northstar.md`,
 `agent_goal.md`, `plan.md`, `tasklist.md`, `run.yaml`, `status.md`, and the
 adopted `banodoco-host-findings.md`, plus this provenance record. They form the
-current plan closure and have been rewritten only to replace machine-local
+current planning package and have been rewritten only to replace machine-local
 paths with repository URLs or portable descriptions.
 
 The ignored `.otto` run directory, logs, archives, raw receipts, caches,
@@ -109,20 +109,20 @@ or authentication receipt is included.
 
 ## Receiving checklist
 
-From a clean clone, inspect the branch and then the immutable plan closure:
+From a clean clone, inspect current `main` and create a work branch:
 
 ```bash
 git clone https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
-git fetch --no-tags origin handover/shared-contributor-auth-20260909
+git switch --create work/shared-contributor-auth-20260909 origin/main
+git rev-parse origin/main
 sed -n '1,220p' docs/plans/shared-contributor-auth-20260909/START-HERE.md
 # Optional parser check; PyYAML is only a handover-validation prerequisite.
 python3 -c 'import yaml; yaml.safe_load(open("docs/plans/shared-contributor-auth-20260909/run.yaml"))'
 ```
 
-The copy-paste command that checks out the immutable closure SHA is kept in
-`assets/handover-message.md` on the final handover tip, so this provenance
-record does not create a self-referential commit hash.
+Record the `origin/main` SHA, compare it with the historical source pin above,
+and reconcile any relevant differences before implementation.
 
 The receiving agent must report readiness from this package, retain
 `planning_only`, and preserve the role, stage, budget, and counter values in

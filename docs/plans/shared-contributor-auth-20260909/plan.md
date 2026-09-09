@@ -176,7 +176,10 @@ an authorized environment.
 
 ## Work sequence and dependencies
 
-The source census is complete: use clean Hivemind PR4 `e93f7e3`, Astrid
+The source census is complete. The historical Hivemind planning pin is PR4
+`e93f7e3`; start future delivery from the current remote `main`, record its
+actual SHA, and reconcile differences before freezing T1. Keep the exact
+historical Astrid
 `3e1a8c8`, Banodoco deployed/origin `main` `f91eca9c`, and read-only
 shared-Supabase and Arca identity evidence. Preserve Banodoco's clean local
 `preview/true-union` `d18eb465` checkout; future delivery uses the deployed/

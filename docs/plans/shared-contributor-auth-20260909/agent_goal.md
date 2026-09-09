@@ -66,9 +66,11 @@ Hivemind GitHub CTA; the CLI URL is sufficient.
 
 Source is the Hivemind repository at
 `https://github.com/banodoco/hivemind.git`, ref `main`.
-The authoritative delivery source is the clean remote `main` at
+The historical planning source pin is the clean remote `main` at
 `e93f7e37bcc49b21b47a715ba6ffc8ce239609f8` (remote `main` and `hivemind`
-agree). The original local checkout was
+agreed at census time). A recipient must start from the current remote
+`main`, record its actual SHA, and reconcile differences before freezing T1.
+The original local checkout was
 `50ff509240c5582a7335dc71920533b59be7792c`,
 ahead 3/behind 22 with untracked `briefing.md` and
 `handoff-agent-note.txt`; those untracked files remain preserved and are
@@ -88,10 +90,10 @@ The shared Supabase checkout is read-only identity evidence, not the migration
 owner. The durable direction is
 [northstar.md](northstar.md), and the single run declaration is [run.yaml](run.yaml).
 
-The user authorized preparation only: do not edit product source, run tests,
-create an implementation worktree, commit, deploy, or perform production
-operations in this planning run. Future implementation remains subject to the
-same explicit scope and an authorized delivery mode.
+The user authorized planning and publication of these documentation artifacts
+only. Do not edit product source, run product tests, deploy, or perform
+production operations in this planning run. Future implementation remains
+subject to the same explicit scope and an authorized delivery mode.
 
 ## Acceptance contract
 

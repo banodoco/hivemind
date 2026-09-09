@@ -1,21 +1,22 @@
 # Megado handover — shared contributor authentication
 
-You are receiving the Banodoco Hivemind planning package from the public
-handover branch:
+This Banodoco Hivemind planning package is prepared for publication on the
+public `main` branch:
 
 ```text
 Project:  https://github.com/banodoco/hivemind.git
-Branch:   handover/shared-contributor-auth-20260909
-Baseline: e93f7e37bcc49b21b47a715ba6ffc8ce239609f8
-Closure:  6d2f574c7ccd98f2fe54bdbbcd650f0a2a1827c0
-Base:     main
+Branch:   main
+Historical source pin: e93f7e37bcc49b21b47a715ba6ffc8ce239609f8
 Mode:     planning_only
 ```
 
-The closure commit is the immutable plan source. The final branch tip adds
-this delivery message. The selected public destination is the Hivemind
-`origin` remote above; no merge, implementation branch, deployment, or cutover
-is authorized by this handover.
+The selected publication target is `main`, with documentation-only changes.
+The historical Hivemind
+source pin above is the exact baseline inspected during planning, not a
+detached-checkout target. On receipt, start from the current `origin/main`,
+record its actual SHA in the delivery receipt, and reconcile any source
+differences against the historical pin before implementation. No
+implementation branch, deployment, or cutover is authorized by this handover.
 
 The objective is to prepare a future shared login path for Hivemind
 contributors while preserving anonymous public reads, current contribution
@@ -58,11 +59,9 @@ Astrid `3e1a8c830fcb670b042ea6ce2f8f009ebb2ea91f`, Banodoco website
 `1c1fbadce8868ed3ae806bc8ca28a65ea67a6135`, and poms-skills
 `ef42515942adfb1683cde4b7b2d53d4e56dbe25e`. Astrid's current remote tip is
 newer (`c2c9bb2ab452b9c813b435278715dffa42e517eb`); the plan remains pinned to
-the inspected ancestor and is not silently upgraded. The handover was prepared
-from a clean Hivemind worktree based on remote `main`; the original dirty local
-checkout and its untracked notes are excluded. The branch is a full repository
-checkout, but the handover additions are documentation-only and no product
-source was changed.
+the inspected ancestor and is not silently upgraded. The original dirty local
+checkout and its untracked notes are excluded. The additions are
+documentation-only and no product source was changed.
 
 The shared Supabase project and schema/configuration evidence are runtime
 dependencies. No fetchable public repository/ref for that evidence was
@@ -94,18 +93,22 @@ https://raw.githubusercontent.com/peteromallet/poms-skills/ef42515942adfb1683cde
 https://raw.githubusercontent.com/peteromallet/poms-skills/ef42515942adfb1683cde4b7b2d53d4e56dbe25e/megado/SKILL.md
 ```
 
-Start from a fresh checkout and inspect the package:
+Start from the current `main`, record the source you received, and create a
+new work branch before implementation:
 
 ```bash
 git clone https://github.com/banodoco/hivemind.git hivemind
 cd hivemind
-git fetch --no-tags origin handover/shared-contributor-auth-20260909
-git switch --detach 6d2f574c7ccd98f2fe54bdbbcd650f0a2a1827c0
-git show --stat --oneline 6d2f574c7ccd98f2fe54bdbbcd650f0a2a1827c0
+git switch --create work/shared-contributor-auth-20260909 origin/main
+git rev-parse origin/main
 sed -n '1,220p' docs/plans/shared-contributor-auth-20260909/START-HERE.md
 # Optional parser check; PyYAML is only a handover-validation prerequisite.
 python3 -c 'import yaml; yaml.safe_load(open("docs/plans/shared-contributor-auth-20260909/run.yaml"))'
 ```
+
+Record the `origin/main` SHA, compare it with the historical Hivemind pin in
+this message and `provenance.md`, and resolve any relevant differences before
+freezing T1. Keep the exact historical source and skill pins as evidence.
 
 The preparer found native Codex tooling and used the configured Luna
 planning/factual-audit agents; no product review or oracle call was made. Live
@@ -116,9 +119,10 @@ Supabase project was not mutated here. Live OAuth, CORS, redirect allowlist,
 database migration, tests as product evidence, and deployment remain pending
 an authorized delivery environment.
 
-Selected finish instruction: keep `planning_only`, inspect the closure and
-report readiness, prerequisites, and any concrete contradiction. A later
-explicit authorization may change the single `run.yaml` mode to delivery while
-preserving roles, stages, budgets, counters, and boundaries; only then may the
-recipient implement and validate the plan. A PR, merge, deploy, or cutover
-requires separate explicit authorization.
+Selected finish instruction: keep `planning_only`, inspect the package from
+current `main`, record the received main SHA, reconcile it with the historical
+pins, and report readiness, prerequisites, and any concrete contradiction. A
+later explicit authorization may change the single `run.yaml` mode to delivery
+while preserving roles, stages, budgets, counters, and boundaries; only then
+may the recipient implement and validate the plan. A PR, merge, deploy, or
+cutover requires separate explicit authorization.
