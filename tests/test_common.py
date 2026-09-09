@@ -78,6 +78,7 @@ class UtilityTests(unittest.TestCase):
         self.assertIn("400 validation error", format_error(400, {"detail": "bad"}))
         self.assertIn("401 unauthorized", format_error(401, {}))
         self.assertIn("hivemind auth login", format_error(401, {}))
+        self.assertIn("403 forbidden", format_error(403, {"detail": "editor authorization required"}))
         self.assertIn("409 duplicate", format_error(409, {"existing_id": "7"}))
         self.assertIn("500 internal", format_error(500, {}))
 
