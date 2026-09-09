@@ -29,7 +29,7 @@ preserved and are excluded from the authoritative baseline, without a claim
 about their contents. Reconcile them if relevant before future execution.
 Astrid's tracked baseline is
 `3e1a8c830fcb670b042ea6ce2f8f009ebb2ea91f`; untracked workflow notes/assets
-are preserved but not used as product-source evidence.
+remain outside the selected baseline, without a claim about their contents.
 Banodoco deployed/origin `main` is
 `f91eca9c748531957a2740707aee753ba674e17a`; its clean local
 `preview/true-union` checkout is `d18eb46557f4d480e040d1a07783edea3b616577`.

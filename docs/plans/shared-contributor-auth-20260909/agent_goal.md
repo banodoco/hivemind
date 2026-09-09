@@ -75,7 +75,8 @@ ahead 3/behind 22 with untracked `briefing.md` and
 excluded from the code baseline, without making any claim about their contents.
 The Astrid source census found clean
 `main` `3e1a8c830fcb670b042ea6ce2f8f009ebb2ea91f`; untracked workflow
-notes/assets are preserved but are not product-source evidence.
+notes/assets remain outside the selected baseline, without a claim about their
+contents.
 Banodoco website deployed/origin `main` is
 `f91eca9c748531957a2740707aee753ba674e17a`; the clean local
 `preview/true-union` checkout is `d18eb46557f4d480e040d1a07783edea3b616577`.
