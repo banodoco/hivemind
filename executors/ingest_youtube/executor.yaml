@@ -40,7 +40,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "hivemind.executors.ingest_youtube.run",
+      "executors.ingest_youtube.run",
       "--url",
       "{url}",
       "--out",

@@ -33,7 +33,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "hivemind.executors.refresh_media.run",
+      "executors.refresh_media.run",
       "--message-id",
       "{message_id}",
       "--out",
