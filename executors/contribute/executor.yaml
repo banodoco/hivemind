@@ -107,7 +107,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "hivemind.executors.contribute.run",
+      "executors.contribute.run",
       "--type",
       "{type}",
       "--out",

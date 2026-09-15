@@ -51,7 +51,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "hivemind.executors.ingest_article.run",
+      "executors.ingest_article.run",
       "--url",
       "{url}",
       "--out",

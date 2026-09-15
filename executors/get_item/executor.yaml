@@ -29,7 +29,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "hivemind.executors.get_item.run",
+      "executors.get_item.run",
       "--kind",
       "{kind}",
       "--id",

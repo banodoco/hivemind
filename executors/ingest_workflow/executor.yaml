@@ -57,7 +57,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "hivemind.executors.ingest_workflow.run",
+      "executors.ingest_workflow.run",
       "--out",
       "{out}/result.json"
     ],

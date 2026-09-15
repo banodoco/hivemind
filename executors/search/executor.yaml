@@ -63,7 +63,7 @@ command:
   argv:
   - '{python_exec}'
   - -m
-  - hivemind.executors.search.run
+  - executors.search.run
   - --query
   - '{query}'
   - --out
