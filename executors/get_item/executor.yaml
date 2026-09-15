@@ -34,8 +34,6 @@
       "{kind}",
       "--id",
       "{id}",
-      "--revision-id",
-      "{revision_id}",
       "--out",
       "{out}/item.json"
     ],
