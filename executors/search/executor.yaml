@@ -103,7 +103,6 @@ isolation:
   network: true
   env_passthrough:
   - HIVEMIND_API_URL
-  - HIVEMIND_ANON_KEY
 metadata:
   runtime_entrypoint: main
   runtime_file: run.py

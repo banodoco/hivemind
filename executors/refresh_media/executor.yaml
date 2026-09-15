@@ -47,7 +47,6 @@
     "mode": "subprocess",
     "network": true,
     "env_passthrough": [
-      "HIVEMIND_ANON_KEY",
       "HIVEMIND_REFRESH_MEDIA_URL"
     ]
   },
