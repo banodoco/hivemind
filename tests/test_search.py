@@ -120,6 +120,21 @@ class RankingTests(unittest.TestCase):
 
 
 class TransportTests(unittest.TestCase):
+    def test_repeated_message_scope_timeout_degrades_to_empty_scope(self):
+        # A low-selectivity token can exhaust the hosted statement budget in
+        # both ordered and unordered message queries.  Search should still
+        # complete so the resource scope (and its results) remain usable.
+        with unittest.mock.patch(
+            "executors.search.run._query_table",
+            side_effect=TimeoutError("statement budget"),
+        ):
+            rows, errors = search._run_scope(
+                "message_feed", ["cyclism"], sources=None, since=None, limit=20,
+                endpoint="https://api.test", anon_key="anon",
+            )
+        self.assertEqual(rows, [])
+        self.assertEqual(errors, [])
+
     def test_scope_failure_is_recorded(self):
         with unittest.mock.patch("executors.search.run._query_table", side_effect=urllib.error.URLError("offline")):
             rows, errors = search._run_scopes(

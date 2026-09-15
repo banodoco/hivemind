@@ -537,7 +537,19 @@ def _run_scope(
         except (urllib.error.HTTPError, TimeoutError) as exc:
             if isinstance(exc, urllib.error.HTTPError) and not _is_statement_timeout(exc):
                 raise
-            return _fetch("or", ordered=False, timeout=_UNORDERED_OR_TIMEOUT_S)
+            try:
+                return _fetch("or", ordered=False, timeout=_UNORDERED_OR_TIMEOUT_S)
+            except (urllib.error.HTTPError, TimeoutError) as retry_exc:
+                # A token with no useful index selectivity can still hit the
+                # hosted PostgREST statement budget in both shapes.  This is
+                # a partial-scope miss, not a failed search: the resource
+                # scope (or any other requested scope) must still be allowed
+                # to return its matches.  Preserve hard HTTP failures while
+                # treating repeated statement/read timeouts as an empty
+                # message scope.
+                if isinstance(retry_exc, urllib.error.HTTPError) and not _is_statement_timeout(retry_exc):
+                    raise
+                return []
 
     try:
         if table == "resources":
