@@ -70,8 +70,7 @@
     "mode": "subprocess",
     "network": true,
     "env_passthrough": [
-      "HIVEMIND_API_URL",
-      "HIVEMIND_CONTRIBUTOR_KEY"
+      "HIVEMIND_API_URL"
     ]
   },
   "metadata": {
