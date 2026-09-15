@@ -60,11 +60,15 @@ def _assemble_result(kind: str, item_id: int | str, *, endpoint: str, anon_key: 
     row = _fetch_row(kind, item_id, endpoint=endpoint, anon_key=anon_key, revision_id=revision_id)
     if row is None: return {"error": "not_found", "detail": f"No {kind} found with id {item_id}"}
     result: dict[str, Any] = {"item": dict(row)}
-    if kind == "revision": result["references"] = _fetch_outgoing("revision", item_id, endpoint=endpoint, anon_key=anon_key)
-    elif kind == "resource":
-        result["cited_by"] = _fetch_cited_by("resource", item_id, endpoint=endpoint, anon_key=anon_key)
-        if row.get("revision_id"): result["references"] = _fetch_outgoing("revision", row["revision_id"], endpoint=endpoint, anon_key=anon_key)
-    else: result["cited_by"] = _fetch_cited_by("message", item_id, endpoint=endpoint, anon_key=anon_key)
+    try:
+        if kind == "revision": result["references"] = _fetch_outgoing("revision", item_id, endpoint=endpoint, anon_key=anon_key)
+        elif kind == "resource":
+            result["cited_by"] = _fetch_cited_by("resource", item_id, endpoint=endpoint, anon_key=anon_key)
+            if row.get("revision_id"): result["references"] = _fetch_outgoing("revision", row["revision_id"], endpoint=endpoint, anon_key=anon_key)
+        else: result["cited_by"] = _fetch_cited_by("message", item_id, endpoint=endpoint, anon_key=anon_key)
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404: raise
+        result["references_unavailable"] = {"status": 404, "kind": kind}
     return result
 
 def main(argv: list[str] | None = None) -> int:
