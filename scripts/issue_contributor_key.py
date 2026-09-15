@@ -6,9 +6,9 @@ hashes it with SHA-256, and outputs both the key (to be shared with the
 contributor) and the INSERT statement (to be run against the contributors
 table).
 
-Usage (operator migration helper for a directly-bound contributor):
-  python3 scripts/issue_contributor_key.py --name "Alice" --kind human \
-      --auth-user-id 00000000-0000-0000-0000-000000000000
+Usage:
+  python3 scripts/issue_contributor_key.py --name "My Agent" --kind agent
+  python3 scripts/issue_contributor_key.py --name "Alice" --kind human
 
 The output is structured so that a smoke test can regex-extract the key,
 the hash, and the INSERT statement.
@@ -47,16 +47,13 @@ def compute_sha256_hex(full_key: str) -> str:
     return hashlib.sha256(full_key.encode("utf-8")).hexdigest()
 
 
-def build_insert_sql(name: str, kind: str, key_hash: str, auth_user_id: str) -> str:
-    """Return SQL for a directly-bound contributor and hashed device key."""
+def build_insert_sql(name: str, kind: str, key_hash: str) -> str:
+    """Return a parameterised INSERT statement for the contributors table."""
     # Escape single quotes in the name for SQL safety
     safe_name = name.replace("'", "''")
     return (
-        f"INSERT INTO contributors (name, kind, auth_user_id, auth_user_id_migration_pending)\n"
-        f"VALUES ('{safe_name}', '{kind}', '{auth_user_id}', false)\n"
-        f"RETURNING id;\n"
-        f"-- Use the returned contributor id: INSERT INTO contributor_keys (contributor_id, key_hash, label)\n"
-        f"-- VALUES (<id>, '{key_hash}', 'issued by operator');"
+        f"INSERT INTO contributors (name, kind, api_key_hash)\n"
+        f"VALUES ('{safe_name}', '{kind}', '{key_hash}');"
     )
 
 
@@ -75,11 +72,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         choices=["agent", "human"],
         help="Contributor kind.",
     )
-    parser.add_argument(
-        "--auth-user-id",
-        required=True,
-        help="Verified auth.users UUID; new contributors cannot be created without it.",
-    )
     return parser.parse_args(argv)
 
 
@@ -89,7 +81,7 @@ def main(argv: list[str] | None = None) -> None:
     hex_part = generate_hex_part()
     full_key = build_key(hex_part)
     key_hash = compute_sha256_hex(full_key)
-    insert_sql = build_insert_sql(args.name, args.kind, key_hash, args.auth_user_id)
+    insert_sql = build_insert_sql(args.name, args.kind, key_hash)
 
     # Machine-parseable structured output for smoke testing.
     # The explicit markers let a test script extract values reliably.

@@ -40,7 +40,7 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "executors.ingest_youtube.run",
+      "hivemind.executors.ingest_youtube.run",
       "--url",
       "{url}",
       "--out",
@@ -61,7 +61,8 @@
     ],
     "env_passthrough": [
       "HIVEMIND_API_URL"
-    ]
+    ],
+    "secrets_required": ["HIVEMIND_CONTRIBUTOR_KEY"]
   },
   "metadata": {
     "runtime_entrypoint": "main",

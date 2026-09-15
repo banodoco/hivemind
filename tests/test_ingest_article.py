@@ -492,17 +492,17 @@ class MainDryRunTests(unittest.TestCase):
                     output = json.loads(mock_stdout.getvalue())
                     self.assertIs(output["dry_run"], True)
                     self.assertIn("envelope", output)
-                    self.assertEqual(output["envelope"]["action"], "submit_resource")
+                    self.assertEqual(output["envelope"]["action"], "add_resource")
                     self.assertEqual(output["envelope"]["data"]["kind"], "article")
-                    self.assertEqual(output["envelope"]["data"]["origin_source"], "web")
+                    self.assertEqual(output["envelope"]["data"]["source"], "web")
                     self.assertEqual(output["envelope"]["data"]["title"], "Test Article")
                     self.assertIn("Body text here", output["envelope"]["data"]["body"])
                     self.assertEqual(
-                        output["envelope"]["data"]["provenance"]["url"],
+                        output["envelope"]["data"]["url"],
                         "https://example.com/article",
                     )
                     self.assertEqual(
-                        output["envelope"]["data"]["origin_external_id"],
+                        output["envelope"]["data"]["external_id"],
                         "https://example.com/article",
                     )
 
@@ -751,11 +751,8 @@ class MainRealSendTests(unittest.TestCase):
                     ret = main(["--url", "https://example.com"])
                     self.assertEqual(ret, 1)
                     output = json.loads(mock_stdout.getvalue())
-                    self.assertEqual(output, {
-                        "error": "login_required",
-                        "detail": "contributor credentials are required for writes",
-                        "recovery_command": "hivemind auth login",
-                    })
+                    self.assertIn("error", output)
+                    self.assertIn("contributor key required", output["error"])
 
     def test_fetch_http_error(self):
         import urllib.error
@@ -909,10 +906,11 @@ class MainRealSendTests(unittest.TestCase):
                     with unittest.mock.patch("sys.stdout", new_callable=io.StringIO):
                         main(["--url", "https://example.com/article"])
             self.assertEqual(
-                captured_payload["data"]["origin_external_id"],
+                captured_payload["data"]["external_id"],
                 "https://example.com/article",
             )
             self.assertEqual(
-                captured_payload["data"]["provenance"]["url"],
+                captured_payload["data"]["url"],
                 "https://example.com/article",
             )
+

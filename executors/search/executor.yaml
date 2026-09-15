@@ -3,25 +3,25 @@ id: hivemind.search
 name: Search
 kind: external
 version: '2.0'
-short_description: Search Discord messages and accepted current resource heads with per-token matching and client-side ranking.
-description: 'Searches message_feed and resources joined to their current accepted resource_revisions with per-token ILIKE predicates. Pending and historical revisions are excluded; text search never uses unified_feed. Filters include kind/source/date/channel/author/thread and pagination.'
+short_description: Search the Hivemind corpus (messages, resources, distillations) with per-token matching and client-side ranking.
+description: 'Searches the raw corpus tables (message_feed, external_resources, distillations) in parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014) on text search. Filters: per-token ILIKE predicates, kind/source/date/token gates, pagination.'
 keywords:
 - hivemind
 - search
 - corpus
 - message_feed
-- resources
+- external_resources
 - postgrest
-- resource_revisions
+- distillation
 inputs:
 - name: query
   type: string
   required: true
-  description: Search query (per-token matched across messages and accepted current resource revisions).
+  description: Search query (per-token ilike-matched across messages, resources, distillations).
 - name: kinds
   type: string
   required: false
-  description: Comma-separated kind filter (message,resource,article,workflow,transcript,...).
+  description: Comma-separated kind filter (message,article,workflow,transcript,distillation,...).
 - name: sources
   type: string
   required: false
@@ -63,7 +63,7 @@ command:
   argv:
   - '{python_exec}'
   - -m
-  - executors.search.run
+  - hivemind.executors.search.run
   - --query
   - '{query}'
   - --out
@@ -107,6 +107,7 @@ metadata:
   runtime_entrypoint: main
   runtime_file: run.py
   runtime_module: hivemind.executors.search.run
+  project_scope: optional
   network_policy:
     allowed_protocols: [dns, tcp]
     allowed_destinations: [https://ujlwuvkrxlvoswwkerdf.supabase.co:443]

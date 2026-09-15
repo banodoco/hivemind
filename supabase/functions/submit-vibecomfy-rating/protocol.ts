@@ -119,11 +119,7 @@ export function validateRequest(
   const turnId = readRequiredString(req, "turn_id");
   if (turnId.error) return invalid(turnId.error);
 
-  const responseIdValue = responseId.value as string;
-  const sessionIdValue = sessionId.value as string;
-  const turnIdValue = turnId.value as string;
-
-  const idError = validateIds(responseIdValue, sessionIdValue, turnIdValue);
+  const idError = validateIds(responseId.value, sessionId.value, turnId.value);
   if (idError) return invalid(idError);
 
   if (typeof req.rating !== "number" || !Number.isInteger(req.rating)) {
@@ -179,9 +175,9 @@ export function validateRequest(
 
   return {
     value: {
-      response_id: responseIdValue,
-      session_id: sessionIdValue,
-      turn_id: turnIdValue,
+      response_id: responseId.value,
+      session_id: sessionId.value,
+      turn_id: turnId.value,
       rating: req.rating,
       comment: comment.value,
       pack_shared: req.pack_shared,

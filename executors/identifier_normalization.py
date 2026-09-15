@@ -209,8 +209,9 @@ def separator_chars() -> frozenset[str]:
 #      disambiguation. No identity is ever dropped to "resolve" an alias.
 
 ENTITY_RESOURCE = "resource"
+ENTITY_DISTILLATION = "distillation"
 ENTITY_MESSAGE = "message"
-ALIAS_ENTITY_TYPES = (ENTITY_RESOURCE, ENTITY_MESSAGE)
+ALIAS_ENTITY_TYPES = (ENTITY_RESOURCE, ENTITY_DISTILLATION, ENTITY_MESSAGE)
 
 #: Provenance vocabulary (frozen). An alias records exactly where it came from;
 #: there is no "unknown" provenance. ``derived_canonical`` is the canonical name's
@@ -510,6 +511,7 @@ __all__ = [
     "canonical_alias_forms",
     # alias representation
     "ENTITY_RESOURCE",
+    "ENTITY_DISTILLATION",
     "ENTITY_MESSAGE",
     "ALIAS_ENTITY_TYPES",
     "PROV_WORKFLOW_SEARCHABLE_ALIASES",

@@ -14,9 +14,9 @@ permissions:
   - id: environment
     reason: Reads HIVEMIND_API_URL, HIVEMIND_ANON_KEY, and HIVEMIND_CONTRIBUTOR_KEY from the environment.
 description: >
-  Hivemind v2 — immutable resource/revision knowledge protocol. Read current
-  resource heads and Discord messages, refresh Discord attachment URLs, and
-  contribute through one locked edge-function write path. Seven
+  Hivemind v2 — unified corpus protocol.  Read the knowledge corpus through
+  a searchable unified feed, refresh Discord attachment URLs, and contribute
+  resources/distillations through a locked edge-function write path.  Seven
   self-contained, stdlib-only executors: search, get_item, refresh_media,
   contribute, ingest_article, ingest_workflow, ingest_youtube.
 keywords:
@@ -24,7 +24,7 @@ keywords:
   - knowledge
   - corpus
   - search
-  - revision
+  - distillation
   - supabase
   - postgrest
   - contribute
@@ -34,22 +34,16 @@ capabilities:
   - search_corpus
   - get_item
   - refresh_media
-  - submit_resource
-  - propose_revision
-  - decide_revision
-  - mark_canonical
-  - capture_message_snapshot
-  - submit_evidence
-  - submit_vibecomfy_rating
-  - contributor_auth
+  - contribute_resource
+  - contribute_distillation
   - ingest_article
   - ingest_workflow
   - ingest_youtube
 agent:
   purpose: >
     Use when you need to search a shared knowledge corpus, retrieve full
-    items, refresh Discord media URLs, or submit/propose reviewed resources and
-    exact evidence to Hivemind.
+    items, refresh Discord media URLs, or submit new resources and cited
+    distillations to the Hivemind.
   do_not_use_for: >
     Not for direct database writes — all writes go through the contribute
     edge function with a contributor key.  Not for audio transcription
@@ -64,3 +58,6 @@ agent:
     - hivemind.ingest_youtube
 content:
   executors: executors
+documentation:
+  kind: skill
+  path: skill/SKILL.md

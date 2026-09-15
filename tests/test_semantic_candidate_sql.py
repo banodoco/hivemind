@@ -134,12 +134,14 @@ class TestSemanticCandidatePurePython(unittest.TestCase):
     # -- result_kind -> entity_type + generic/concrete resource rule ---------
     def test_kind_to_entity_mapping(self) -> None:
         self.assertEqual(ei.entity_type_for_result_kind("message"), "message")
+        self.assertEqual(ei.entity_type_for_result_kind("distillation"), "distillation")
         # 'resource' (generic) and every concrete resource kind map to resource.
         for k in ("resource", "workflow", "article", "transcript", "repo"):
             self.assertEqual(ei.entity_type_for_result_kind(k), "resource", k)
         self.assertTrue(ei.result_kind_is_resource("workflow"))
         self.assertTrue(ei.result_kind_is_resource("resource"))
         self.assertFalse(ei.result_kind_is_resource("message"))
+        self.assertFalse(ei.result_kind_is_resource("distillation"))
 
     def test_generic_vs_concrete_resource_rule(self) -> None:
         # The SQL rule: 'resource' is generic (matches all resource kinds); a
@@ -150,7 +152,7 @@ class TestSemanticCandidatePurePython(unittest.TestCase):
         def matches(requested: list[str], source_kind: str) -> bool:
             has = len(requested) > 0
             generic = (not has) or "resource" in requested
-            concrete = [k for k in requested if k not in ("message", "resource")]
+            concrete = [k for k in requested if k not in ("message", "distillation", "resource")]
             want_res = generic or len(concrete) > 0
             return want_res and (generic or source_kind in concrete)
 
@@ -178,24 +180,29 @@ class TestSemanticCandidatePurePython(unittest.TestCase):
         def resolve(kinds: list[str]) -> str | None:
             has = len(kinds) > 0
             want_msg = (not has) or "message" in kinds
+            want_dist = (not has) or "distillation" in kinds
             generic = (not has) or "resource" in kinds
-            concrete = [k for k in kinds if k not in ("message", "resource")]
+            concrete = [k for k in kinds if k not in ("message", "distillation", "resource")]
             want_res = generic or len(concrete) > 0
-            if want_msg and not want_res:
+            if want_msg and not want_res and not want_dist:
                 return "message"
-            if want_res and not want_msg:
+            if want_res and not want_msg and not want_dist:
                 return "resource"
+            if want_dist and not want_msg and not want_res:
+                return "distillation"
             return None  # ambiguous / bare -> fail closed
 
         # Exactly one entity -> item_ids restrict to it.
         self.assertEqual(resolve(["message"]), "message")
         self.assertEqual(resolve(["workflow"]), "resource")     # concrete resource kind
         self.assertEqual(resolve(["resource"]), "resource")     # generic resource kind
+        self.assertEqual(resolve(["distillation"]), "distillation")
         # Bare (no kinds) -> ambiguous across ALL entities -> fail closed.
         self.assertIsNone(resolve([]))
         # Two entities -> ambiguous -> fail closed.
         self.assertIsNone(resolve(["message", "resource"]))
         self.assertIsNone(resolve(["message", "workflow"]))
+        self.assertIsNone(resolve(["workflow", "distillation"]))
         # Two concrete resource kinds still resolve to the ONE resource entity.
         self.assertEqual(resolve(["workflow", "article"]), "resource")
 

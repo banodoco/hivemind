@@ -24,11 +24,10 @@ from typing import Any
 # -- dual-import guard (T5 pattern) -------------------------------------------
 try:
     from .._common import (
-        build_submit_resource_envelope,
+        build_add_resource_envelope,
         dry_run_output,
         edge_post,
         format_error,
-        login_required_error,
         output_json,
         resolve_contributor_key,
     )
@@ -39,11 +38,10 @@ except ImportError:
     _EXECUTORS = _os.path.dirname(_HERE)
     sys.path.insert(0, _EXECUTORS)
     from _common import (  # type: ignore[import-not-found]
-        build_submit_resource_envelope,
+        build_add_resource_envelope,
         dry_run_output,
         edge_post,
         format_error,
-        login_required_error,
         output_json,
         resolve_contributor_key,
     )
@@ -253,7 +251,7 @@ def build_envelope(
     *,
     kind: str = "transcript",
 ) -> dict[str, Any]:
-    """Assemble the initial resource envelope for a YouTube transcript."""
+    """Assemble the add_resource envelope for a YouTube transcript."""
     video_id = extract_video_id(metadata)
     title = metadata.get("title") or video_id or url
     channel = metadata.get("channel") or metadata.get("uploader")
@@ -261,10 +259,10 @@ def build_envelope(
 
     data: dict[str, Any] = {
         "kind": kind,
-        "origin_source": "youtube",
+        "source": "youtube",
         "title": title,
         "body": transcript,
-        "provenance": {"url": metadata.get("webpage_url") or url, "source_url": url},
+        "url": metadata.get("webpage_url") or url,
         "metadata": {
             "video_id": video_id,
             "channel": channel,
@@ -272,10 +270,10 @@ def build_envelope(
         },
     }
     if channel:
-        data["provenance"]["author"] = channel
+        data["author"] = channel
     if video_id:
-        data["origin_external_id"] = video_id
-    return build_submit_resource_envelope(data)
+        data["external_id"] = video_id
+    return build_add_resource_envelope(data)
 
 
 # ---------------------------------------------------------------------------
@@ -357,7 +355,13 @@ def main(argv: list[str] | None = None) -> int:
     # 5. Real send — requires contributor key
     contributor_key = resolve_contributor_key()
     if not contributor_key:
-        output_json(login_required_error(), args.out)
+        output_json(
+            {
+                "error": "contributor key required",
+                "detail": "set HIVEMIND_CONTRIBUTOR_KEY or use --dry-run",
+            },
+            args.out,
+        )
         return 1
 
     try:

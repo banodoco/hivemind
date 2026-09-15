@@ -5,18 +5,28 @@
   "kind": "external",
   "version": "2.0",
   "short_description": "Fetch a single full row from the Hivemind corpus by kind and id.",
-  "description": "Retrieves a full message, current stable resource, or exact pinned resource revision and its knowledge-reference context.",
+  "description": "Retrieves an untruncated row by kind and id. Messages use the indexed message_feed surface; resources and distillations use unified_feed. For distillations, also fetches its distillation_cites. For messages and resources, also fetches distillations that cite the item.",
   "keywords": [
     "hivemind",
     "get",
     "fetch",
     "corpus",
+    "distillation",
     "cite"
   ],
   "inputs": [
-    {"name": "kind", "type": "string", "required": true, "description": "Item kind: message | resource | revision."},
-    {"name": "id", "type": "string", "required": true, "description": "Decimal ID, kept as text at JSON boundaries."},
-    {"name": "revision_id", "type": "string", "required": false, "description": "Exact revision to fetch for a resource."}
+    {
+      "name": "kind",
+      "type": "string",
+      "required": true,
+      "description": "Item kind: message | resource | distillation."
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": true,
+      "description": "Decimal item id, kept as text so Discord snowflakes are lossless."
+    }
   ],
   "outputs": [
     {
@@ -29,15 +39,14 @@
     "argv": [
       "{python_exec}",
       "-m",
-      "executors.get_item.run",
+      "hivemind.executors.get_item.run",
       "--kind",
       "{kind}",
       "--id",
       "{id}",
       "--out",
       "{out}/item.json"
-    ],
-    "input_args": [{"input": "revision_id", "flag": "--revision-id", "optional": true}]
+    ]
   },
   "cache": {
     "mode": "none"
@@ -52,7 +61,8 @@
   "metadata": {
     "runtime_entrypoint": "main",
     "runtime_file": "run.py",
-    "runtime_module": "hivemind.executors.get_item.run"
+    "runtime_module": "hivemind.executors.get_item.run",
+    "project_scope": "optional"
     ,"network_policy": {"allowed_protocols": ["dns", "tcp"], "allowed_destinations": ["https://ujlwuvkrxlvoswwkerdf.supabase.co:443"], "allow_redirects": false, "broker": {"host_managed": true}}
   }
 }
