@@ -537,7 +537,7 @@ def build_representation_manifest(
 ) -> list[RepresentationManifestEntry]:
     """Build the canonical representation manifest entries for one source row.
 
-    Yields one entry per representation: prose for messages/distillations/non-
+    Yields one entry per representation: prose for messages/non-
     workflow resources; prose + workflow_python for workflows. Safe workflow
     Python carries its chunks; quarantined/unavailable Python is a STATE-ONLY
     entry (no chunks, no source) so the worker/finalize/cleanup can DROP stale

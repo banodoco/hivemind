@@ -765,6 +765,7 @@ def _apply(
                                 "chunk_index": c.chunk_index, "chunk_text": c.text,
                                 "embedding": vector, "representation_hash": c.representation_hash,
                                 "chunk_hash": c.chunk_hash,
+                                "source_revision_id": row.get("revision_id") if c.entity_type == "resource" else None,
                             })
                         estimated_spend_usd += estimated_batch_cost
                     if item_failed:

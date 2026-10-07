@@ -74,8 +74,7 @@ WEIGHTS = ("A", "B", "C", "D")
 
 ENTITY_MESSAGE = "message"
 ENTITY_RESOURCE = "resource"
-ENTITY_DISTILLATION = "distillation"
-ENTITY_TYPES = (ENTITY_MESSAGE, ENTITY_RESOURCE, ENTITY_DISTILLATION)
+ENTITY_TYPES = (ENTITY_MESSAGE, ENTITY_RESOURCE)
 
 REP_PROSE = "prose"
 REP_WORKFLOW_PYTHON = "workflow_python"
@@ -111,8 +110,8 @@ Stemming/stopword differences observed on the same instance:
   to_tsvector('simple','... running configs ...')  -> 'running','configs' (literal); kept
 
 Decision: adopt ``'simple'`` for EVERY entity and representation — messages,
-resource title/prose, workflow prose, workflow Python, distillation
-question/conditions/answer — and for EVERY query constructor. Uniform config
+resource title/prose, workflow prose, and workflow Python — and for EVERY query
+constructor. Uniform config
 guarantees indexed-vector / query-vector agreement across all sources, so a
 ``websearch_to_tsquery('simple', q)`` can never mismatch an indexed expression.
 
@@ -136,8 +135,8 @@ the canonical query path.
 # Weight map (PostgreSQL default ts_rank multipliers: A=1.0 B=0.4 C=0.2 D=0.1):
 #   A (high)   — title / question
 #   B (medium) — tags + projected workflow_semantics (aliases, nodes, models,
-#                custom_nodes, conditions for distillations)
-#   C (normal) — prose body / answer
+#                custom_nodes)
+#   C (normal) — prose body
 #   D (lowest) — workflow Python code chunks (uniform; weight only matters across
 #                representations, and chunks collapse to one best per resource)
 #
@@ -192,29 +191,12 @@ SOURCE_RESOURCE_TITLE = "title"
 SOURCE_RESOURCE_TAGS = "hivemind_resource_tags(metadata)"
 SOURCE_RESOURCE_PROSE = "hivemind_workflow_prose(body, kind)"   # strips python blocks when kind=workflow
 SOURCE_RESOURCE_SEMANTICS = "hivemind_workflow_semantics_text(metadata)"  # incl. searchable_aliases
-SOURCE_DISTILLATION_QUESTION = "question"
-SOURCE_DISTILLATION_CONDITIONS = "conditions"
-SOURCE_DISTILLATION_ANSWER = "answer"
 SOURCE_WORKFLOW_PYTHON_CHUNK = "chunk_text"   # column of the per-chunk document table
 
 
 #: Message / prose — single bare field, no weighting (messages are short; no
 #: title). Stored as a bare to_tsvector, NOT a TsvSpec (no arms).
 MESSAGE_BARE_SOURCE = SOURCE_MESSAGE_CONTENT
-
-#: Distillation / prose — weighted, single document (max answer ~562 chars).
-DISTILLATION_SPEC = TsvSpec(
-    entity_type=ENTITY_DISTILLATION,
-    representation_type=REP_PROSE,
-    config=LEXICAL_CONFIG,
-    arms=(
-        TsvArm("question", SOURCE_DISTILLATION_QUESTION, "A"),
-        TsvArm("conditions", SOURCE_DISTILLATION_CONDITIONS, "B"),
-        TsvArm("answer", SOURCE_DISTILLATION_ANSWER, "C"),
-    ),
-    chunked=False,
-    identity=("entity_type", "item_id", "representation_type", "chunk_index"),
-)
 
 #: Resource / prose — weighted, single document for normal-length prose.
 #: Over-long prose (rare: the both-cohort Python block is stripped first) falls
@@ -246,7 +228,6 @@ WORKFLOW_PYTHON_SPEC = TsvSpec(
 
 #: Index of all weighted specs (messages handled separately as a bare field).
 WEIGHTED_SPECS = {
-    (ENTITY_DISTILLATION, REP_PROSE): DISTILLATION_SPEC,
     (ENTITY_RESOURCE, REP_PROSE): RESOURCE_PROSE_SPEC,
     (ENTITY_RESOURCE, REP_WORKFLOW_PYTHON): WORKFLOW_PYTHON_SPEC,
 }
@@ -381,7 +362,7 @@ def normalize_identifier(value: str) -> str:
 
     This is the IMMUTABLE contract task 1.4 implements as
     ``public.hivemind_normalize_identifier(text)`` for use in expression indexes
-    on resource titles and distillation questions. It is applied identically to
+    on resource titles. It is applied identically to
     the indexed value and the query term.
     """
     if value is None:
@@ -441,21 +422,15 @@ MESSAGE_BOT_POLICY = (
     "AND COALESCE(mb.bot, false) OR COALESCE(mb.system, false)))"
 )
 
-#: Distillation visibility predicate. RLS is ``status <> 'rejected`` and the
-#: unified_feed branch is ``status IN ('pending','approved')`` (net identical for
-#: the feed). Service-role bypass means the RPC re-encodes this.
-DISTILLATION_ELIGIBLE = "d.status IN ('pending', 'approved')"
-
-#: Resource base predicate. Resources have no status/soft-delete column (0.2 §5);
-#: all rows are eligible for the prose representation.
-RESOURCE_ELIGIBLE = "true"
+#: Resource-head predicate. Only an accepted current revision is searchable.
+RESOURCE_ELIGIBLE = "r.current_revision_id is not null"
 
 #: Workflow-Python representation gate. Only ``kind = 'workflow'`` resources carry
 #: a workflow_python representation, and ONLY when the authoritative Python is
 #: resolved to cohort payload_python / body_python / recoverable AND public state
 #: is ``safe`` (0.8 §7). Quarantined Python never produces a lexical document.
 WORKFLOW_PYTHON_ELIGIBLE = (
-    "r.kind = 'workflow' AND hivemind_workflow_python_state(r.id) = 'safe'"
+    "v.kind = 'workflow' AND v.state = 'accepted' AND hivemind_workflow_python_state(r.id) = 'safe'"
 )
 
 
@@ -476,23 +451,16 @@ MESSAGE_ELIGIBILITY = Eligibility(
     predicates=(MESSAGE_ELIGIBLE, MESSAGE_AUTHOR_OPTOUT, MESSAGE_BOT_POLICY),
 )
 
-DISTILLATION_ELIGIBILITY = Eligibility(
-    entity_type=ENTITY_DISTILLATION,
-    base_table="public.distillations",
-    identity_column="id::text",
-    predicates=(DISTILLATION_ELIGIBLE,),
-)
-
 RESOURCE_PROSE_ELIGIBILITY = Eligibility(
     entity_type=ENTITY_RESOURCE,
-    base_table="public.external_resources",
+    base_table="public.resources",
     identity_column="id::text",
     predicates=(RESOURCE_ELIGIBLE,),
 )
 
 WORKFLOW_PYTHON_ELIGIBILITY = Eligibility(
     entity_type=ENTITY_RESOURCE,
-    base_table="public.external_resources",
+    base_table="public.resources",
     identity_column="id::text",
     predicates=(WORKFLOW_PYTHON_ELIGIBLE,),
 )

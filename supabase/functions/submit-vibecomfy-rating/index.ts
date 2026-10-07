@@ -8,7 +8,7 @@ import {
 } from "./protocol.ts";
 
 interface ContributorRow {
-  id: number;
+  contributor_id?: number;
 }
 
 interface InsertRow {
@@ -108,15 +108,12 @@ async function requireContributorKeyHash(
   serviceRoleKey: string,
   contributorKey: string,
 ): Promise<string | null> {
-  const hash = await sha256Hex(contributorKey);
-  const url = new URL("/rest/v1/contributors", supabaseUrl);
-  url.searchParams.set("api_key_hash", `eq.${hash}`);
-  url.searchParams.set("revoked_at", "is.null");
-  url.searchParams.set("select", "id");
-  url.searchParams.set("limit", "1");
-
-  const response = await fetch(url, {
-    headers: createServiceHeaders(serviceRoleKey),
+  // contributor_keys is the sole protected lookup path.  The key is sent only
+  // in the TLS request body and is never placed in a URL or log message.
+  const response = await fetch(new URL("/rest/v1/rpc/hivemind_resolve_contributor_key", supabaseUrl), {
+    method: "POST",
+    headers: createServiceHeaders(serviceRoleKey, { "content-type": "application/json" }),
+    body: JSON.stringify({ p_key: contributorKey }),
   });
 
   if (!response.ok) {
@@ -124,7 +121,7 @@ async function requireContributorKeyHash(
   }
 
   const rows = await response.json() as ContributorRow[];
-  return rows[0]?.id ? hash : null;
+  return rows[0]?.contributor_id ? await sha256Hex(contributorKey) : null;
 }
 
 function reportObjectPath(now = new Date(), id = crypto.randomUUID()): string {
@@ -161,7 +158,7 @@ async function uploadReportPack(
       "content-type": "application/zip",
       "x-upsert": "false",
     }),
-    body: request.pack_zip_bytes,
+    body: request.pack_zip_bytes as unknown as BodyInit,
   });
 
   if (!response.ok) {

@@ -247,8 +247,8 @@
     "recoverable": true,
     "unavailable": true
   },
-  "pgvector_version": "0.8.5",
-  "postgres_version": "PostgreSQL 14.15 (Homebrew) on aarch64-apple-darwin23.6.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.4), 64-bit",
+  "pgvector_version": "0.8.6",
+  "postgres_version": "PostgreSQL 17.11 (Homebrew) on aarch64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.4.2), 64-bit",
   "production_mutated": false,
   "recovery": {
     "recovered": 1,

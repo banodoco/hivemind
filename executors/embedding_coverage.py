@@ -27,8 +27,8 @@ Design rules (frozen contract §gates.coverage + the 2.12 handoff):
   *eligible* iff its item belongs to an enabled source cohort and the
   representation is applicable (safe workflow Python; never quarantined Python).
   C6 counts any *stored* representation that is not eligible+expected — a
-  quarantined-Python vector, a deleted-message vector, a rejected-distillation
-  vector — and that count must be zero (release blocker).  Quarantined Python is
+  quarantined-Python vector or a deleted-message vector — and that count must be
+  zero (release blocker).  Quarantined Python is
   therefore modelled as a non-eligible, empty-expected representation sample so
   that any illicit storage is detected here, not hidden.
 * **No double indexing.**  Per representation the stored chunk hashes are
@@ -80,17 +80,15 @@ __all__ = [
 # Frozen gate identities (mirror phase0-workflow-representation-contract.json)
 # ---------------------------------------------------------------------------
 
-GATE_C1 = "C1"  # eligible distillations + resource representations coverage == 1.0
+GATE_C1 = "C1"  # accepted current resource representations coverage == 1.0
 GATE_C2 = "C2"  # enabled message-cohort coverage >= 0.95
 GATE_C3 = "C3"  # recoverable workflows materialized/versioned/hashed Python == 1.0
 GATE_C4 = "C4"  # unavailable rows without an explicit nonsecret reason == 0
 GATE_C5 = "C5"  # stale/mismatched representation hashes < 0.001
 GATE_C6 = "C6"  # ineligible indexed items == 0 (release blocker)
 
-#: Distillation + resource sources that C1 covers.
-C1_SOURCES: frozenset[str] = frozenset(
-    {"approved_distillations", "pending_distillations", "distillations", "resources"}
-)
+#: The active resource source cohort that C1 covers.
+C1_SOURCES: frozenset[str] = frozenset({"resources"})
 
 #: Message sources that C2 covers (the enabled cohort).
 MESSAGE_SOURCES: frozenset[str] = frozenset({"messages"})
@@ -371,7 +369,7 @@ def evaluate_coverage(
     reps = list(representations)
     wf = list(workflows or [])
 
-    # C1 — eligible distillation + resource representations covered exactly.
+    # C1 — accepted current resource representations covered exactly.
     c1_reps = [r for r in reps if r.source in C1_SOURCES]
     c1_num, c1_den = _coverage_gate(c1_reps)
     # C2 — enabled message-cohort coverage >= 0.95.
@@ -403,7 +401,7 @@ def evaluate_coverage(
     gates: dict[str, GateVerdict] = {
         GATE_C1: GateVerdict(
             GATE_C1,
-            "active_contract_coverage_distillations_and_resources",
+            "active_contract_coverage_resources",
             "==",
             1.0,
             c1_num,

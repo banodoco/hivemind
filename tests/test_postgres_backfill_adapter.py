@@ -95,13 +95,11 @@ class WriteSafetyTests(unittest.TestCase):
     def test_workflow_patch_has_no_identity_or_artifact_column(self):
         session = RecordingSession()
         store = pg.PostgresWorkflowStore(session)  # type: ignore[arg-type]
-        store.patch(22, {"payload": {"python_source": "x=1"}, "body": "prose", "metadata": {"x": 1}})
-        sql = session.sql[-1]
-        self.assertIn("set payload=", sql)
-        self.assertIn(" body=", sql)
-        self.assertIn(" metadata=", sql)
-        for forbidden in ("title=", "url=", "source=", "external_id=", "id="):
-            self.assertNotIn(forbidden, sql.split(" set ", 1)[1].split(" where ", 1)[0])
+        with self.assertRaisesRegex(RuntimeError, "immutable_resource_revision_requires_proposal"):
+            store.patch(22, {"payload": {"python_source": "x=1"}, "body": "prose", "metadata": {"x": 1}})
+        # The adapter must fail before emitting a direct source-row update;
+        # revisions are changed only through the proposal/approval path.
+        self.assertEqual(session.sql, [])
 
 
 class ReportShapeTests(unittest.TestCase):

@@ -1054,6 +1054,8 @@ class TestReplayOfflineNoNetwork(unittest.TestCase):
     winner with zero calls."""
 
     def test_replay_reproduces_when_live_reader_and_network_raise(self):
+        if not (_REAL_DECISION.exists() and _REAL_BUNDLE.exists() and _REAL_MANIFEST.exists()):
+            self.skipTest("private semantic evaluation artifacts absent")
         import scripts.compare_embedding_candidates as cli
 
         def _boom(*a, **k):
@@ -1306,6 +1308,8 @@ class TestReplayReadOnlyCache(unittest.TestCase):
     """Item 10: strict replay never writes/compacts either paid cache."""
 
     def test_replay_does_not_touch_cache_writes(self):
+        if not (_REAL_DECISION.exists() and _REAL_BUNDLE.exists() and _REAL_MANIFEST.exists()):
+            self.skipTest("private semantic evaluation artifacts absent")
         decision = json.loads(_REAL_DECISION.read_text())
         bundle = json.loads(_REAL_BUNDLE.read_text())
         manifest = json.loads(_REAL_MANIFEST.read_text())
@@ -1383,6 +1387,8 @@ class TestStructuralPrivacyRejection(unittest.TestCase):
         self.assertTrue(any(v.startswith("raw_field:") for v in v))
 
     def test_existing_sanitized_artifacts_remain_clean(self):
+        if not (_REAL_DECISION.exists() and _REAL_BUNDLE.exists() and _REAL_MANIFEST.exists()):
+            self.skipTest("private semantic evaluation artifacts absent")
         # The tracked artifacts must remain clean under the structural check.
         d = json.loads(_REAL_DECISION.read_text())
         m = json.loads(_REAL_MANIFEST.read_text())
@@ -1517,6 +1523,8 @@ class TestEvidencePairNeverOptional(unittest.TestCase):
                 decision_json_path=str(jp), decision_md_path=str(mp))
 
     def test_cli_replay_requires_explicit_md_and_unreachable_network(self):
+        if not (_REAL_DECISION.exists() and _REAL_BUNDLE.exists() and _REAL_MANIFEST.exists()):
+            self.skipTest("private semantic evaluation artifacts absent")
         # Gap 1 CLI: explicit --decision-md; endpoint/proxy unreachable -> still
         # zero provider/network calls (strict evidence replay).
         import scripts.compare_embedding_candidates as cli
@@ -1602,6 +1610,8 @@ class TestAccountingCompleteBinding(unittest.TestCase):
             self._replay(cache_dir, golden_path, d2, bundle, manifest, jp, mp)
 
     def test_real_accounting_bound_and_stable(self):
+        if not (_REAL_DECISION.exists() and _REAL_BUNDLE.exists() and _REAL_MANIFEST.exists()):
+            self.skipTest("private semantic evaluation artifacts absent")
         d = json.loads(_REAL_DECISION.read_text())
         b = json.loads(_REAL_BUNDLE.read_text())
         m = json.loads(_REAL_MANIFEST.read_text())

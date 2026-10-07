@@ -20,9 +20,13 @@ Every executor imports from this module and uses the same dual-import guard:
 from __future__ import annotations
 
 import json
+import hashlib
 import os
+import re
 import sys
+import tempfile
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Any, Mapping
 
@@ -34,7 +38,9 @@ _DEFAULT_API_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1"
 _DEFAULT_ANON_KEY = "sb_publishable_O38oPBafrBoFrpi_rlWJvA_UJrulFsx"
 _DEFAULT_CONTRIBUTE_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/contribute"
 _DEFAULT_REFRESH_MEDIA_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/refresh-media-urls"
+_DEFAULT_AUTH_BROKER_URL = "https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/contributor-auth"
 _BODY_TRUNCATION_LIMIT = 700
+_CONTRIBUTOR_KEY_RE = re.compile(r"^hm_[0-9a-f]{64}$")
 
 # ---------------------------------------------------------------------------
 # Environment resolution
@@ -54,19 +60,71 @@ def resolve_anon_key() -> str:
 def resolve_contributor_key() -> str | None:
     """Return the contributor key from the environment or standard key file."""
     env_key = os.environ.get("HIVEMIND_CONTRIBUTOR_KEY")
-    if env_key:
+    if env_key and env_key.strip():
         return env_key.strip()
 
-    home_dir = os.environ.get("HOME")
-    if not home_dir:
-        return None
-    key_path = os.path.join(home_dir, ".hivemind", "key")
+    key_path = contributor_key_path()
     try:
         with open(key_path, encoding="utf-8") as handle:
             file_key = handle.read().strip()
     except (FileNotFoundError, OSError):
         return None
     return file_key or None
+
+
+def hash_contributor_key(key: str) -> str:
+    """Return the storage digest for a strict contributor key."""
+    if not _CONTRIBUTOR_KEY_RE.fullmatch(key):
+        raise ValueError("contributor key must be hm_<64 lowercase hex chars>")
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
+def contributor_key_path(home: str | None = None) -> str:
+    """Return the local owner-only key path without reading its contents."""
+    root = home or os.environ.get("HOME")
+    if not root:
+        root = os.path.expanduser("~")
+    return os.path.join(root, ".hivemind", "key")
+
+
+def write_contributor_key(key: str, *, home: str | None = None) -> str:
+    """Atomically replace the local key with mode 0600 and return its path."""
+    if not _CONTRIBUTOR_KEY_RE.fullmatch(key):
+        raise ValueError("broker returned an invalid contributor key")
+    path = contributor_key_path(home)
+    directory = os.path.dirname(path)
+    os.makedirs(directory, mode=0o700, exist_ok=True)
+    os.chmod(directory, 0o700)
+    fd, temporary = tempfile.mkstemp(prefix=".key.", dir=directory, text=True)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(key + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        os.chmod(path, 0o600)
+    except Exception:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+        raise
+    return path
+
+
+def delete_local_contributor_key(*, home: str | None = None) -> bool:
+    """Delete only the local key file; server revocation is a separate action."""
+    try:
+        os.unlink(contributor_key_path(home))
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def resolve_auth_broker_url() -> str:
+    """Return the contributor-auth broker edge-function URL."""
+    return os.environ.get("HIVEMIND_AUTH_BROKER_URL", _DEFAULT_AUTH_BROKER_URL).rstrip("/")
 
 
 def resolve_contribute_url() -> str:
@@ -119,7 +177,7 @@ def postgrest_get(
     Parameters
     ----------
     path:
-        Relative path, e.g. ``"unified_feed"``.
+        Relative path, e.g. ``"message_feed"``.
     params:
         Query-string parameters (e.g. ``{"select": "*", "limit": "20"}``).
     endpoint:
@@ -212,92 +270,61 @@ def public_edge_post(
     return _http_post(url.rstrip("/"), headers, json.dumps(payload).encode("utf-8"))
 
 
+def auth_post(
+    payload: dict[str, Any],
+    *,
+    broker_url: str | None = None,
+    anon_key: str | None = None,
+) -> dict[str, Any]:
+    """Call the contributor-auth broker without ever putting secrets in URLs."""
+    key = anon_key or resolve_anon_key()
+    headers = {
+        "Authorization": f"Bearer {key}",
+        "apikey": key,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    return _http_post(
+        (broker_url or resolve_auth_broker_url()).rstrip("/"),
+        headers,
+        json.dumps(payload).encode("utf-8"),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Envelope builders
 # ---------------------------------------------------------------------------
 
 
-def build_add_resource_envelope(data: dict[str, Any]) -> dict[str, Any]:
-    """Construct a complete ``add_resource`` request envelope.
+def build_knowledge_model_envelope(action: str, data: dict[str, Any]) -> dict[str, Any]:
+    """Build a T2-T6 contribution envelope with caller-scoped retry data."""
+    if not action or not isinstance(data, dict):
+        raise ValueError("knowledge-model action and object data are required")
+    return {"action": action, "data": data}
 
-    Parameters
-    ----------
-    data:
-        Must contain ``kind``, ``source``, ``title``, ``body``.
-        Optional: ``external_id``, ``author``, ``url``, ``metadata``,
-        ``payload``.
+
+def build_submit_resource_envelope(data: dict[str, Any], *, idempotency_token: str | None = None) -> dict[str, Any]:
+    """Build the sole initial-resource write envelope used by ingestors.
+
+    The token is deterministic for source-owned identities, making a retry
+    safe without creating a second contribution endpoint.
     """
-    return {
-        "action": "add_resource",
-        "data": data,
-    }
-
-
-def build_submit_distillation_envelope(data: dict[str, Any]) -> dict[str, Any]:
-    """Construct a complete ``submit_distillation`` request envelope.
-
-    Parameters
-    ----------
-    data:
-        Must contain ``question``, ``answer``, ``confidence``, ``cites``.
-        Optional: ``conditions``, ``supersedes_id``.
-    """
-    return {
-        "action": "submit_distillation",
-        "data": data,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Cite parsing
-# ---------------------------------------------------------------------------
-
-# Valid cite item kinds (must match the DB constraint and protocol.ts).
-_VALID_CITE_ITEM_KINDS = frozenset({"message", "resource", "distillation"})
-
-
-def parse_cites(cites_str: str) -> list[dict[str, object]]:
-    """Parse a ``--cites`` CLI string into a list of cite objects.
-
-    Expected format: ``"message:88123,resource:17"``.
-
-    Returns a list of ``{"item_kind": "<kind>", "item_id": <int>}`` dicts.
-
-    Raises *ValueError* if any element is malformed.
-    """
-    if not cites_str.strip():
-        raise ValueError("cites string must not be empty")
-
-    results: list[dict[str, object]] = []
-    for chunk in cites_str.split(","):
-        chunk = chunk.strip()
-        if ":" not in chunk:
-            raise ValueError(
-                f"invalid cite '{chunk}': expected format 'kind:id' (e.g. message:88123)"
-            )
-        kind, _, id_str = chunk.partition(":")
-        kind = kind.strip()
-        id_str = id_str.strip()
-
-        if kind not in _VALID_CITE_ITEM_KINDS:
-            raise ValueError(
-                f"invalid cite kind '{kind}': must be one of "
-                f"{sorted(_VALID_CITE_ITEM_KINDS)!r}"
-            )
-        if not id_str.isdigit():
-            raise ValueError(
-                f"invalid cite id '{id_str}': must be a positive integer"
-            )
-        item_id = int(id_str)
-        if item_id < 1:
-            raise ValueError(
-                f"invalid cite id {item_id}: must be >= 1"
-            )
-        # item_id travels as a STRING: Discord snowflake ids exceed the
-        # float64-safe integer range, so a JSON number would be silently
-        # rounded by the edge function's JSON.parse.
-        results.append({"item_kind": kind, "item_id": str(item_id)})
-    return results
+    if not isinstance(data, dict):
+        raise ValueError("resource data must be an object")
+    if idempotency_token:
+        token = idempotency_token
+    else:
+        # The source identity makes retries for the same representation stable;
+        # the content digest makes a changed re-import a new proposal instead of
+        # colliding with the original submit_resource idempotency row.  Keep the
+        # token bounded because the database contract caps it at 200 characters.
+        source = str(data.get("origin_source") or "unknown")[:32]
+        identity = str(data.get("origin_external_id") or data.get("title") or "untitled")
+        identity_digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
+        request = json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
+        content_digest = hashlib.sha256(request.encode("utf-8")).hexdigest()[:32]
+        token = f"ingest:{source}:{identity_digest}:{content_digest}"
+    return build_knowledge_model_envelope("submit_resource", {"idempotency_token": token, **data})
 
 
 # ---------------------------------------------------------------------------
@@ -346,6 +373,15 @@ def truncate_body(
 # ---------------------------------------------------------------------------
 
 
+def login_required_error() -> dict[str, str]:
+    """Return the stable, non-secret error for an unauthenticated write."""
+    return {
+        "error": "login_required",
+        "detail": "contributor credentials are required for writes",
+        "recovery_command": "hivemind auth login",
+    }
+
+
 def format_error(status: int, body: dict[str, Any]) -> str:
     """Map a contribute API error response to a human-readable message.
 
@@ -362,7 +398,13 @@ def format_error(status: int, body: dict[str, Any]) -> str:
         detail = body.get("detail", "bad request")
         return f"400 validation error: {detail}"
     if status == 401:
-        return "401 unauthorized — contributor key is missing, invalid, or revoked"
+        return (
+            "401 unauthorized — contributor key is missing, invalid, or revoked; "
+            "run hivemind auth login"
+        )
+    if status == 403:
+        detail = body.get("detail", "editor authorization required")
+        return f"403 forbidden — {detail}"
     if status == 409:
         existing_id = body.get("existing_id", "?")
         detail = body.get("detail", "duplicate")

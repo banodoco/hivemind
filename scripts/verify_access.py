@@ -55,7 +55,6 @@ TEMP_REF_FILES = REPO_ROOT / "supabase" / ".temp"
 # Hivemind Edge Functions that must be deployed for the pack surface.
 HIVEMIND_FUNCTION_SLUGS = (
     "contribute",
-    "contribute-resource",
     "refresh-media-urls",
 )
 # Secret names whose *presence* (never value) is relevant to the plan.

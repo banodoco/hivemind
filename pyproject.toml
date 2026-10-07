@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hivemind"
 version = "2.0.0"
-description = "Banodoco Hivemind — public knowledge corpus client: search messages/resources/distillations, fetch rows, refresh media URLs, and contribute via the locked edge-function write path."
+description = "Banodoco Hivemind — public knowledge corpus client: search messages and accepted resource heads, fetch exact revisions, refresh media URLs, and contribute via the locked edge-function write path."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

@@ -116,12 +116,12 @@ def _is_workflow(row: dict[str, Any] | None) -> bool:
 def applicable_representations(row: dict[str, Any] | None, entity_type: str) -> list[str]:
     """Return the representation streams an entity row carries.
 
-    Messages/distillations/non-workflow resources carry ``prose`` only; a
+    Messages/non-workflow resources carry ``prose`` only; a
     workflow carries ``prose`` and ``workflow_python`` (the worker decides
     whether python is actually available/safe — task 0.8 §7).
     """
 
-    if entity_type in (ei.ENTITY_MESSAGE, ei.ENTITY_DISTILLATION):
+    if entity_type == ei.ENTITY_MESSAGE:
         return [REP_PROSE]
     if _is_workflow(row):
         return [REP_PROSE, REP_WORKFLOW_PYTHON]
@@ -179,16 +179,12 @@ def decide_jobs(
 
     if entity_type == ei.ENTITY_MESSAGE:
         return _decide_message(old, new, op, sid)
-    if entity_type == ei.ENTITY_DISTILLATION:
-        return _decide_distillation(old, new, op, sid)
     return _decide_resource(old, new, op, sid)
 
 
 def _id_from_row(row: dict[str, Any], entity_type: str) -> Any:
     if entity_type == ei.ENTITY_MESSAGE:
         return row.get("message_id")
-    if entity_type == ei.ENTITY_DISTILLATION:
-        return row.get("id")
     return row.get("id")
 
 
@@ -204,27 +200,6 @@ def _decide_message(old, new, op, sid) -> list[JobIntent]:
             return [JobIntent(ei.ENTITY_MESSAGE, sid, REP_PROSE, JOB_REEMBED, SOURCE_UPDATE)]
         return []
     return [JobIntent(ei.ENTITY_MESSAGE, sid, REP_PROSE, JOB_DROP, SOURCE_DELETE)]
-
-
-def _decide_distillation(old, new, op, sid) -> list[JobIntent]:
-    if op == OP_INSERT:
-        if _distillation_eligible(new):
-            return [JobIntent(ei.ENTITY_DISTILLATION, sid, REP_PROSE, JOB_EMBED, SOURCE_INSERT)]
-        return []
-    if op == OP_UPDATE:
-        eligible_old = _distillation_eligible(old)
-        eligible_new = _distillation_eligible(new)
-        if not eligible_new and eligible_old:
-            return [JobIntent(ei.ENTITY_DISTILLATION, sid, REP_PROSE, JOB_DROP, SOURCE_STATUS_CHANGE)]
-        if eligible_new and (
-            new.get("question") != old.get("question")
-            or new.get("conditions") != old.get("conditions")
-            or new.get("answer") != old.get("answer")
-            or not eligible_old
-        ):
-            return [JobIntent(ei.ENTITY_DISTILLATION, sid, REP_PROSE, JOB_REEMBED, SOURCE_UPDATE)]
-        return []
-    return [JobIntent(ei.ENTITY_DISTILLATION, sid, REP_PROSE, JOB_DROP, SOURCE_DELETE)]
 
 
 def _decide_resource(old, new, op, sid) -> list[JobIntent]:
@@ -258,7 +233,3 @@ def _decide_resource(old, new, op, sid) -> list[JobIntent]:
 
 def _is_deleted(row: dict[str, Any]) -> bool:
     return bool(row.get("is_deleted"))
-
-
-def _distillation_eligible(row: dict[str, Any]) -> bool:
-    return (row.get("status") or "") in ("pending", "approved")

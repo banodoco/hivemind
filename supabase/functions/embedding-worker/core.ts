@@ -125,7 +125,6 @@ async function handleDrop(
   config: WorkerConfig,
   outcome: Outcome,
 ): Promise<void> {
-  const contractId = job.contract_id ?? "";
   if (!contractMatches(job, config.contract.selectedContractId)) {
     await failJob(
       rpc,
@@ -137,21 +136,33 @@ async function handleDrop(
     );
     return;
   }
-  if (contractId) {
-    await rpc("hivemind_drop_embedding_chunks", {
-      p_contract_id: contractId,
-      p_entity_type: job.entity_type,
-      p_item_id: job.item_id,
-      p_representation_type: job.representation_type,
-    });
-  }
-  await rpc("hivemind_complete_embedding_job", {
+  const result = await rpc<FinalizeResult>("hivemind_finalize_embedding_job", {
     p_job_id: job.job_id,
     p_worker_id: config.workerId,
-    p_chunks_written: 0,
+    p_chunks: [],
+    p_expected_representation_hash: null,
+    p_expected_public_state: null,
+    p_expected_source_available: false,
   });
-  outcome.dropped += 1;
-  outcome.completed += 1;
+  switch (result?.outcome) {
+    case "dropped":
+    case "completed":
+      outcome.dropped += 1;
+      outcome.completed += 1;
+      return;
+    case "source_changed":
+      // The finalizer requeued the job after observing a newer resource head.
+      outcome.completed += 1;
+      return;
+    case "contract_mismatch":
+    case "validation_failed":
+      await failJob(rpc, job, config, outcome, new Error(`finalize: ${result.outcome}`), false);
+      return;
+    case "not_processing":
+    default:
+      outcome.completed += 1;
+      return;
+  }
 }
 
 /** Compare the contract id as a STRING (the selected bigint is > 2^53). */

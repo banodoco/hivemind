@@ -97,6 +97,10 @@ def _tiny_cohort():
     return cohort
 
 
+@unittest.skipUnless(
+    R.CACHE_384.exists() and R.REPLAY_BUNDLE.exists(),
+    "private semantic evaluation cache artifacts absent",
+)
 class TestPreflightOffline(unittest.TestCase):
     """The offline preflight must be green with zero provider/network."""
 

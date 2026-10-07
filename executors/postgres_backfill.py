@@ -130,16 +130,7 @@ class PsqlSession:
 
 
 _SOURCE_SQL: dict[str, tuple[str, str]] = {
-    "approved_distillations": (
-        "distillations", "d.status = 'approved'",
-    ),
-    "pending_distillations": (
-        "distillations", "d.status = 'pending'",
-    ),
-    "distillations": (
-        "distillations", "d.status in ('approved','pending')",
-    ),
-    "resources": ("external_resources", "true"),
+    "resources": ("resources", "r.current_revision_id is not null and exists (select 1 from public.resource_revisions v where v.id=r.current_revision_id and v.state='accepted')"),
     "messages": ("discord_messages", "coalesce(m.is_deleted, false) = false"),
 }
 
@@ -227,7 +218,7 @@ class PostgresBackfillStore:
 
     def high_water(self, source: str) -> str | None:
         table, predicate = self._source(source)
-        alias = "d" if table == "distillations" else "m" if table == "discord_messages" else "r"
+        alias = "m" if table == "discord_messages" else "r"
         row = self.session.json_one(
             f"select max({alias}.{ 'message_id' if table == 'discord_messages' else 'id' })::text as high_water "
             f"from public.{table} {alias} where {predicate}"
@@ -236,7 +227,7 @@ class PostgresBackfillStore:
 
     def eligible_total(self, source: str) -> int:
         table, predicate = self._source(source)
-        alias = "d" if table == "distillations" else "m" if table == "discord_messages" else "r"
+        alias = "m" if table == "discord_messages" else "r"
         value = self.session.run(
             f"select count(*) from public.{table} {alias} where {predicate};"
         )
@@ -246,17 +237,12 @@ class PostgresBackfillStore:
         table, predicate = self._source(source)
         if limit < 1:
             return []
-        if table == "distillations":
+        if table == "resources":
             query = (
-                "select 'distillation'::text as entity_type, d.id::text as item_id, "
-                "d.question, d.conditions, d.answer, d.created_at "
-                "from public.distillations d where " + predicate
-            )
-            ident, created = "d.id", "d.created_at"
-        elif table == "external_resources":
-            query = (
-                "select 'resource'::text as entity_type, r.id::text as item_id, r.kind, r.title, r.body, "
-                "r.metadata, r.payload, r.created_at from public.external_resources r where " + predicate
+                "select 'resource'::text as entity_type, r.id::text as item_id, v.id::text as revision_id, "
+                "v.kind, v.title, v.body, v.metadata, v.payload, r.created_at "
+                "from public.resources r join public.resource_revisions v on v.id=r.current_revision_id "
+                "where v.state='accepted' and " + predicate
             )
             ident, created = "r.id", "r.created_at"
         else:
@@ -288,7 +274,8 @@ class PostgresBackfillStore:
             "select e.entity_type,e.item_id,e.representation_type,e.chunk_index,e.representation_hash "
             "from public.content_embeddings e join (values " + values + ") as k(entity_type,item_id,representation_type,chunk_index) "
             "on (e.entity_type,e.item_id,e.representation_type,e.chunk_index)=(k.entity_type,k.item_id,k.representation_type,k.chunk_index) "
-            f"where e.contract_id={int(self._contract_id)}"
+            f"where e.contract_id={int(self._contract_id)} and (e.entity_type <> 'resource' or exists "
+            "(select 1 from public.resources r where r.id=e.item_id::bigint and r.current_revision_id=e.source_revision_id))"
         )
         return {(str(r["entity_type"]), str(r["item_id"]), str(r["representation_type"]), int(r["chunk_index"])): str(r["representation_hash"]) for r in rows}
 
@@ -305,7 +292,8 @@ class PostgresBackfillStore:
             "select e.entity_type,e.item_id,e.representation_type,e.chunk_index,e.representation_hash,e.chunk_hash "
             "from public.content_embeddings e join (values " + values + ") as k(entity_type,item_id,representation_type) "
             "on (e.entity_type,e.item_id,e.representation_type)=(k.entity_type,k.item_id,k.representation_type) "
-            "where e.contract_id=" + str(int(self._contract_id))
+            "where e.contract_id=" + str(int(self._contract_id)) + " and (e.entity_type <> 'resource' or exists "
+            "(select 1 from public.resources r where r.id=e.item_id::bigint and r.current_revision_id=e.source_revision_id))"
         )
         actual: dict[tuple[str, str, str], set[tuple[int, str, str]]] = {}
         for row in rows:
@@ -331,9 +319,9 @@ class PostgresBackfillStore:
         for row in rows:
             vector = ec.validate_vectors([row["embedding"]], dimension=len(row["embedding"]))[0]
             literal = "[" + ",".join(format(float(v), ".17g") for v in vector) + "]"
-            values.append("(" + ",".join((str(int(row["contract_id"])), _q(row["entity_type"]), _q(row["item_id"]), _q(row["representation_type"]), str(int(row["chunk_index"])), _q(row["chunk_text"]), _q(literal) + "::vector", _q(row["representation_hash"]), _q(row["chunk_hash"]))) + ")")
+            values.append("(" + ",".join((str(int(row["contract_id"])), _q(row["entity_type"]), _q(row["item_id"]), _q(row["representation_type"]), str(int(row["chunk_index"])), _q(row["chunk_text"]), _q(literal) + "::vector", _q(row["representation_hash"]), _q(row["chunk_hash"]), _q(row.get("source_revision_id"))) ) + ")")
         self.session.run(
-            "begin;\n" + deletes + "\ninsert into public.content_embeddings (contract_id,entity_type,item_id,representation_type,chunk_index,chunk_text,embedding,representation_hash,chunk_hash) values " + ",".join(values) + ";\ncommit;",
+            "begin;\n" + deletes + "\ninsert into public.content_embeddings (contract_id,entity_type,item_id,representation_type,chunk_index,chunk_text,embedding,representation_hash,chunk_hash,source_revision_id) values " + ",".join(values) + ";\ncommit;",
             timeout=300,
         )
 
@@ -459,7 +447,7 @@ class PostgresWorkflowStore:
         self.session = session
 
     def high_water(self) -> int | None:
-        value = self.session.run("select max(id) from public.external_resources where kind='workflow';")
+        value = self.session.run("select max(r.id) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where v.kind='workflow' and v.state='accepted';")
         return int(value) if value else None
 
     # -- task-2.12 durable remediation lifecycle ------------------------
@@ -504,29 +492,29 @@ class PostgresWorkflowStore:
         return dict(row.get("value") or {}) if row else {"ok": False}
 
     def eligible_total(self) -> int:
-        return int(self.session.run("select count(*) from public.external_resources where kind='workflow';") or 0)
+        return int(self.session.run("select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where v.kind='workflow' and v.state='accepted';") or 0)
 
     def fetch_page(self, *, after_id: int | None, high_water: int | None, limit: int) -> list[dict[str, Any]]:
-        where = "kind='workflow'"
+        where = "v.kind='workflow' and v.state='accepted'"
         if after_id is not None:
-            where += f" and id>{int(after_id)}"
+            where += f" and r.id>{int(after_id)}"
         if high_water is not None:
-            where += f" and id<={int(high_water)}"
-        return self.session.json_rows("select id,kind,title,body,url,metadata,payload,source,external_id,created_at from public.external_resources where " + where + f" order by id asc limit {int(limit)}")
+            where += f" and r.id<={int(high_water)}"
+        return self.session.json_rows("select r.id,v.kind,v.title,v.body,v.metadata,v.payload,r.origin_source as source,r.origin_external_id as external_id,r.created_at,v.id::text as revision_id from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where " + where + f" order by r.id asc limit {int(limit)}")
 
     def current(self, row_id: int) -> dict[str, Any] | None:
-        return self.session.json_one("select id,payload,body,metadata from public.external_resources where id=" + str(int(row_id)))
+        return self.session.json_one("select r.id,v.id::text as revision_id,v.kind,v.payload,v.body,v.metadata from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.id=" + str(int(row_id)))
 
     def patch(self, row_id: int, update: dict[str, Any]) -> None:
         # Identity/native artifacts are deliberately not in this update list.
-        self.session.run("update public.external_resources set payload=" + _json(update["payload"]) + ", body=" + _q(update["body"]) + ", metadata=" + _json(update["metadata"]) + " where id=" + str(int(row_id)) + " and kind='workflow';")
+        raise RuntimeError("immutable_resource_revision_requires_proposal")
 
     def refresh(self, row_id: int) -> None:
         # The existing lexical contract derives from authoritative source rows.
         # A full refresh is intentionally left to its established operator
         # command; this trigger-free call only refreshes derived workflow state
         # if task-1.2 tables are installed.
-        exists = self.session.run("select to_regclass('public.lexical_resource_python_state') is not null;")
+        exists = self.session.run("select to_regclass('public.knowledge_resource_python_state') is not null;")
         if exists != "t":
             return
         row = self.current(row_id)
@@ -534,12 +522,7 @@ class PostgresWorkflowStore:
             raise RuntimeError("missing_workflow_after_patch")
         row["kind"] = "workflow"
         state, docs = ld.compute_workflow_python_documents(row)
-        state_values = ",".join((
-            _q(state.resource_id), _q(state.kind), _q(state.cohort), _q(state.public_state),
-            _q(state.available), _q(state.body_duplicate), _q(state.delimiter), _q(state.derivation),
-            _q(state.representation_hash), "array[" + ",".join(_q(x) for x in state.secret_reason_codes) + "]::text[]",
-            str(state.canonicalization_version), str(state.secret_scan_version), str(state.chunking_version), str(state.chunk_count),
-        ))
+        state_values = ",".join((_q(state.resource_id), _q(row["revision_id"]), _q(state.public_state), _q(state.representation_hash), str(state.chunk_count)))
         docs_values = []
         for doc in docs:
             docs_values.append("(" + ",".join((
@@ -547,15 +530,16 @@ class PostgresWorkflowStore:
                 _q(doc.chunk_text), _q(doc.matched_anchor), str(doc.source_offset_start), str(doc.source_offset_end),
                 _q(doc.representation_hash), _q(doc.chunk_hash), _q(doc.quarantine_state), str(doc.lexicalization_version),
                 str(doc.canonicalization_version), str(doc.chunking_version), str(doc.secret_scan_version), _q(doc.method),
+                _q(row["revision_id"]),
             )) + ")")
         sql = (
             "begin;\n"
             "delete from public.lexical_documents where entity_type='resource' and item_id=" + _q(str(row_id)) + " and representation_type='workflow_python';\n"
-            "delete from public.lexical_resource_python_state where resource_id=" + str(int(row_id)) + ";\n"
-            "insert into public.lexical_resource_python_state (resource_id,kind,cohort,public_state,available,body_duplicate,delimiter,derivation,representation_hash,secret_reason_codes,canonicalization_version,secret_scan_version,chunking_version,chunk_count) values (" + state_values + ");\n"
+            "delete from public.knowledge_resource_python_state where resource_id=" + str(int(row_id)) + ";\n"
+            "insert into public.knowledge_resource_python_state (resource_id,revision_id,public_state,representation_hash,chunk_count) values (" + state_values + ");\n"
         )
         if docs_values:
-            sql += "insert into public.lexical_documents (entity_type,item_id,representation_type,chunk_index,chunk_text,matched_anchor,source_offset_start,source_offset_end,representation_hash,chunk_hash,quarantine_state,lexicalization_version,canonicalization_version,chunking_version,secret_scan_version,method) values " + ",".join(docs_values) + ";\n"
+            sql += "insert into public.lexical_documents (entity_type,item_id,representation_type,chunk_index,chunk_text,matched_anchor,source_offset_start,source_offset_end,representation_hash,chunk_hash,quarantine_state,lexicalization_version,canonicalization_version,chunking_version,secret_scan_version,method,source_revision_id) values " + ",".join(docs_values) + ";\n"
         self.session.run(sql + "commit;", timeout=300)
 
     def record_failure(self, row_id: int, reason: str) -> None:

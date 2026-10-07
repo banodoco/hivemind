@@ -219,7 +219,7 @@ Deno.test("permanent/exhausted transient -> fail retryable (queue-level retry)",
   assertTrue(!!fail && fail.params.p_retryable === true);
 });
 
-Deno.test("drop job -> drop chunks then complete", async () => {
+Deno.test("drop job -> freshness-checked finalizer", async () => {
   const db: FakeDb = {
     calls: [], finalizeOutcome: "completed", embedFailuresBeforeSuccess: 0, embedBehavior: "ok",
     embedCallCount: 0, payloadRowsFor: () => [], claimedJobs: [job("prose", SEL, "drop")],
@@ -227,8 +227,11 @@ Deno.test("drop job -> drop chunks then complete", async () => {
   const out = await runOnce({ rpc: makeRpc(db), config: buildConfig({ transport: makeEmbedTransport(db) }) });
   assertEquals(db.embedCallCount, 0);
   assertEquals(out.dropped, 1);
-  assertTrue(db.calls.some((c) => c.name === "hivemind_drop_embedding_chunks"));
-  assertTrue(db.calls.some((c) => c.name === "hivemind_complete_embedding_job"));
+  const fin = db.calls.find((c) => c.name === "hivemind_finalize_embedding_job");
+  assertTrue(!!fin);
+  assertEquals((fin!.params.p_chunks as any[]).length, 0);
+  assertTrue(!db.calls.some((c) => c.name === "hivemind_drop_embedding_chunks"));
+  assertTrue(!db.calls.some((c) => c.name === "hivemind_complete_embedding_job"));
 });
 
 Deno.test("source-change: finalize returns source_changed, no stale authority", async () => {

@@ -6,11 +6,11 @@ snowflakes as exact strings so they survive JSON round-trips:
 
 - ``entity_type`` — the small, stable INTERNAL vocabulary used by the shared
   embedding index, chunk collapse, deletion, and hydration (plan AD-2):
-  ``message`` | ``resource`` | ``distillation``. A resource's concrete public
+  ``message`` | ``resource``. A resource's concrete public
   kind (``article``, ``workflow``, ``transcript``, …) is a separate
   ``result_kind`` that never changes the embedding identity.
 - ``result_kind`` — the concrete PUBLIC kind that appears as ``kind`` in
-  ``unified_feed`` and in the search response. ``workflow`` is a
+  the search response. ``workflow`` is a
   backwards-compatible alias for ``resource`` (plan AD-1): both map to
   ``entity_type='resource'``.
 
@@ -24,7 +24,7 @@ Snowflakes: Discord message ids are ~18–19 digit integers stored as ``bigint``
 and exceed the float64-safe integer range (2^53). A JSON number would silently
 round them, so every item id travels as a **string** at the API, the shared
 index (``content_embeddings.item_id`` is text), citations, and ``get_item``.
-``unified_feed`` already casts ``message_id::text``; this module is the explicit,
+The read path casts ``message_id::text``; this module is the explicit,
 tested boundary so no path reintroduces a numeric id.
 
 Pure stdlib, offline, dependency-free. It does not touch the database; the
@@ -40,11 +40,9 @@ from typing import Any
 __all__ = [
     "ENTITY_MESSAGE",
     "ENTITY_RESOURCE",
-    "ENTITY_DISTILLATION",
     "ENTITY_TYPES",
     "RESOURCE_GENERIC_KIND",
     "RESULT_KIND_MESSAGE",
-    "RESULT_KIND_DISTILLATION",
     "RESULT_KIND_RESOURCE",
     "RESULT_KIND_WORKFLOW",
     "KNOWN_RESOURCE_KINDS",
@@ -68,26 +66,23 @@ __all__ = [
 
 ENTITY_MESSAGE = "message"
 ENTITY_RESOURCE = "resource"
-ENTITY_DISTILLATION = "distillation"
-
 #: The complete internal entity_type vocabulary. Adding a value is a schema
 #: change (the content_embeddings CHECK and the search SQL enumerate these).
-ENTITY_TYPES: tuple[str, ...] = (ENTITY_MESSAGE, ENTITY_RESOURCE, ENTITY_DISTILLATION)
+ENTITY_TYPES: tuple[str, ...] = (ENTITY_MESSAGE, ENTITY_RESOURCE)
 
 
 # ---------------------------------------------------------------------------
-# result_kind vocabulary (plan AD-1 — concrete public kind in unified_feed)
+# result_kind vocabulary (plan AD-1 — concrete public kind in search results)
 # ---------------------------------------------------------------------------
 
 #: The generic resource kind on the public surface (the `kind=resource` input).
 RESOURCE_GENERIC_KIND = "resource"
 
 #: Concrete public kinds that map to entity_type='resource'. Open in principle
-#: (external_resources.kind is free text), but these are the known/frequent ones;
-#: ``result_kind_is_resource`` treats any non-{message,distillation} kind as a
+#: (resource revision kinds are free text), but these are the known/frequent
+#: ones; ``result_kind_is_resource`` treats any non-message kind as a
 #: resource so a new resource kind needs no code change.
 RESULT_KIND_MESSAGE = "message"
-RESULT_KIND_DISTILLATION = "distillation"
 RESULT_KIND_RESOURCE = "resource"
 RESULT_KIND_WORKFLOW = "workflow"  # backwards-compatible alias for resource (AD-1)
 
@@ -101,10 +96,9 @@ KNOWN_RESOURCE_KINDS: tuple[str, ...] = (
     "doc",
 )
 
-#: distillation_cites.item_kind vocabulary (schema/001): the cite polymorphic
-#: kinds. They map 1:1 to entity_type (a cite never targets a concrete resource
-#: sub-kind, only the generic resource entity).
-CITE_ITEM_KINDS: tuple[str, ...] = (ENTITY_MESSAGE, ENTITY_RESOURCE, ENTITY_DISTILLATION)
+#: Active typed-reference vocabulary. Exact revision targets use
+#: target_version_id on a resource reference.
+CITE_ITEM_KINDS: tuple[str, ...] = (ENTITY_MESSAGE, ENTITY_RESOURCE)
 
 
 # ---------------------------------------------------------------------------
@@ -115,7 +109,7 @@ CITE_ITEM_KINDS: tuple[str, ...] = (ENTITY_MESSAGE, ENTITY_RESOURCE, ENTITY_DIST
 def result_kind_is_resource(kind: Any) -> bool:
     """Return whether a public kind is a resource (any concrete resource kind).
 
-    Every kind that is not ``message`` or ``distillation`` is a resource,
+    Every kind that is not ``message`` is a resource,
     including the generic ``resource`` and the ``workflow`` alias, and including
     resource kinds not yet enumerated. This is why adding a resource kind needs
     no identity change: it still maps to ``entity_type='resource'``.
@@ -123,14 +117,14 @@ def result_kind_is_resource(kind: Any) -> bool:
 
     if not isinstance(kind, str) or not kind:
         return False
-    return kind not in (RESULT_KIND_MESSAGE, RESULT_KIND_DISTILLATION)
+    return kind != RESULT_KIND_MESSAGE
 
 
 def entity_type_for_result_kind(kind: Any) -> str:
     """Map a public ``result_kind`` to the internal ``entity_type``.
 
-    ``message`` → ``message``; ``distillation`` → ``distillation``; every other
-    kind (``resource``, ``workflow``, ``article``, ``transcript``, …) →
+    ``message`` → ``message``; every other kind (``resource``, ``workflow``,
+    ``article``, ``transcript``, …) →
     ``resource``. Raises ``ValueError`` on an empty/non-string kind so a
     malformed caller fails loudly rather than silently filing under resource.
     """
@@ -139,16 +133,14 @@ def entity_type_for_result_kind(kind: Any) -> str:
         raise ValueError(f"result_kind must be a non-empty string, got {kind!r}")
     if kind == RESULT_KIND_MESSAGE:
         return ENTITY_MESSAGE
-    if kind == RESULT_KIND_DISTILLATION:
-        return ENTITY_DISTILLATION
     return ENTITY_RESOURCE
 
 
 def normalize_result_kind(kind: Any) -> str:
     """Return the canonical public result_kind, resolving the workflow alias.
 
-    ``workflow`` stays ``workflow`` on the public surface (it is a real concrete
-    kind in external_resources), but callers may also pass the generic
+    ``workflow`` stays ``workflow`` on the public surface (it is a concrete
+    resource kind), but callers may also pass the generic
     ``resource``; both are valid resource kinds. This helper does not collapse
     ``workflow`` to ``resource`` — they are distinct public kinds that share one
     entity_type. It only validates and trims.
@@ -163,10 +155,10 @@ def normalize_result_kind(kind: Any) -> str:
 
 
 def entity_type_for_cite_kind(item_kind: Any) -> str:
-    """Map a ``distillation_cites.item_kind`` to ``entity_type`` (1:1).
+    """Map an active typed-reference kind to ``entity_type`` (1:1).
 
-    The cite vocabulary (schema/001) is exactly {message, resource, distillation}
-    — the same as entity_type — so a cite maps directly. Provided as a named
+    The active vocabulary is {message, resource} — the same as entity_type — so
+    a reference maps directly. Provided as a named
     boundary so the cite string conversion (Phase 4) plugs in here.
     """
 
@@ -225,7 +217,7 @@ def stringify_item_id(value: Any) -> str:
     """Return *value* as an exact item-id string, never a float.
 
     Accepts a ``str`` or an ``int`` (e.g. a raw ``bigint`` message_id /
-    external_resources.id / distillations.id). An int is rendered with
+    resource.id). An int is rendered with
     :func:`str` (exact, no precision loss, no exponent). A float is rejected — a
     float id means precision was already lost upstream. A numeric string is
     returned verbatim (leading zeros preserved, since ids are opaque strings).

@@ -14,10 +14,11 @@ from typing import Any
 # -- dual-import guard (T5 pattern) -------------------------------------------
 try:
     from .._common import (
-        build_add_resource_envelope,
+        build_submit_resource_envelope,
         dry_run_output,
         edge_post,
         format_error,
+        login_required_error,
         output_json,
         resolve_contribute_url,
         resolve_contributor_key,
@@ -29,10 +30,11 @@ except ImportError:
     _EXECUTORS = _os.path.dirname(_HERE)
     sys.path.insert(0, _EXECUTORS)
     from _common import (  # type: ignore[import-not-found]
-        build_add_resource_envelope,
+        build_submit_resource_envelope,
         dry_run_output,
         edge_post,
         format_error,
+        login_required_error,
         output_json,
         resolve_contribute_url,
         resolve_contributor_key,
@@ -290,16 +292,16 @@ def main(argv: list[str] | None = None) -> int:
     # 2. Resolve title
     title = resolve_title(args.title, og_title, html_title, fallback=args.url)
 
-    # 3. Build add_resource envelope
+    # 3. Build the initial resource envelope
     data: dict[str, Any] = {
         "kind": args.kind,
-        "source": "web",
+        "origin_source": "web",
         "title": title,
         "body": text,
-        "url": args.url,
-        "external_id": args.url,
+        "provenance": {"url": args.url, "source_url": args.url},
+        "origin_external_id": args.url,
     }
-    envelope = build_add_resource_envelope(data)
+    envelope = build_submit_resource_envelope(data)
 
     # 4. Dry-run path
     if args.dry_run:
@@ -309,13 +311,7 @@ def main(argv: list[str] | None = None) -> int:
     # 5. Real send — requires contributor key
     contributor_key = resolve_contributor_key()
     if not contributor_key:
-        output_json(
-            {
-                "error": "contributor key required",
-                "detail": "set HIVEMIND_CONTRIBUTOR_KEY or use --dry-run",
-            },
-            args.out,
-        )
+        output_json(login_required_error(), args.out)
         return 1
 
     try:
