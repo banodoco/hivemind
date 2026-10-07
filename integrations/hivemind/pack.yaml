@@ -1,0 +1,731 @@
+schema_version: 3
+id: hivemind
+name: Hivemind
+version: 2.0.0
+domain: integration
+stability: experimental
+support: community
+visibility: visible
+permissions:
+- id: network
+  reason: Executors call the Hivemind Supabase REST API, refresh-media edge function, and contribute edge
+    function.
+- id: subprocess
+  reason: YouTube ingest shells out to yt-dlp for caption extraction.
+- id: environment
+  reason: Reads HIVEMIND_API_URL, HIVEMIND_ANON_KEY, and HIVEMIND_CONTRIBUTOR_KEY from the environment.
+description: 'Hivemind v2 — unified corpus protocol.  Read the knowledge corpus through a searchable unified
+  feed, refresh Discord attachment URLs, and contribute resources/distillations through a locked edge-function
+  write path.  Seven self-contained, stdlib-only executors: search, get_item, refresh_media, contribute,
+  ingest_article, ingest_workflow, ingest_youtube.
+
+  '
+keywords:
+- hivemind
+- knowledge
+- corpus
+- search
+- distillation
+- supabase
+- postgrest
+- contribute
+- refresh-media
+- ingest
+capabilities:
+- search_corpus
+- get_item
+- refresh_media
+- contribute_resource
+- contribute_distillation
+- ingest_article
+- ingest_workflow
+- ingest_youtube
+agent:
+  purpose: 'Use when you need to search a shared knowledge corpus, retrieve full items, refresh Discord
+    media URLs, or submit new resources and cited distillations to the Hivemind.
+
+    '
+  do_not_use_for: 'Not for direct database writes — all writes go through the contribute edge function
+    with a contributor key.  Not for audio transcription (use Astrid editorial.transcribe and then hivemind.contribute).
+
+    '
+  normal_entrypoints:
+  - hivemind.search
+  - hivemind.get_item
+  - hivemind.refresh_media
+  - hivemind.contribute
+  - hivemind.ingest_article
+  - hivemind.ingest_workflow
+  - hivemind.ingest_youtube
+documentation:
+  kind: skill
+  path: docs/SKILL.md
+dependencies:
+  python:
+  - hivemind==2.0.0
+actions:
+  search:
+    name: Search
+    version: '2.0'
+    short_description: Search the Hivemind corpus (messages, resources, distillations) with per-token
+      matching and client-side ranking.
+    description: 'Searches the raw corpus tables (message_feed, external_resources, distillations) in
+      parallel with per-token ILIKE predicates — never the unified_feed view, which times out (57014)
+      on text search. Filters: per-token ILIKE predicates, kind/source/date/token gates, pagination.'
+    keywords:
+    - hivemind
+    - search
+    - corpus
+    - message_feed
+    - external_resources
+    - postgrest
+    - distillation
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/search/run.py
+        - --query
+        - '{query}'
+        - --out
+        - '{out}/results.json'
+        input_args:
+        - input: kinds
+          flag: --kinds
+          optional: true
+        - input: sources
+          flag: --sources
+          optional: true
+        - input: since
+          flag: --since
+          optional: true
+        - input: channel
+          flag: --channel
+          optional: true
+        - input: author
+          flag: --author
+          optional: true
+        - input: thread
+          flag: --thread
+          optional: true
+        - input: limit
+          flag: --limit
+          optional: true
+        - input: offset
+          flag: --offset
+          optional: true
+        - input: sort
+          flag: --sort
+          optional: true
+    inputs:
+    - name: query
+      type: string
+      required: true
+      description: Search query (per-token ilike-matched across messages, resources, distillations).
+    - name: kinds
+      type: string
+      required: false
+      description: Comma-separated kind filter (message,article,workflow,transcript,distillation,...).
+    - name: sources
+      type: string
+      required: false
+      description: Comma-separated source filter.
+    - name: since
+      type: string
+      required: false
+      description: ISO timestamp lower bound for created_at.
+    - name: channel
+      type: string
+      required: false
+      description: Discord channel name; searches messages in that channel only (e.g. wan_chatter). Message
+        surface only.
+    - name: author
+      type: string
+      required: false
+      description: Discord author display name; searches that author's messages only (e.g. Kijai). Message
+        surface only.
+    - name: thread
+      type: string
+      required: false
+      description: Discord thread id (snowflake); searches messages in that thread only (index-backed
+        message_filters surface).
+    - name: limit
+      type: number
+      required: false
+      description: Max results per page (default 20).
+    - name: offset
+      type: number
+      required: false
+      description: Skip this many ranked results; page through a query with --limit + --offset. The response
+        carries total/has_more. The ranked pool is deterministic while the corpus is unchanged (page N
+        is stable across calls).
+    - name: sort
+      type: string
+      required: false
+      description: 'relevance (default: score, then recency, then table+id) or recent (created_at desc,
+        then score).'
+    outputs:
+    - name: results
+      type: file
+      path_template: '{out}/results.json'
+      description: 'Paging contract: response JSON carries results[], count, total (ranked-pool extent),
+        has_more, page, pages, next_offset. When has_more is true, fetch the next page by re-running with
+        --offset <next_offset> (next_offset is null when has_more is false). Ranking is deterministic
+        while the corpus is unchanged, so a page is stable across calls. A human summary prints to stderr;
+        stdout is pure JSON.'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      env_passthrough:
+      - HIVEMIND_API_URL
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/search/run.py
+      runtime_module: hivemind.executors.search.run
+      project_scope: optional
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        allow_redirects: false
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/search/run.py
+  get_item:
+    name: Get Item
+    version: '2.0'
+    short_description: Fetch a single full row from the Hivemind corpus by kind and id.
+    description: Retrieves an untruncated row by kind and id. Messages use the indexed message_feed surface;
+      resources and distillations use unified_feed. For distillations, also fetches its distillation_cites.
+      For messages and resources, also fetches distillations that cite the item.
+    keywords:
+    - hivemind
+    - get
+    - fetch
+    - corpus
+    - distillation
+    - cite
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/get_item/run.py
+        - --kind
+        - '{kind}'
+        - --id
+        - '{id}'
+        - --out
+        - '{out}/item.json'
+    inputs:
+    - name: kind
+      type: string
+      required: true
+      description: 'Item kind: message | resource | distillation.'
+    - name: id
+      type: string
+      required: true
+      description: Decimal item id, kept as text so Discord snowflakes are lossless.
+    outputs:
+    - name: item
+      type: file
+      path_template: '{out}/item.json'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      env_passthrough:
+      - HIVEMIND_API_URL
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/get_item/run.py
+      runtime_module: hivemind.executors.get_item.run
+      project_scope: optional
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        allow_redirects: false
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/get_item/run.py
+  refresh_media:
+    name: Refresh Media
+    version: '1.0'
+    short_description: Refresh expiring Discord CDN attachment URLs for a message.
+    description: Calls the refresh-media-urls Supabase edge function with a quoted Discord message_id
+      string, returning fresh attachment URLs and metadata. Useful when message_feed has a Discord permalink
+      but no media URL, or old CDN links have expired.
+    keywords:
+    - hivemind
+    - discord
+    - media
+    - attachments
+    - cdn
+    - refresh
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/refresh_media/run.py
+        - --message-id
+        - '{message_id}'
+        - --out
+        - '{out}/result.json'
+    inputs:
+    - name: message_id
+      type: string
+      required: true
+      description: Discord message snowflake. Must be passed as a string to preserve precision.
+    outputs:
+    - name: result
+      type: file
+      path_template: '{out}/result.json'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      env_passthrough:
+      - HIVEMIND_REFRESH_MEDIA_URL
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/refresh_media/run.py
+      runtime_module: hivemind.executors.refresh_media.run
+      project_scope: optional
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        allow_redirects: false
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/refresh_media/run.py
+  contribute:
+    name: Contribute
+    version: '2.0'
+    short_description: Submit a resource or distillation to the Hivemind corpus via the contribute edge
+      function.
+    description: Builds the locked request envelope (action + data) and POSTs to the contribute edge function
+      with X-Contributor-Key auth. Supports --dry-run to print the request body without sending. Maps
+      400/401/409 responses to readable messages.
+    keywords:
+    - hivemind
+    - contribute
+    - submit
+    - resource
+    - distillation
+    - edge-function
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/contribute/run.py
+        - --type
+        - '{type}'
+        - --out
+        - '{out}/result.json'
+        input_args:
+        - input: kind
+          flag: --kind
+          optional: true
+        - input: title
+          flag: --title
+          optional: true
+        - input: body_file
+          flag: --body-file
+          optional: true
+        - input: source
+          flag: --source
+          optional: true
+        - input: url
+          flag: --url
+          optional: true
+        - input: author
+          flag: --author
+          optional: true
+        - input: question
+          flag: --question
+          optional: true
+        - input: answer
+          flag: --answer
+          optional: true
+        - input: confidence
+          flag: --confidence
+          optional: true
+        - input: cites
+          flag: --cites
+          optional: true
+        - input: supersedes
+          flag: --supersedes
+          optional: true
+        - input: conditions
+          flag: --conditions
+          optional: true
+        - input: from_file
+          flag: --from-file
+          optional: true
+        - input: dry_run
+          flag: --dry-run
+          optional: true
+    inputs:
+    - name: type
+      type: string
+      required: true
+      description: 'What to contribute: resource | distillation.'
+    - name: kind
+      type: string
+      required: false
+      description: kind
+    - name: title
+      type: string
+      required: false
+      description: title
+    - name: body_file
+      type: string
+      required: false
+      description: body file
+    - name: source
+      type: string
+      required: false
+      description: source
+    - name: url
+      type: string
+      required: false
+      description: url
+    - name: author
+      type: string
+      required: false
+      description: author
+    - name: question
+      type: string
+      required: false
+      description: question
+    - name: answer
+      type: string
+      required: false
+      description: answer
+    - name: confidence
+      type: string
+      required: false
+      description: confidence
+    - name: cites
+      type: string
+      required: false
+      description: Comma-separated cites, e.g. message:88123,resource:17.
+    - name: supersedes
+      type: number
+      required: false
+      description: supersedes
+    - name: conditions
+      type: string
+      required: false
+      description: conditions
+    - name: from_file
+      type: string
+      required: false
+      description: Read the full payload from a JSON file.
+    - name: dry_run
+      type: boolean
+      required: false
+      description: Print the request envelope without sending.
+    outputs:
+    - name: result
+      type: file
+      path_template: '{out}/result.json'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      env_passthrough:
+      - HIVEMIND_API_URL
+      secrets_required:
+      - HIVEMIND_CONTRIBUTOR_KEY
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/contribute/run.py
+      runtime_module: hivemind.executors.contribute.run
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        allow_redirects: false
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/contribute/run.py
+  ingest_article:
+    name: Ingest Article
+    version: '2.0'
+    short_description: Fetch a web article, extract readable text, and submit as a resource.
+    description: Fetches a URL with urllib, extracts readable text with a stdlib html.parser-based extractor
+      (strips script/style/nav, collapses whitespace, picks up title from <title> or og:title), builds
+      the add_resource envelope, and submits via the same code path as hivemind.contribute. --dry-run
+      supported.
+    keywords:
+    - hivemind
+    - ingest
+    - article
+    - web
+    - extract
+    - html
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/ingest_article/run.py
+        - --url
+        - '{url}'
+        - --out
+        - '{out}/result.json'
+        input_args:
+        - input: title
+          flag: --title
+          optional: true
+        - input: kind
+          flag: --kind
+          optional: true
+        - input: dry_run
+          flag: --dry-run
+          optional: true
+    inputs:
+    - name: url
+      type: string
+      required: true
+      description: Article URL to fetch and ingest.
+    - name: title
+      type: string
+      required: false
+      description: title
+    - name: kind
+      type: string
+      required: false
+      description: kind
+    - name: dry_run
+      type: boolean
+      required: false
+      description: Print the envelope without submitting.
+    outputs:
+    - name: result
+      type: file
+      path_template: '{out}/result.json'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      env_passthrough:
+      - HIVEMIND_API_URL
+      secrets_required:
+      - HIVEMIND_CONTRIBUTOR_KEY
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/ingest_article/run.py
+      runtime_module: hivemind.executors.ingest_article.run
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        dynamic_url_inputs:
+        - url
+        allow_redirects: false
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/ingest_article/run.py
+  ingest_workflow:
+    name: Ingest Workflow
+    version: '2.0'
+    short_description: Parse a ComfyUI workflow JSON and submit as a resource with model metadata.
+    description: Parses a ComfyUI workflow JSON (from --path or --url), extracts metadata.models (checkpoint/lora/vae
+      names from node widget values), metadata.custom_nodes (non-core class_type values), metadata.node_count,
+      and generates a searchable body description. The full workflow JSON is stored in payload. Submits
+      as kind=workflow via the contribute path. --dry-run supported.
+    keywords:
+    - hivemind
+    - ingest
+    - workflow
+    - comfyui
+    - json
+    - models
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/ingest_workflow/run.py
+        - --out
+        - '{out}/result.json'
+        input_args:
+        - input: path
+          flag: --path
+          optional: true
+        - input: url
+          flag: --url
+          optional: true
+        - input: title
+          flag: --title
+          optional: true
+        - input: kind
+          flag: --kind
+          optional: true
+        - input: dry_run
+          flag: --dry-run
+          optional: true
+    inputs:
+    - name: path
+      type: string
+      required: false
+      description: Local path to a ComfyUI workflow JSON (mutually exclusive with url).
+    - name: url
+      type: string
+      required: false
+      description: URL of a ComfyUI workflow JSON (mutually exclusive with path).
+    - name: title
+      type: string
+      required: false
+      description: title
+    - name: kind
+      type: string
+      required: false
+      description: kind
+    - name: dry_run
+      type: boolean
+      required: false
+      description: Print the envelope without submitting.
+    outputs:
+    - name: result
+      type: file
+      path_template: '{out}/result.json'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      env_passthrough:
+      - HIVEMIND_API_URL
+      secrets_required:
+      - HIVEMIND_CONTRIBUTOR_KEY
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/ingest_workflow/run.py
+      runtime_module: hivemind.executors.ingest_workflow.run
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        dynamic_url_inputs:
+        - url
+        allow_redirects: false
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/ingest_workflow/run.py
+  ingest_youtube:
+    name: Ingest YouTube
+    version: '2.0'
+    short_description: Extract YouTube captions via yt-dlp and submit as a transcript resource.
+    description: Shells out to yt-dlp --skip-download --write-subs --write-auto-subs --sub-format vtt
+      to extract captions into a temp directory, parses VTT to clean text (deduping rolling auto-caption
+      repeats), fetches metadata (title, channel, duration, video id) via yt-dlp -j, and submits as kind=transcript,
+      source=youtube, external_id=<video id>. Exits non-zero with a clear message if no captions exist.
+      No Whisper, no audio download. --dry-run supported.
+    keywords:
+    - hivemind
+    - ingest
+    - youtube
+    - transcript
+    - captions
+    - yt-dlp
+    - vtt
+    invocation:
+      kind: command
+      command:
+        argv:
+        - '{python_exec}'
+        - actions/ingest_youtube/run.py
+        - --url
+        - '{url}'
+        - --out
+        - '{out}/result.json'
+        input_args:
+        - input: dry_run
+          flag: --dry-run
+          optional: true
+    inputs:
+    - name: url
+      type: string
+      required: true
+      description: YouTube video URL (captions-only ingestion).
+    - name: dry_run
+      type: boolean
+      required: false
+      description: Print the envelope without submitting.
+    outputs:
+    - name: result
+      type: file
+      path_template: '{out}/result.json'
+    cache:
+      mode: none
+    isolation:
+      mode: subprocess
+      network: true
+      binaries:
+      - yt-dlp
+      env_passthrough:
+      - HIVEMIND_API_URL
+      secrets_required:
+      - HIVEMIND_CONTRIBUTOR_KEY
+    metadata:
+      runtime_entrypoint: main
+      runtime_file: actions/ingest_youtube/run.py
+      runtime_module: hivemind.executors.ingest_youtube.run
+      network_policy:
+        allowed_protocols:
+        - dns
+        - tcp
+        allowed_destinations:
+        - https://ujlwuvkrxlvoswwkerdf.supabase.co:443
+        dynamic_url_inputs:
+        - url
+        allow_redirects: false
+        descendant_enforcement:
+          kind: broker
+          validated: true
+          observable: true
+          route: dynamic-url
+          wrapper: hivemind.executors.ingest_youtube.run
+        broker:
+          host_managed: true
+    resources:
+    - kind: implementation
+      path: actions/ingest_youtube/run.py

@@ -309,6 +309,41 @@ class AssembleResultTests(unittest.TestCase):
             self.assertEqual(result["item"]["body"], "full message body")
             self.assertIn("cited_by", result)
 
+    def test_message_row_survives_missing_citation_relation(self):
+        """A missing ancillary citation table must not hide the full row."""
+        import urllib.error
+
+        def mock_get(path, params=None, endpoint=None, anon_key=None):
+            if path == "message_feed":
+                return [{
+                    "message_id": 1545199805058252820,
+                    "content": "the complete message body",
+                }]
+            raise urllib.error.HTTPError(
+                "http://fake.example.com/rest/v1/distillation_cites",
+                404,
+                "Not Found",
+                {},
+                io.BytesIO(
+                    b'{"code":"42P01","message":"relation '
+                    b'\\"public.distillation_cites\\" does not exist"}'
+                ),
+            )
+
+        with unittest.mock.patch("executors.get_item.run.postgrest_get", side_effect=mock_get):
+            result = _assemble_result(
+                "message",
+                "1545199805058252820",
+                endpoint=self.endpoint,
+                anon_key=self.anon_key,
+            )
+
+        self.assertEqual(result["item"]["body"], "the complete message body")
+        self.assertEqual(result["cited_by"], [])
+        self.assertEqual(
+            result["references_unavailable"], {"status": 404, "kind": "message"}
+        )
+
     def test_resource_includes_cited_by(self):
         call_count = 0
 

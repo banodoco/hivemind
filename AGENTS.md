@@ -40,6 +40,14 @@ phrase ILIKE returns zero rows (the literal substring never occurs).  Use
 
 ## Installing and using this pack
 
+The Astrid v3 integration is `integrations/hivemind/pack.yaml`, with seven
+explicit actions and thin entrypoints under `integrations/hivemind/actions/`.
+Select `pack_id: hivemind` and `pack_subpath: integrations/hivemind` at an
+immutable repository commit. Build/install Hivemind from the same revision
+in the interpreter running Astrid; provisioning the source does not install
+Python dependencies. Operation implementations remain in `executors/` and
+both standalone console entrypoints remain in `pyproject.toml`.
+
 The repo root doubles as the importable `hivemind` package.  Two equivalent
 ways to run the search executor:
 
@@ -54,7 +62,7 @@ python3 executors/search/run.py --query "which lora" --out /tmp/search.json
 ```
 
 Basic usage (the full surface table and filter reference live in
-`skill/SKILL.md` — that is the canonical playbook):
+`integrations/hivemind/docs/SKILL.md` — that is the canonical playbook):
 
 ```bash
 # Bare query — per-token match across messages, resources, distillations.

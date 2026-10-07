@@ -44,22 +44,25 @@ findable entry for the next person.
 git clone https://github.com/banodoco/hivemind /tmp/hivemind-skill-tmp \
   && mkdir -p ~/.claude/skills \
   && rm -rf ~/.claude/skills/hivemind \
-  && cp -r /tmp/hivemind-skill-tmp/skill ~/.claude/skills/hivemind \
+  && cp -r /tmp/hivemind-skill-tmp/integrations/hivemind/docs ~/.claude/skills/hivemind \
   && rm -rf /tmp/hivemind-skill-tmp \
   && echo "Installed. Restart Claude Code, then try: /hivemind"
 ```
 
 Or run `bash install.sh` from a clone of this repo.
 
-### 2. Astrid pack (executor-based)
+### 2. Astrid integration (seven actions)
 
 ```bash
 python3 -m astrid.setup --declarations /path/to/astrid-source-declarations.json
 ```
 
-The declaration must select this repository at an immutable commit and use
-`pack_id: hivemind`; Astrid validates the strict v2 `pack.yaml` before the
-source becomes active. The pack exposes seven executors: `hivemind.search`, `hivemind.get_item`,
+The declaration must select this repository at an immutable commit with
+`pack_id: hivemind` and `pack_subpath: integrations/hivemind`; Astrid validates
+`integrations/hivemind/pack.yaml` as schema v3 before the source becomes active.
+Build and install the Hivemind Python package from the same source revision
+into the interpreter running Astrid; source provisioning does not install
+Python dependencies. The integration exposes seven actions: `hivemind.search`, `hivemind.get_item`,
 `hivemind.refresh_media`, `hivemind.contribute`, `hivemind.ingest_article`,
 `hivemind.ingest_workflow`, `hivemind.ingest_youtube`. See `AGENTS.md` for the
 agent guide. Discovery and skill sync are read-only after setup; corpus reads
@@ -67,7 +70,7 @@ still require network access.
 
 ### 3. Codex / any agent (instruction-file copy)
 
-Copy `skill/SKILL.md` into your `AGENTS.md` (or equivalent instruction
+Copy `integrations/hivemind/docs/SKILL.md` into your `AGENTS.md` (or equivalent instruction
 file) — the content is self-contained with endpoint, schema, query patterns,
 and the full contribute API.
 
@@ -109,20 +112,21 @@ The existing `hivemind-search` console script mirrors `python3 executors/search/
 
 ## Repository layout
 
-One repo, three products — the Astrid pack is contractually pinned to the
-repo root (`pack.yaml` must be in a directory whose name equals the pack id;
-the canonical checkout directory is `hivemind`):
+One repo, three products — the Astrid integration lives at
+`integrations/hivemind/`, while the Python package and standalone CLI retain
+their repository-root layout:
 
 | entry | belongs to | what it is |
 |---|---|---|
-| `skill/SKILL.md` | all agents | **The canonical playbook** — installed as the Claude skill, discovered by Astrid, copy-paste for anything else |
-| `pack.yaml`, `executors/`, `AGENTS.md`, `__init__.py` | Astrid pack | Manifest, seven stdlib-only executors, agent guide, package marker for `hivemind.executors.*` imports |
+| `integrations/hivemind/docs/SKILL.md` | all agents | **The canonical playbook** — installed as the Claude skill, discovered by Astrid, copy-paste for anything else |
+| `integrations/hivemind/pack.yaml`, `integrations/hivemind/actions/` | Astrid integration | v3 manifest and seven thin command adapters around the installed Hivemind package |
+| `executors/`, `cli.py`, `pyproject.toml`, `AGENTS.md`, `__init__.py` | Python package / CLI | Seven stdlib-only operation implementations, both console entrypoints, agent guide, package marker for `hivemind.executors.*` imports |
 | `schema/`, `supabase/` | backend | The corpus DDL and the `contribute` edge function (the only write path) |
 | `scripts/` | ops | Contributor-key issuance |
 | `tests/` | dev | 309 Python unit tests (mocked HTTP) + deno tests under `supabase/` |
 | `install.sh`, `assets/` | repo | Claude-skill installer, mascot |
 | `DESIGN.md` | docs | Architecture: layers, flywheel, deferred decisions |
-| `.astridignore` | Astrid pack | Keeps backend/assets/tests out of installed pack copies |
+| `.astridignore` | legacy repo filtering | The v3 source selects `integrations/hivemind/` directly; backend/assets/tests stay outside the pack root |
 
 ---
 
@@ -295,14 +299,12 @@ curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed?select=me
 
 ## Further reading
 
-- **[hivemind/SKILL.md](hivemind/SKILL.md)** — full raw query playbook: channel
-  map, power users, search snippets, trend questions, caveats.
 - **[AGENTS.md](AGENTS.md)** — agent guide: when to use each executor, flywheel
   loop, key constraints.
 - **[DESIGN.md](DESIGN.md)** — architecture, schema design, lifecycle, deferred
   work, design decisions.
-- **[skill/SKILL.md](skill/SKILL.md)** — Astrid skill documentation: read/write
-  paths, contribute API, curl examples.
+- **[integrations/hivemind/docs/SKILL.md](integrations/hivemind/docs/SKILL.md)** — canonical agent playbook:
+  channel map, query patterns, read/write paths, and contribute API.
 
 ---
 

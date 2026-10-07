@@ -226,14 +226,26 @@ def _assemble_result(
 
     result: dict[str, Any] = {"item": dict(row)}
 
-    if kind == "distillation":
-        # Include what this distillation cites
-        cites = _fetch_distillation_cites(item_id, endpoint=endpoint, anon_key=anon_key)
-        result["cites"] = cites
-    else:
-        # Include distillations that cite this item
-        cited_by = _fetch_cited_by(kind, item_id, endpoint=endpoint, anon_key=anon_key)
-        result["cited_by"] = cited_by
+    # Citation context is ancillary to the item row.  Some deployed corpus
+    # snapshots do not expose the citation relation; do not turn a successful
+    # full-row lookup into a 404 merely because that optional context is absent.
+    try:
+        if kind == "distillation":
+            # Include what this distillation cites
+            result["cites"] = _fetch_distillation_cites(
+                item_id, endpoint=endpoint, anon_key=anon_key
+            )
+        else:
+            # Include distillations that cite this item
+            result["cited_by"] = _fetch_cited_by(
+                kind, item_id, endpoint=endpoint, anon_key=anon_key
+            )
+    except urllib.error.HTTPError as exc:
+        if exc.code != 404:
+            raise
+        context_key = "cites" if kind == "distillation" else "cited_by"
+        result[context_key] = []
+        result["references_unavailable"] = {"status": 404, "kind": kind}
 
     return result
 

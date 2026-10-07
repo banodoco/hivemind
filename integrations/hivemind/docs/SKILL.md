@@ -48,10 +48,10 @@ curl -s "https://ujlwuvkrxlvoswwkerdf.supabase.co/rest/v1/message_feed?select=me
 | Search curated Q&A (distillations) | `distillations` + `or=(question.ilike.*T*,answer.ilike.*T*,conditions.ilike.*T*)` | flywheel, highest signal; status `pending,approved` |
 | Search resources (workflows, articles) | `external_resources?kind=eq.<resource-kind>&or=(title.ilike.*T*)` | raw table, kind btree + trigram GIN |
 | **Search message content** (free text) | `message_feed` + `or=(content.ilike.*T1*,content.ilike.*T2*)` | per-token OR is index-friendly; `unified_feed` ilike **times out** (57014) |
-| Just search everything at once | `python3 executors/search/run.py --query "wan animate workflow"` | the pack executor: 3 scopes in parallel, per-token predicates, client-ranked merge |
-| Search one Discord channel | `python3 executors/search/run.py --query "lora" --channel wan_chatter` | channel-scoped message search |
-| Search one person's messages | `python3 executors/search/run.py --query "lora" --author Kijai` | author-scoped message search |
-| Search inside a thread | `python3 executors/search/run.py --query "context" --thread <snowflake>` | index-backed `message_filters` thread surface |
+| Just search everything at once | `python3 -m hivemind.executors.search.run --query "wan animate workflow"` | the pack executor: 3 scopes in parallel, per-token predicates, client-ranked merge |
+| Search one Discord channel | `python3 -m hivemind.executors.search.run --query "lora" --channel wan_chatter` | channel-scoped message search |
+| Search one person's messages | `python3 -m hivemind.executors.search.run --query "lora" --author Kijai` | author-scoped message search |
+| Search inside a thread | `python3 -m hivemind.executors.search.run --query "context" --thread <snowflake>` | index-backed `message_filters` thread surface |
 | Page through results | `--limit 10 --offset 10` (response has `total`/`has_more`) | deterministic ranked pool; stable pages |
 | Filter messages by a field (pinned, thread, reply, attachment, channel) | `message_filters` | index-backed, ~0.1–0.25s |
 | Fetch a full row by id | `get_item` (executor) | complete body + metadata + cites; message ids stay lossless strings |
@@ -164,7 +164,7 @@ only finds attachments the archive typed (~5% of videos, ~3% of images).
 ### get_item — full rows
 
 ```
-python3 executors/get_item/run.py --kind message|resource|distillation --id <id>
+python3 -m hivemind.executors.get_item.run --kind message|resource|distillation --id <id>
 # or: unified_feed?item_id=eq.<id>
 ```
 
@@ -303,7 +303,7 @@ Discord CDN attachment URLs expire. Given a message id/permalink with no usable
 media URL, refresh through the public edge function:
 
 ```bash
-python3 executors/refresh_media/run.py --message-id 1512127379039060118
+python3 -m hivemind.executors.refresh_media.run --message-id 1512127379039060118
 # or raw:
 curl -s -X POST 'https://ujlwuvkrxlvoswwkerdf.supabase.co/functions/v1/refresh-media-urls' \
   -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" \
@@ -364,14 +364,23 @@ Responses: `201 {"id":N,"status":"ok"}` · `400 validation` · `401 unauthorized
    research effort, ≥1 cite; supersede a similar existing one rather than
    duplicate).
 
-## Astrid pack (optional)
+## Astrid integration (optional)
 
-If installed as an Astrid pack (`python3 -m astrid packs install
-https://github.com/banodoco/hivemind.git`), use the executors:
-`hivemind.search`, `hivemind.get_item`, `hivemind.refresh_media`,
-`hivemind.contribute`, `hivemind.ingest_article|workflow|youtube` (YouTube is
-captions-only). They also run standalone: `python3 executors/search/run.py
---query "wan animate"`.
+The Astrid v3 manifest is `integrations/hivemind/pack.yaml` in the Hivemind
+repository; this skill is the single authored `docs/SKILL.md` within that
+integration. Select an immutable repository commit with `pack_id: hivemind`
+and `pack_subpath: integrations/hivemind` in Astrid's source declaration, then
+provision with `python3 -m astrid.setup --declarations <declarations.json>`.
+
+Source provisioning does not install the Python package. Build and install
+Hivemind from that same source revision into the interpreter running Astrid.
+The seven explicit actions are `hivemind.search`, `hivemind.get_item`,
+`hivemind.refresh_media`, `hivemind.contribute`, `hivemind.ingest_article`,
+`hivemind.ingest_workflow`, and `hivemind.ingest_youtube` (captions-only).
+Their entrypoints under `actions/<name>/run.py` delegate to the installed
+`hivemind.executors.<name>.run` modules; invoke them through Astrid's normal
+SDK/host. For standalone use after installing the package, run
+`python3 -m hivemind.executors.search.run --query "wan animate"`.
 
 Hivemind is Astrid's default shared knowledge pack — search it before
 re-researching community practice; keep raw runs/conclusions locally; promote
