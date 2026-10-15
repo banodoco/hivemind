@@ -3,7 +3,7 @@
 // Pins the provider-boundary + dimension-validation logic the Edge Function
 // relies on, with an injectable transport (no network). NOTE: these run under
 // `deno test`; on a machine without Deno they are committed-but-unrun and the
-// worker SQL path is instead proven by scripts/rehearse_embedding_lifecycle.py
+// worker SQL path is instead proven by hivemind_scripts/rehearse_embedding_lifecycle.py
 // (2.9 protocol measure) on the isolated cluster.
 
 import {

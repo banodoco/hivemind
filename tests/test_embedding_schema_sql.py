@@ -18,7 +18,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import lexical_pg  # noqa: E402
 

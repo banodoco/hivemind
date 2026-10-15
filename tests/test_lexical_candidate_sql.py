@@ -23,7 +23,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import rehearse_lexical_candidate as R  # noqa: E402
 from lexical_pg import find_pgbins  # noqa: E402
@@ -38,7 +38,7 @@ class TestLexicalCandidateSQLCluster(unittest.TestCase):
             R.reset_schema(cls.cluster)
             R.bootstrap(cls.cluster)
             # A modest seed is enough for correctness/EXPLAIN; the full rehearsal
-            # (scripts/rehearse_lexical_candidate.py) exercises production volume.
+            # (hivemind_scripts/rehearse_lexical_candidate.py) exercises production volume.
             R.seed(cls.cluster, n_messages=8000)
         except Exception:
             cls.cluster.tear_down()

@@ -25,9 +25,9 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
-import scripts.short_field_trigram as M  # noqa: E402
+import hivemind_scripts.short_field_trigram as M  # noqa: E402
 import executors.identifier_normalization as IN  # noqa: E402
 from verify_access import redact  # noqa: E402
 
@@ -507,7 +507,7 @@ class IdempotenceIntegrationTests(unittest.TestCase):
     """Apply schema/005 + build BOTH indexes twice + drop twice = safe no-ops."""
 
     def test_double_apply_and_double_drop_are_safe(self):
-        import scripts.rehearse_short_field_trigram as R
+        import hivemind_scripts.rehearse_short_field_trigram as R
         db = R.RehearsalCluster()
         try:
             db.start()

@@ -16,21 +16,21 @@ defects, with live production proof, and sign `PROCEED` only when every gate is 
 - **Live access**: psql path only (`supabase db dump --schema public --dry-run` → short-lived
   CLI-login libpq env, held in child-process env; output via `verify_access.redact`).
   Pooler, port 5432. **HTTP/service-role path does NOT work** (key unset, no Edge Function).
-  Reuse `scripts/live_lexical_search.py::{derive_pg_env, psql, elevate}`.
+  Reuse `hivemind_scripts/live_lexical_search.py::{derive_pg_env, psql, elevate}`.
 - **Preflight GREEN**: `fn_candidates`, `fn_rpc`, `tbl_lexical_documents`, `idx_python_chunk_trgm`
   all live; 15,265 `lexical_documents` (all `workflow_python`); 0 long txns; rehearsal 18/18.
 - **Tests**: 1,060 passing, 5 skipped. `python3` interpreter, `unittest.TestCase`. Skips are
   `tests/test_message_identifier.py::ClusterIntegration` (gated `HIVEMIND_EVAL_CLUSTER=1`).
-- **Rehearsal harness**: `scripts/lexical_pg.py` (throwaway PG14 cluster), `rehearse_lexical_candidate.py`
+- **Rehearsal harness**: `hivemind_scripts/lexical_pg.py` (throwaway PG14 cluster), `rehearse_lexical_candidate.py`
   (forward 001→009), `rehearse_lexical_apply_rollback.py` (reverse rollback). Prod apply = operator psql.
 - **Latency (PROVEN BAD)**: WanVideoSampler 13.6s, FLUX.1 5.4s, CogVideoX 5.6s, Mochi 2.8s,
   KSampler 27.9s. Target warm p95 ≤ 750 ms. Candidate fn: `Function Scan`, **2,752,717 shared
   buffer hits** for 100 rows — near-full-scans `discord_messages` (~1.25M rows) per query.
-  Probe tool: `scripts/probe_lexical_latency.py`.
+  Probe tool: `hivemind_scripts/probe_lexical_latency.py`.
 
 ## Requirements A–G (acceptance criteria + touchpoints)
 
-### A — Repair refresh verifier (`scripts/live_lexical_refresh.py`)
+### A — Repair refresh verifier (`hivemind_scripts/live_lexical_refresh.py`)
 - Coverage SQL (≈L311-325): add `safe_available_python_rows` = state where `public_state='safe'
   AND available=true AND cohort IN ('payload_python','body_python','recoverable')`; also expose
   `unavailable_safe_rows`, `quarantined_rows` for explicit 3-way partition.
@@ -44,7 +44,7 @@ defects, with live production proof, and sign `PROCEED` only when every gate is 
 - **Live (serial, owner)**: idempotent rerun in bounded batches; capture source-table checksums
   before/after (prove unchanged); prove all 2,757 rows hash-skip (no derived churn).
 
-### B — Repair evidence capture (`scripts/live_lexical_search.py::capture_evidence`, ≈L275)
+### B — Repair evidence capture (`hivemind_scripts/live_lexical_search.py::capture_evidence`, ≈L275)
 - Read RPC count from `response->>'count'`, results from `response->'results'` (RPC envelope
   `{results,count,meta}`). Record both `rpc_smoke_count` and `rpc_smoke_results_len`.
 - Regression test pinning the `{results,count,meta}` envelope parse.
@@ -145,7 +145,7 @@ per-query subprocess calls.
   node-class tokens (VACE 1616, KSampler 1157, CLIPTextEncode 1118, VAEDecode 1028).
 - Root residual cost: trigram bitmap heap scan over lexical_documents chunks + message arms
   over 1.25M discord_messages for high-frequency tokens.
-- Next: definitive golden-workload p95 (scripts/probe_golden_latency.py). If >750ms, targeted
+- Next: definitive golden-workload p95 (hivemind_scripts/probe_golden_latency.py). If >750ms, targeted
   additive optimization (per-arm rank-ordered LIMIT caps, or per-item workflow_python search
   index) preserving recall; re-measure. Do NOT relax gates or drop arms.
 
@@ -163,7 +163,7 @@ The isolated rehearsal for `schema/012_lexical_latency_phase2.sql` reported 26/2
 but root review found five gaps that made that evidence insufficient. All five are
 corrected; nothing here mutates production (the parent coordinator authorizes a
 later serial apply). Files: `schema/012_lexical_latency_phase2.sql`,
-`scripts/rehearse_lexical_012.py`, `scripts/live_lexical_refresh.py`,
+`hivemind_scripts/rehearse_lexical_012.py`, `hivemind_scripts/live_lexical_refresh.py`,
 `tests/test_lexical_refresh_mv.py`.
 
 ### Gaps found + corrections
@@ -213,7 +213,7 @@ later serial apply). Files: `schema/012_lexical_latency_phase2.sql`,
    workflow contributes zero candidates.
 
 4. **Refresh lifecycle + read-path trust distinction.**
-   `scripts/live_lexical_refresh.py` refreshes the MV after the
+   `hivemind_scripts/live_lexical_refresh.py` refreshes the MV after the
    lexical_documents/state rebuild: `refresh_search_mv` tries
    `REFRESH ... CONCURRENTLY` (unique index `lexical_workflow_python_search_item_uidx`
    present) with a deterministic plain `REFRESH` fallback (also the
@@ -239,7 +239,7 @@ later serial apply). Files: `schema/012_lexical_latency_phase2.sql`,
    refresh absent/present cases, plus initial population, refresh-after-change,
    stale detection, idempotent rerun, and CONCURRENTLY support.
 
-5. **Strengthened rehearsal/evidence.** `scripts/rehearse_lexical_012.py` now
+5. **Strengthened rehearsal/evidence.** `hivemind_scripts/rehearse_lexical_012.py` now
    compares FULL canonical candidate rows (entity/item/representation/
    matched_snippet/lexical_rank/lexical_source/created_at, ORDER, global limit) via
    jsonb for 12 representative + adversarial queries (incl the cross-boundary and
@@ -264,7 +264,7 @@ when the installed candidate function is still schema/010 (pre-012). It is
 dangerously wrong when schema/012 is active but its MV was dropped/missing: the
 search function then depends on the missing MV and the verifier would falsely
 report success. Nothing here mutates production (isolated cluster + unit tests
-only); files touched: `scripts/live_lexical_refresh.py`,
+only); files touched: `hivemind_scripts/live_lexical_refresh.py`,
 `tests/test_lexical_refresh_mv.py`.
 
 **Fix — a precise read-path distinction.**
@@ -310,7 +310,7 @@ test.
 
 - Apply `schema/012` to production (the parent coordinator authorizes a later
   serial apply). NOT applied here.
-- Run `scripts/live_lexical_refresh.py --apply` (refreshes lexical_documents +
+- Run `hivemind_scripts/live_lexical_refresh.py --apply` (refreshes lexical_documents +
   the MV) and `--verify` (now includes the MV dimension).
 - Run the frozen live gate (all 112 golden cases, warm p95 ≤ 750 ms). NOT run
   here — the latency claim is proven separately on production; the isolated

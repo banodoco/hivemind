@@ -26,13 +26,13 @@ recalled from memory.
 | `docs/hybrid-search/phase1-lexical-contract.json` | **Machine-readable contract** (version-pinned, `post_hoc_locked: true`). |
 | `executors/lexical_contract.py` | **Frozen reference module** — config, weighted specs, query arms, normalizers, eligibility predicates, collapse rule, bounded code-doc policy. Pure stdlib, offline. |
 | `docs/hybrid-search/phase1-fts-probes.sql` | **SQL probe script** (read-only) for 1.2/1.3 to re-confirm exact tokenization on the live DB. |
-| `scripts/validate_lexical_contract.py` | **Deterministic validator** (contract consistency + reference behaviour on fixtures incl. observed evidence). |
+| `hivemind_scripts/validate_lexical_contract.py` | **Deterministic validator** (contract consistency + reference behaviour on fixtures incl. observed evidence). |
 | `tests/test_lexical_contract.py` | **Offline tests** pinning every frozen decision. |
 
 ## Commands
 
 ```bash
-python3 scripts/validate_lexical_contract.py                # contract validation
+python3 hivemind_scripts/validate_lexical_contract.py                # contract validation
 python3 -m unittest tests.test_lexical_contract -v          # this task's tests
 python3 -m unittest discover tests/                         # whole repo
 ```
@@ -498,7 +498,7 @@ None blocks the 1.1 completion signal; each is a named input to a later task.
   It was torn down after capture; no production or shared database was touched.
 - **Reference module.** `executors/lexical_contract.py` is pure stdlib, offline,
   dependency-free; it is the frozen spec 1.2–1.10 implement against.
-- **Validator + tests.** `scripts/validate_lexical_contract.py` checks the JSON
+- **Validator + tests.** `hivemind_scripts/validate_lexical_contract.py` checks the JSON
   contract consistency and the reference behaviour on fixtures (including the
   observed simple-vs-english facts and the `Wan 2.2`/`Wan2.2` collapse).
   `tests/test_lexical_contract.py` pins every frozen decision; both green.

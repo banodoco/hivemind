@@ -23,9 +23,9 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
-import scripts.discord_message_fts as M  # noqa: E402
+import hivemind_scripts.discord_message_fts as M  # noqa: E402
 import executors.lexical_contract as LC  # noqa: E402
 from verify_access import redact  # noqa: E402
 

@@ -19,7 +19,7 @@ sys.path.insert(0, str(_REPO))
 from executors import embedding_coverage as cov  # noqa: E402
 from executors import workflow_representation as wr  # noqa: E402
 
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 import rehearse_embedding_pilot as pilot  # noqa: E402
 
 

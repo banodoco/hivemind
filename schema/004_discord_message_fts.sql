@@ -23,7 +23,7 @@
 -- HOW TO APPLY (operator, not `supabase db push`):
 --   * `CREATE INDEX CONCURRENTLY` cannot run inside a transaction block, so this
 --     file is applied via a session-mode / direct psql connection with autocommit
---     (task 0.1 access path: scripts/live_discord_fts.py), NOT via the
+--     (task 0.1 access path: hivemind_scripts/live_discord_fts.py), NOT via the
 --     transactional `db push` migration wrapper. `psql -f` does NOT wrap in a
 --     transaction by default, so each statement below autocommits independently.
 --   * The driver sets a bounded `lock_timeout` before the build so a transient
@@ -38,13 +38,13 @@
 --   * KNOWN LIMITATION: if a *previous concurrent build failed* and left an
 --     INVALID index of this name behind, `IF NOT EXISTS` will skip and the
 --     invalid remnant will remain. The preflight driver
---     (scripts/discord_message_fts.py `preflight_queries`) detects
+--     (hivemind_scripts/discord_message_fts.py `preflight_queries`) detects
 --     `pg_index.indisvalid = false` remnants and the recovery is the rollback
 --     command below, then a fresh build.
 --
 -- ROLLBACK (one line, online, outside a transaction):
 --   DROP INDEX CONCURRENTLY IF EXISTS public.idx_discord_messages_content_fts_simple;
---   (Also exposed as `scripts/live_discord_fts.py --rollback`.)
+--   (Also exposed as `hivemind_scripts/live_discord_fts.py --rollback`.)
 -- ============================================================
 
 -- ---------------------------------------------------------------------------

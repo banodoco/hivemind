@@ -19,7 +19,7 @@ IN:
 4. Test fixtures + unit tests for the pack (Python, stdlib `unittest`, mocked HTTP — no live
    network in tests) and for the edge function's validation logic (pure TS functions).
 5. Docs: update `hivemind/SKILL.md` (the existing Claude skill) and `README.md` for v2; write
-   `DESIGN.md` capturing the architecture; tiny `scripts/issue_contributor_key.py` helper that
+   `DESIGN.md` capturing the architecture; tiny `hivemind_scripts/issue_contributor_key.py` helper that
    generates an `hm_` key + prints the INSERT statement with its sha256 hash.
 
 OUT (anti-scope — do not build):
@@ -185,10 +185,10 @@ relatively by the executors — no duplication of the request code six times.
 4. Every executor responds to `--help`; ingest executors + contribute produce correct envelopes
    under `--dry-run` against the fixtures.
 5. Docs updated as specified; `DESIGN.md` exists; key-issuance helper script works
-   (`python3 scripts/issue_contributor_key.py` prints key + INSERT).
+   (`python3 hivemind_scripts/issue_contributor_key.py` prints key + INSERT).
 
 ## Touchpoints
 
 `schema/001_unified_corpus.sql` · `supabase/functions/contribute/` (new) · `pack.yaml` (new) ·
 `executors/` (new) · `tests/` (new) · `hivemind/SKILL.md` · `README.md` · `DESIGN.md` (new) ·
-`AGENTS.md` (new, pack-level) · `skill/SKILL.md` (new, pack-level) · `scripts/` (new)
+`AGENTS.md` (new, pack-level) · `skill/SKILL.md` (new, pack-level) · `hivemind_scripts/` (new)

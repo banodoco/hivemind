@@ -61,7 +61,7 @@
 -- HOW TO APPLY (operator, not `supabase db push`):
 --   * CREATE INDEX CONCURRENTLY cannot run inside a transaction block, so this
 --     file is applied via a session-mode / direct psql connection with autocommit
---     (scripts/live_message_identifier.py), NOT the transactional `db push`
+--     (hivemind_scripts/live_message_identifier.py), NOT the transactional `db push`
 --     wrapper. psql -f does not wrap in a transaction; each statement autocommits.
 --   * The driver sets a bounded lock_timeout before the build so a transient
 --     ACCESS EXCLUSIVE conflict fails fast instead of wedging writers, and
@@ -74,12 +74,12 @@
 -- IDEMPOTENCE: CREATE INDEX CONCURRENTLY IF NOT EXISTS makes a re-run a safe
 -- no-op when a *valid* index of this name exists. KNOWN LIMITATION: if a previous
 -- concurrent build failed and left an INVALID index of this name, IF NOT EXISTS
--- skips and the invalid remnant remains; preflight (scripts/live_message_identifier.py)
+-- skips and the invalid remnant remains; preflight (hivemind_scripts/live_message_identifier.py)
 -- detects pg_index.indisvalid=false and the rollback below + a fresh build recovers.
 --
 -- ROLLBACK (online, outside a transaction; idempotent):
 --   DROP INDEX CONCURRENTLY IF EXISTS public.idx_discord_messages_identifier_trgm;
---   (Also: scripts/live_message_identifier.py --rollback.)
+--   (Also: hivemind_scripts/live_message_identifier.py --rollback.)
 --   No source row is touched; the read path returns to its exact pre-1.6 state.
 -- ============================================================
 

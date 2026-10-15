@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit tests for scripts/probe_golden_latency.py — failure-preservation + secrecy.
+"""Unit tests for hivemind_scripts/probe_golden_latency.py — failure-preservation + secrecy.
 
 No database is required: these exercise the parser, the report builder, and the
 plan summarizer on synthetic psql output. The probe is failure-preserving (a
@@ -14,7 +14,7 @@ import sys
 import unittest
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import probe_golden_latency as P  # noqa: E402
 

@@ -55,10 +55,10 @@ hashing, and schema vocabulary **once** and reuses them everywhere:
 | `schema/022_content_embeddings.sql` | Task 2.3 — fixed `vector(384)` shared index + dimension-mixing trigger. |
 | `schema/023_embedding_contract_switch.sql` | Task 2.3 — atomic same-dimension switch + coverage guard (SECURITY DEFINER, fixed `search_path`). |
 | `schema/024_identity_and_canonical_representations.sql` | Tasks 2.4/2.5 — SQL identity + canonical-text/hash parity functions. |
-| `scripts/rehearse_embedding_schema.py` | Isolated-cluster rehearsal of 020–024 (all gates). |
-| `scripts/validate_embedding_contract.py` | Offline 2.1 validator + provider-smoke-gate evidence. |
-| `scripts/register_embedding_secret.py` | Secret-safe operator tool: registers ONLY `OPENAI_API_KEY` in Hivemind's Edge secret store (narrow upload, value never exposed). |
-| `scripts/smoke_embedding_provider.py` | The one authorized live provider smoke via `OpenAIEmbedder` + the registered boundary; writes sanitized evidence. |
+| `hivemind_scripts/rehearse_embedding_schema.py` | Isolated-cluster rehearsal of 020–024 (all gates). |
+| `hivemind_scripts/validate_embedding_contract.py` | Offline 2.1 validator + provider-smoke-gate evidence. |
+| `hivemind_scripts/register_embedding_secret.py` | Secret-safe operator tool: registers ONLY `OPENAI_API_KEY` in Hivemind's Edge secret store (narrow upload, value never exposed). |
+| `hivemind_scripts/smoke_embedding_provider.py` | The one authorized live provider smoke via `OpenAIEmbedder` + the registered boundary; writes sanitized evidence. |
 | `tests/test_embedding_contract.py` | 45 offline tests (2.1). |
 | `tests/test_embedding_provider_smoke.py` | Smoke-driver sanitization + verification tests (2.1 secret boundary). |
 | `tests/test_entity_identity.py` | 24 offline tests (2.4). |
@@ -218,8 +218,8 @@ tests.test_embedding_contract           45  offline   PASS
 tests.test_entity_identity              24  offline   PASS
 tests.test_canonical_representations    21  offline   PASS
 tests.test_embedding_schema_sql         12  isolated PG17 + pgvector  PASS
-scripts/rehearse_embedding_schema.py    15/15 checks  isolated PG14 + pgvector  PASS
-scripts/validate_embedding_contract.py  offline + smoke-gate  PASS (live smoke PASSED)
+hivemind_scripts/rehearse_embedding_schema.py    15/15 checks  isolated PG14 + pgvector  PASS
+hivemind_scripts/validate_embedding_contract.py  offline + smoke-gate  PASS (live smoke PASSED)
 tests.test_workflow_representation      48  (frozen dependency, unchanged) PASS
 ```
 

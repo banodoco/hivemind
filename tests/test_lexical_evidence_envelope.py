@@ -1,7 +1,7 @@
 """Tests for the lexical-search RPC evidence-envelope parsing (requirement B).
 
 Regression coverage for the bug where ``capture_evidence`` in
-``scripts/live_lexical_search.py`` called ``jsonb_array_length`` on the
+``hivemind_scripts/live_lexical_search.py`` called ``jsonb_array_length`` on the
 top-level RPC envelope object — which is ``{results, count, meta}`` (see
 schema/009:239-249), NOT a bare array — so the smoke reported NULL/garbage and
 failed even when the RPC was healthy.
@@ -20,7 +20,7 @@ from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 from live_lexical_search import capture_evidence, parse_rpc_envelope  # noqa: E402
 

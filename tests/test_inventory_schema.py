@@ -1,4 +1,4 @@
-"""Tests for ``scripts/inventory_schema.py`` — the Hivemind schema inventory.
+"""Tests for ``hivemind_scripts/inventory_schema.py`` — the Hivemind schema inventory.
 
 Pure and offline: no network, no CLI, no secrets are printed. These tests pin:
 
@@ -20,7 +20,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 import inventory_schema as inv  # noqa: E402
 import verify_access as va  # noqa: E402  (shared redactor)

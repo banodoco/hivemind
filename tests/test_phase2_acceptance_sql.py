@@ -1,6 +1,6 @@
 """Task 2.17 — isolated PostgreSQL/pgvector Phase-2 acceptance (T4/T5/T6).
 
-Wraps scripts/rehearse_phase2_acceptance.rehearse(), which runs the COMPLETE
+Wraps hivemind_scripts/rehearse_phase2_acceptance.rehearse(), which runs the COMPLETE
 selected-contract lifecycle on a throwaway local cluster (schema/003 + 020-033 +
 034): source/remediation -> manifest -> enqueue -> claim -> payload -> fake embed/
 drop -> source-hash-safe finalize -> complete -> semantic candidates, plus
@@ -15,7 +15,7 @@ import sys
 import unittest
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 
 def _have_pg() -> bool:

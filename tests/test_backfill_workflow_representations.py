@@ -7,7 +7,7 @@ These tests define the contract for two not-yet-implemented surfaces:
     reconciles one historical ``kind=workflow`` row into a canonical, hashed,
     secret-scanned Python + searchable-body representation, and orchestrates a
     resumable, bounded, idempotent batch over an injected row store.
-  * ``scripts.backfill_workflow_representations`` — the operator CLI, whose
+  * ``hivemind_scripts.backfill_workflow_representations`` — the operator CLI, whose
     default mode is a read-only audit/dry-run.
 
 The module is offline: no network, database, provider, subprocess, VibeComfy
@@ -32,7 +32,7 @@ sys.path.insert(0, str(_REPO))
 from executors import workflow_representation as wr  # noqa: E402
 from executors import workflow_semantics as ws  # noqa: E402
 from executors import workflow_remediation as remediation  # noqa: E402
-from scripts import backfill_workflow_representations as cli  # noqa: E402
+from hivemind_scripts import backfill_workflow_representations as cli  # noqa: E402
 
 
 # ---------------------------------------------------------------------------

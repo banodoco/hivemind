@@ -45,7 +45,7 @@ guide/navigation marker, not a truth claim.
 
 ## Conversion boundary
 
-`scripts/convert_legacy_knowledge.py` performs one export → transaction →
+`hivemind_scripts/convert_legacy_knowledge.py` performs one export → transaction →
 commit boundary. Legacy external resources retain useful IDs when available;
 legacy question/answer rows become ordinary `knowledge` resources with
 `legacy_confidence` inert metadata. The explicit lifecycle mapping is:

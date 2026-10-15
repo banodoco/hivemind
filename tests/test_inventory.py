@@ -1,4 +1,4 @@
-"""Tests for ``scripts/inventory_corpus.py`` — offline parsers, statistics, redaction.
+"""Tests for ``hivemind_scripts/inventory_corpus.py`` — offline parsers, statistics, redaction.
 
 Pure and offline: no network, no CLI, no secrets are printed.  
 These tests pin the redactor, statistics helpers, workflow cohort classifier,
@@ -17,7 +17,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 import inventory_corpus as ic  # noqa: E402
 

@@ -1,7 +1,7 @@
-"""Contract tests for ``scripts/rehearse_lexical_013.py``.
+"""Contract tests for ``hivemind_scripts/rehearse_lexical_013.py``.
 
 Test-first gate: this file is the FIRST repository edit in the schema/013
-local-proof batch. It MUST be run while ``scripts/rehearse_lexical_013.py`` does
+local-proof batch. It MUST be run while ``hivemind_scripts/rehearse_lexical_013.py`` does
 not yet exist, recording the exact red failing count; only then may the rehearsal
 script be created.
 
@@ -64,7 +64,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys_path_added = str(REPO / "scripts")
+sys_path_added = str(REPO / "hivemind_scripts")
 
 import sys  # noqa: E402
 
@@ -72,7 +72,7 @@ sys.path.insert(0, sys_path_added)
 
 from lexical_pg import find_pgbins  # noqa: E402
 
-SCRIPT = REPO / "scripts" / "rehearse_lexical_013.py"
+SCRIPT = REPO / "hivemind_scripts" / "rehearse_lexical_013.py"
 SCHEMA_013 = REPO / "schema" / "013_lexical_latency_phase3.sql"
 
 

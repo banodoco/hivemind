@@ -87,5 +87,5 @@ zero rows for multi-word queries).
 - The contribute executor requires `HIVEMIND_CONTRIBUTOR_KEY` in the
   environment (a `hm_<64 hex>` key issued by the corpus owner).
 - YouTube ingest requires `yt-dlp` on PATH at runtime (tests mock it).
-- `scripts/convert_legacy_knowledge.py` is the only direct conversion boundary;
+- `hivemind_scripts/convert_legacy_knowledge.py` is the only direct conversion boundary;
   use `--rehearse` for rollback proof and never run it against a live corpus.

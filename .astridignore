@@ -5,7 +5,7 @@ assets/
 supabase/
 schema/
 tests/
-scripts/
+hivemind_scripts/
 .megaplan/
 install.sh
 DESIGN.md

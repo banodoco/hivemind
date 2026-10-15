@@ -9,7 +9,7 @@ never put a URL or provider key in shell history, a report, or this repository.
 Audit the workflow representation population first:
 
 ```text
-python3 scripts/backfill_workflow_representations.py \
+python3 hivemind_scripts/backfill_workflow_representations.py \
   --database-url "$HIVEMIND_DB_URL" --vibecomfy-root "$VIBECOMFY_ROOT" \
   --report-path /secure/operator/workflow-audit.json
 ```
@@ -19,7 +19,7 @@ remediation first in either mode; dry-run does not read or require a provider
 key.
 
 ```text
-python3 scripts/backfill_embeddings.py \
+python3 hivemind_scripts/backfill_embeddings.py \
   --database-url "$HIVEMIND_DB_URL" --contract-id "$HIVEMIND_CONTRACT_ID" \
   --source approved_distillations --source pending_distillations --source resources \
   --vibecomfy-root "$VIBECOMFY_ROOT" --report-path /secure/operator/embed-audit.json
@@ -29,7 +29,7 @@ After reviewing the audit, apply deliberately. The approved env file is read
 only for `OPENAI_API_KEY`; it is never printed or written to the report.
 
 ```text
-python3 scripts/backfill_embeddings.py --apply \
+python3 hivemind_scripts/backfill_embeddings.py --apply \
   --database-url "$HIVEMIND_DB_URL" --contract-id "$HIVEMIND_CONTRACT_ID" \
   --source approved_distillations --source pending_distillations --source resources \
   --vibecomfy-root "$VIBECOMFY_ROOT" --provider-env-file /secure/operator/approved.env \
@@ -41,7 +41,7 @@ On an interruption, retain the reported `run_id` and resume with the same
 source/date/contract choices:
 
 ```text
-python3 scripts/backfill_embeddings.py --apply --resume-run-id RUN_ID \
+python3 hivemind_scripts/backfill_embeddings.py --apply --resume-run-id RUN_ID \
   --database-url "$HIVEMIND_DB_URL" --contract-id "$HIVEMIND_CONTRACT_ID" \
   --source resources --vibecomfy-root "$VIBECOMFY_ROOT"
 ```
@@ -82,7 +82,7 @@ VibeComfy’s existing parser/converter and never executes stored Python.
 For a local-only rehearsal, run:
 
 ```text
-python3 scripts/rehearse_historical_backfill.py
+python3 hivemind_scripts/rehearse_historical_backfill.py
 ```
 
 It creates an isolated cluster and is safe to rerun. Do not point either

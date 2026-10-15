@@ -20,7 +20,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 from eval.retrieval.adapters import LegacyIlikeAdapter, OracleAdapter  # noqa: E402
 from eval.retrieval.compare import compare_systems, render_markdown  # noqa: E402

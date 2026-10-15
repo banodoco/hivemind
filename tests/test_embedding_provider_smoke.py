@@ -1,9 +1,9 @@
 """Tests for the task-2.1 authorized-provider smoke driver and secret boundary.
 
 Pure and offline: no network, no real provider call, no real key. These pin the
-sanitization contract of ``scripts/smoke_embedding_provider.run_smoke`` (the
+sanitization contract of ``hivemind_scripts/smoke_embedding_provider.run_smoke`` (the
 unit-testable core of the one authorized live smoke) and the secret-safe
-``scripts.register_embedding_secret`` parser:
+``hivemind_scripts.register_embedding_secret`` parser:
 
   * a successful smoke records exactly the allowed, sanitized fields;
   * the embedding vector and the credential are NEVER present in the evidence,
@@ -30,8 +30,8 @@ _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
 
-import scripts.smoke_embedding_provider as smoke_drv  # noqa: E402
-import scripts.register_embedding_secret as reg  # noqa: E402
+import hivemind_scripts.smoke_embedding_provider as smoke_drv  # noqa: E402
+import hivemind_scripts.register_embedding_secret as reg  # noqa: E402
 from executors import embedding_contract as ec  # noqa: E402
 
 #: A throwaway key used only to PROVE the evidence never contains it.

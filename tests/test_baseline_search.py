@@ -1,4 +1,4 @@
-"""Tests for ``scripts/baseline_search.py`` — the Hivemind legacy-ILIKE baseline.
+"""Tests for ``hivemind_scripts/baseline_search.py`` — the Hivemind legacy-ILIKE baseline.
 
 Pure and offline: no network, no secrets printed. These tests pin (a) that the
 probe reproduces the deployed executor's request exactly, (b) the failure /
@@ -21,7 +21,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 import baseline_search as bs  # noqa: E402
 

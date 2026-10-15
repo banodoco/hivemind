@@ -27,7 +27,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import rehearse_lexical_candidate as R  # noqa: E402
 from lexical_pg import find_pgbins  # noqa: E402

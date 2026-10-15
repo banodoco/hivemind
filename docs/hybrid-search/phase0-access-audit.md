@@ -3,7 +3,7 @@
 **Date:** 2026-07-28
 **Task:** 0.1 — Confirm existing Hivemind Supabase project/deployment ownership and verify current CLI, database, Edge deployment, secret-store, and session-mode access.
 **Plan:** `docs/architecture/hivemind-hybrid-search-plan.md` (Astrid planning copy)
-**Reproduce:** `python3 scripts/verify_access.py` (add `--db-probe` for the authenticated DB round-trip). Tests: `python3 -m unittest tests.test_verify_access`.
+**Reproduce:** `python3 hivemind_scripts/verify_access.py` (add `--db-probe` for the authenticated DB round-trip). Tests: `python3 -m unittest tests.test_verify_access`.
 
 This audit records **capability status, command names, safe project identifiers,
 timestamps, and redacted failure classes only.** No API key, database password,
@@ -37,7 +37,7 @@ in scope for this plan.
 | Secret-store: service-role | ✅ Ready | `SUPABASE_SERVICE_ROLE_KEY` present (name only) | `supabase secrets list` |
 | Secret-store: DB URL secret | ✅ Ready | `SUPABASE_DB_URL` present (name only) | `supabase secrets list` |
 | Public read path (PostgREST) | ✅ Ready | `unified_feed` returns live corpus rows (`kind=message`, `source=banodoco-discord`); snowflake `item_id`s preserved as strings | `GET .../rest/v1/unified_feed` with publishable key |
-| Database session-mode (authenticated) | ✅ Ready | round-trip OK via CLI login role; see below | `scripts/verify_access.py --db-probe` |
+| Database session-mode (authenticated) | ✅ Ready | round-trip OK via CLI login role; see below | `hivemind_scripts/verify_access.py --db-probe` |
 
 ## Session-mode database detail
 
@@ -73,7 +73,7 @@ operator-run backfill (it must **refuse** the transaction pooler).
 - **CLI login credential handling:** the `db dump --dry-run` script embeds a
   short-lived `cli_login_postgres` password. The probe captures it to a temp
   file, uses it once in a child-process env, then deletes the file; it is never
-  printed or persisted, and `scripts/verify_access.py` routes all output through
+  printed or persisted, and `hivemind_scripts/verify_access.py` routes all output through
   a redactor (covered by `tests/test_verify_access.py`).
 
 ## Boundary confirmation

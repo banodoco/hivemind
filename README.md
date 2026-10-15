@@ -59,7 +59,7 @@ exact revision/message-snapshot subjects, sources, and supersession.
 
 ## Conversion and proof
 
-`scripts/convert_legacy_knowledge.py` is the one direct conversion boundary.
+`hivemind_scripts/convert_legacy_knowledge.py` is the one direct conversion boundary.
 It supports export-only (default), disposable `--rehearse` rollback, and
 explicit local/test `--apply`; it performs no dual write and fabricates no
 evidence. Visibility maps to accepted/pending/rejected/withdrawn and old

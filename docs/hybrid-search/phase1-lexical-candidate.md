@@ -112,9 +112,9 @@ All ≪ the 750 ms lexical-only gate and the legacy 30 s timeout.
 - `schema/008_lexical_candidate_sql.sql` — the canonical candidate function + the
   bounded workflow-code fragment trigram index (`CREATE INDEX CONCURRENTLY`).
 - `schema/009_lexical_search_rpc.sql` — the hardened SECURITY DEFINER RPC.
-- `scripts/rehearse_lexical_candidate.py` — isolated-cluster rehearsal (bootstrap
+- `hivemind_scripts/rehearse_lexical_candidate.py` — isolated-cluster rehearsal (bootstrap
   001+003–009, seed, RPC, eligibility, EXPLAIN, verdict).
-- `scripts/live_lexical_search.py` — preflight / gated apply / rollback / evidence.
+- `hivemind_scripts/live_lexical_search.py` — preflight / gated apply / rollback / evidence.
 - `tests/test_lexical_candidate_sql.py` — 14 cluster SQL+RPC tests.
 - `tests/test_lexical_adapter.py` — 18 offline adapter model tests.
 - `eval/retrieval/adapters.py` — `LexicalAdapter` + `lexical_*` helpers (registered).
@@ -123,7 +123,7 @@ All ≪ the 750 ms lexical-only gate and the legacy 30 s timeout.
 
 ## Live deployment state (BLOCKER — handoff to merge gate)
 
-`scripts/live_lexical_search.py --preflight` (read-only, 2026-07-29):
+`hivemind_scripts/live_lexical_search.py --preflight` (read-only, 2026-07-29):
 
 | Object | Live |
 |---|---|
@@ -148,7 +148,7 @@ fragment index; no source row is touched.
 ## Rollback (one command, once applied)
 
 ```bash
-python3 scripts/live_lexical_search.py --rollback
+python3 hivemind_scripts/live_lexical_search.py --rollback
 # equivalent to: drop function ... hivemind_lexical_search(...);
 #                drop function ... hivemind_lexical_candidates(...);
 #                drop index if exists public.lexical_documents_python_chunk_trgm_idx;

@@ -721,7 +721,7 @@ def run(scenario: str) -> dict[str, object]:
         with tempfile.TemporaryDirectory(prefix="hivemind-conversion-export-") as export_dir:
             export_path = Path(export_dir) / "legacy.json"
             exported = subprocess.run(
-                ["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--export", str(export_path)],
+                ["python3", str(ROOT / "hivemind_scripts" / "convert_legacy_knowledge.py"), "--export", str(export_path)],
                 cwd=ROOT, env=env, text=True, capture_output=True,
             )
             if exported.returncode:
@@ -729,12 +729,12 @@ def run(scenario: str) -> dict[str, object]:
             export_payload = json.loads(export_path.read_text(encoding="utf-8"))
             if len(export_payload.get("external_resources", [])) != 2 or len(export_payload.get("distillations", [])) != 1 or len(export_payload.get("cites", [])) != 1:
                 raise RuntimeError("conversion export was not recoverable row data")
-        rehearsal = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--rehearse"], cwd=ROOT, env=env, text=True, capture_output=True)
+        rehearsal = subprocess.run(["python3", str(ROOT / "hivemind_scripts" / "convert_legacy_knowledge.py"), "--rehearse"], cwd=ROOT, env=env, text=True, capture_output=True)
         if rehearsal.returncode:
             raise RuntimeError(rehearsal.stderr or rehearsal.stdout)
         if _psql(url, "select count(*) from public.resources") != "0":
             raise RuntimeError("conversion rehearsal did not roll back")
-        applied = subprocess.run(["python3", str(ROOT / "scripts" / "convert_legacy_knowledge.py"), "--apply"], cwd=ROOT, env=env, text=True, capture_output=True)
+        applied = subprocess.run(["python3", str(ROOT / "hivemind_scripts" / "convert_legacy_knowledge.py"), "--apply"], cwd=ROOT, env=env, text=True, capture_output=True)
         if applied.returncode:
             raise RuntimeError(applied.stderr or applied.stdout)
         check = _psql(url, "select count(*) from public.resources r join public.resource_revisions v on v.id=r.current_revision_id where r.origin_source='legacy-distillation' and v.state='accepted'; select count(*) from public.knowledge_references where label='converted legacy cite'; select (to_regclass('public.external_resources') is null)::int; select (to_regclass('public.lexical_resource_python_state') is null)::int; select (to_regclass('public.lexical_workflow_python_search') is null)::int; select (to_regclass('public.distillations') is null)::int; select (to_regclass('public.distillation_cites') is null)::int;")

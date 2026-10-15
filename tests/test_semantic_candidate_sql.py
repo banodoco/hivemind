@@ -20,7 +20,7 @@ Two layers:
 
 2. **Discoverable SQL rehearsal test** (auto-skips when PostgreSQL binaries or
    pgvector are unavailable locally). It wraps
-   :mod:`scripts.rehearse_semantic_candidates`, which applies schema/003 +
+   :mod:`hivemind_scripts.rehearse_semantic_candidates`, which applies schema/003 +
    schema/020–029 + the new schema/032 in an isolated throwaway cluster and
    proves every task-2.15
    completion signal against live SQL (active-contract filtering, cosine
@@ -37,7 +37,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 from executors import chunking  # noqa: E402
 from executors import entity_identity as ei  # noqa: E402

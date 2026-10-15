@@ -40,9 +40,9 @@ on live data (`Wan2.2`→841 titles, `FLUX.1`→236). See *Findings* for the hon
 | Path | Role |
 |---|---|
 | `schema/006_short_field_trigram.sql` | **Canonical additive/idempotent migration** — schema/005 guard + table/column guards + `CREATE INDEX CONCURRENTLY IF NOT EXISTS` ×2 + verification SELECT + rollback recipe. Elevation-free (runnable as the owner). |
-| `scripts/short_field_trigram.py` | **Pure importable module** — frozen index identities (2 targets), build/rollback SQL, preflight query set + verdict logic, evidence queries (`<%`/`%`, natural + forced), EXPLAIN parser, schema/005-applied check, rehearsal schema/seed, frozen constants. |
-| `scripts/rehearse_short_field_trigram.py` | **Isolated-cluster rehearsal harness** — throwaway PG 14 cluster, loads `schema/005`, ~2,759 titles / 11 questions, timed online build, sizes, plans, eligibility proof, cancellation/rollback, teardown. |
-| `scripts/live_short_field_trigram.py` | **Live driver** — task-0.1 session-mode preflight + apply `schema/005` (if missing) + parity probe + online build (monitored) + evidence + rollback; all output redacted; `--apply` gated on a green preflight. |
+| `hivemind_scripts/short_field_trigram.py` | **Pure importable module** — frozen index identities (2 targets), build/rollback SQL, preflight query set + verdict logic, evidence queries (`<%`/`%`, natural + forced), EXPLAIN parser, schema/005-applied check, rehearsal schema/seed, frozen constants. |
+| `hivemind_scripts/rehearse_short_field_trigram.py` | **Isolated-cluster rehearsal harness** — throwaway PG 14 cluster, loads `schema/005`, ~2,759 titles / 11 questions, timed online build, sizes, plans, eligibility proof, cancellation/rollback, teardown. |
+| `hivemind_scripts/live_short_field_trigram.py` | **Live driver** — task-0.1 session-mode preflight + apply `schema/005` (if missing) + parity probe + online build (monitored) + evidence + rollback; all output redacted; `--apply` gated on a green preflight. |
 | `tests/test_short_field_trigram.py` | **55 tests** — frozen identity, build/rollback SQL, schema-file consistency, preflight verdict, EXPLAIN parsing, security/eligibility/length-bounds, Unicode/cross-variant, capacity, rehearsal+live evidence, redaction, PG-gated idempotence. |
 | `docs/hybrid-search/phase1-short-field-trigram-rehearsal.json` | Rehearsal evidence (machine-readable). |
 | `docs/hybrid-search/phase1-short-field-trigram-live.json` | Live preflight + schema/005 apply + parity + build + evidence (machine-readable). |
@@ -80,7 +80,7 @@ sensitive ILIKE) path; this task adds the normalized form alongside them.
 ## Exact query rules (frozen, for task 1.7)
 
 The candidate SQL (1.7) consumes these indexes with this **exact** shape
-(`scripts/short_field_trigram.py`: `candidate_query_template`):
+(`hivemind_scripts/short_field_trigram.py`: `candidate_query_template`):
 
 ```sql
 SET pg_trgm.word_similarity_threshold = 0.3;     -- frozen WORD_SIMILARITY_THRESHOLD
@@ -204,7 +204,7 @@ DROP INDEX CONCURRENTLY IF EXISTS public.idx_distillations_question_trgm_norm;
 ```
 
 ```
-python3 scripts/live_short_field_trigram.py --rollback   # SET ROLE postgres; DROP INDEX CONCURRENTLY IF EXISTS … (both)
+python3 hivemind_scripts/live_short_field_trigram.py --rollback   # SET ROLE postgres; DROP INDEX CONCURRENTLY IF EXISTS … (both)
 ```
 
 ## Capacity result
@@ -277,12 +277,12 @@ no gate is approached.
 ## Reproduce
 
 ```bash
-python3 scripts/live_short_field_trigram.py --preflight        # read-only preflight
-python3 scripts/live_short_field_trigram.py --dry-run          # SQL it would run + preflight
-python3 scripts/live_short_field_trigram.py --evidence         # capture plans (indexes must exist)
-python3 scripts/live_short_field_trigram.py --apply            # apply 005(if needed)+build (preflight green)
-python3 scripts/live_short_field_trigram.py --rollback         # drop both
-python3 scripts/rehearse_short_field_trigram.py                # isolated rehearsal (~2,759 titles)
+python3 hivemind_scripts/live_short_field_trigram.py --preflight        # read-only preflight
+python3 hivemind_scripts/live_short_field_trigram.py --dry-run          # SQL it would run + preflight
+python3 hivemind_scripts/live_short_field_trigram.py --evidence         # capture plans (indexes must exist)
+python3 hivemind_scripts/live_short_field_trigram.py --apply            # apply 005(if needed)+build (preflight green)
+python3 hivemind_scripts/live_short_field_trigram.py --rollback         # drop both
+python3 hivemind_scripts/rehearse_short_field_trigram.py                # isolated rehearsal (~2,759 titles)
 python3 -m unittest tests.test_short_field_trigram -v          # this task's tests (55)
 python3 -m unittest discover tests/                            # whole repo (821 green)
 ```

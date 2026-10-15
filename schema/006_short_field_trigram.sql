@@ -41,7 +41,7 @@
 -- HOW TO APPLY (operator, not `supabase db push`):
 --   * ``CREATE INDEX CONCURRENTLY`` cannot run inside a transaction block, so
 --     this file is applied via a session-mode / direct psql connection with
---     autocommit (task 0.1 access path: scripts/live_short_field_trigram.py),
+--     autocommit (task 0.1 access path: hivemind_scripts/live_short_field_trigram.py),
 --     NOT the transactional ``db push`` wrapper. ``psql -f`` does NOT wrap in a
 --     transaction by default, so each statement below autocommits independently.
 --   * The driver sets a bounded ``lock_timeout`` before the build so a transient
@@ -60,14 +60,14 @@
 --   * KNOWN LIMITATION: if a *previous concurrent build failed* and left an
 --     INVALID index of this name behind, ``IF NOT EXISTS`` will skip and the
 --     invalid remnant will remain. The preflight driver
---     (scripts/short_field_trigram.py preflight_queries) detects
+--     (hivemind_scripts/short_field_trigram.py preflight_queries) detects
 --     ``pg_index.indisvalid = false`` remnants; the recovery is the rollback
 --     command below, then a fresh build.
 --
 -- ROLLBACK (online, outside a transaction; idempotent):
 --   DROP INDEX CONCURRENTLY IF EXISTS public.idx_external_resources_title_trgm_norm;
 --   DROP INDEX CONCURRENTLY IF EXISTS public.idx_distillations_question_trgm_norm;
---   (Also exposed as `scripts/live_short_field_trigram.py --rollback`.)
+--   (Also exposed as `hivemind_scripts/live_short_field_trigram.py --rollback`.)
 -- ============================================================
 
 -- pg_trgm is required by gin_trgm_ops (also created by schema/001/003).

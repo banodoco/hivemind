@@ -5,8 +5,8 @@
 deletion behavior, RLS, grants, and ingestion paths.
 **Plan:** `docs/architecture/hivemind-hybrid-search-plan.md` (Astrid planning copy)
 **Prereq:** Task 0.1 — access audit (`docs/hybrid-search/phase0-access-audit.md`).
-**Reproduce:** `python3 scripts/inventory_schema.py` (catalog + public eligibility),
-`python3 scripts/inventory_schema.py --json out.json`. Tests:
+**Reproduce:** `python3 hivemind_scripts/inventory_schema.py` (catalog + public eligibility),
+`python3 hivemind_scripts/inventory_schema.py --json out.json`. Tests:
 `python3 -m unittest tests.test_inventory_schema`.
 
 This map records **safe schema/object names, RLS policies, decoded grants,
@@ -33,9 +33,9 @@ Inventory was produced two ways and reconciled:
 1. **Repo-defined schema + ingestion code** — `schema/001_unified_corpus.sql`,
    `schema/002_vibecomfy_ratings.sql`, `supabase/functions/{contribute,
    contribute-resource,submit-vibecomfy-rating}/`, `executors/`,
-   `scripts/backfill_workflow_semantics.py`, `executors/workflow_semantics.py`,
+   `hivemind_scripts/backfill_workflow_semantics.py`, `executors/workflow_semantics.py`,
    `DESIGN.md`, `README.md`, `skill/SKILL.md`.
-2. **Live database metadata** — `scripts/inventory_schema.py` runs a strictly
+2. **Live database metadata** — `hivemind_scripts/inventory_schema.py` runs a strictly
    read-only catalog pass (`pg_catalog` + `pg_policies` + bounded `SELECT … GROUP
    BY`; pinned read-only by `tests/test_inventory_schema.py`) plus a public
    publishable-key eligibility pass (`Prefer: count=exact`). The CLI login
@@ -437,14 +437,14 @@ or `vibecomfy_ratings`. The only corpus-adjacent trigger is the
 | Contribute a resource or cited distillation | `supabase/functions/contribute` (Deno) | `X-Contributor-Key: hm_<64hex>` → `contributors.api_key_hash` (sha256 of full key), `revoked_at IS NULL`; service role | `external_resources`, `distillations` (forced `pending`), `distillation_cites` (≥1, deduped) |
 | Public resource ingest (workflows) | `supabase/functions/contribute-resource` (Deno) | publishable key; `ALLOWED_SOURCES` allowlist (default `vibecomfy`,`vibecomfy-external`); annotates `metadata._submitted_from_{ip,user_agent},_submitted_at`; service role | `external_resources` |
 | VibeComfy rating | `supabase/functions/submit-vibecomfy-rating` (Deno) | contributor-key hash; service role | `vibecomfy_ratings` |
-| Workflow-semantics enrichment (operator) | `scripts/backfill_workflow_semantics.py` | anon read; `--apply` needs service role | `external_resources.metadata.workflow_semantics`, `.body` |
+| Workflow-semantics enrichment (operator) | `hivemind_scripts/backfill_workflow_semantics.py` | anon read; `--apply` needs service role | `external_resources.metadata.workflow_semantics`, `.body` |
 | Discord message sync (ingestion) | **external** job (not in this repo); `discord_messages` trigger `enforce_writable_server_guild()` guards writes | operator/service | `discord_messages`, `discord_channels`, `discord_reactions`, `members` (upsert on ids; `synced_at`/`indexed_at`) |
 | Discord media URL refresh | `refresh-media-urls` edge function (**deployed; source NOT in this repo**) + `get_message_for_refresh()` SECURITY DEFINER | publishable key | `discord_messages.attachments` |
 | Client ingestion helpers | `executors/ingest_{article,workflow,youtube}` | contributor key → `contribute` | (via contribute) |
 
 Repo references for these conventions (plan "Existing systems"): `schema/001_unified_corpus.sql`
 (DDL), `supabase/functions/contribute/` (service-role use, request validation,
-secret handling), `scripts/backfill_workflow_semantics.py` (paged dry-run/apply,
+secret handling), `hivemind_scripts/backfill_workflow_semantics.py` (paged dry-run/apply,
 service-role updates, sampling, reporting), `tests/`.
 
 `pg_cron` and `pg_net` extensions are installed — relevant because the plan's
@@ -550,7 +550,7 @@ completion signal; each is an input to a later task.
 
 ## Reproducibility and tests
 
-- **Tool:** `scripts/inventory_schema.py` — re-runs the read-only catalog pass
+- **Tool:** `hivemind_scripts/inventory_schema.py` — re-runs the read-only catalog pass
   (via the task-0.1 session-mode credential) and the public eligibility pass
   (publishable key, `count=exact`). Reuses `verify_access.redact` and
   `verify_access.parse_dryrun_pg_env`; the credential never leaves a child env.

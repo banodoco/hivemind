@@ -24,13 +24,13 @@ Edge function, provider call, or corpus/backfill change, and does not start task
 | `docs/hybrid-search/phase0-workflow-representation-contract.md` | **This decision record** (human). |
 | `docs/hybrid-search/phase0-workflow-representation-contract.json` | **Machine-readable contract** (version-pinned). |
 | `executors/workflow_representation.py` | **Frozen reference module** (precedence, delimiter grammar, no-duplication, normalization/hashing, secret scanner, chunking). Pure stdlib, offline, dependency-free. |
-| `scripts/validate_workflow_contract.py` | **Deterministic validator** (contract JSON consistency + reference-module behaviour on fixtures). |
+| `hivemind_scripts/validate_workflow_contract.py` | **Deterministic validator** (contract JSON consistency + reference-module behaviour on fixtures). |
 | `tests/test_workflow_representation.py` | **48 offline tests** pinning every frozen behaviour. |
 
 ## Commands
 
 ```bash
-python3 scripts/validate_workflow_contract.py                         # contract validation (46 checks)
+python3 hivemind_scripts/validate_workflow_contract.py                         # contract validation (46 checks)
 python3 -m unittest tests.test_workflow_representation -v              # this task's tests (48)
 python3 -m unittest discover tests/                                    # whole repo
 ```
@@ -142,8 +142,8 @@ not imported at runtime):
 
 | Delimiter | VibeComfy source |
 |---|---|
-| `Python ready-template source:` | `scripts/upload_ready_templates_to_hivemind.py:242` |
-| `Python scratchpad source:` | `scripts/upload_external_workflows_to_hivemind.py:744` |
+| `Python ready-template source:` | `hivemind_scripts/upload_ready_templates_to_hivemind.py:242` |
+| `Python scratchpad source:` | `hivemind_scripts/upload_external_workflows_to_hivemind.py:744` |
 
 **Grammar.** A block starts at a line whose `rstrip()` equals a recognized
 literal; the Python text runs until the next recognized delimiter, the

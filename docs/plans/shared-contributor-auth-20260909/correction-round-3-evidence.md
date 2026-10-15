@@ -7,7 +7,7 @@ and host credentials are intentionally omitted.
 | Check | Result |
 | --- | --- |
 | `python3 -m unittest tests.test_contributor_auth -v` | PASS — 13 tests, including truncated redeem response plus cleanup-failure redaction |
-| `python3 scripts/rehearse_contributor_auth.py` | PASS — disposable PostgreSQL cluster created and torn down; safe rollback retained the migration-040 resolver boundary, rejected the revoked legacy key, and preserved legacy/audit rows |
+| `python3 hivemind_scripts/rehearse_contributor_auth.py` | PASS — disposable PostgreSQL cluster created and torn down; safe rollback retained the migration-040 resolver boundary, rejected the revoked legacy key, and preserved legacy/audit rows |
 | `deno check supabase/functions/contributor-auth/index.ts supabase/functions/contributor-auth/protocol.ts supabase/functions/contributor-auth/protocol_test.ts` | PASS |
 | `deno test --allow-net supabase/functions/contributor-auth/protocol_test.ts supabase/functions/contribute/protocol_test.ts supabase/functions/submit-vibecomfy-rating/protocol_test.ts` | PASS — 20 tests |
 | `deno fmt --check supabase/functions/contributor-auth/index.ts supabase/functions/contributor-auth/protocol.ts supabase/functions/contributor-auth/protocol_test.ts` | PASS |

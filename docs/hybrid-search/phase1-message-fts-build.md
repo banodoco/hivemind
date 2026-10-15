@@ -30,9 +30,9 @@ seq scan) with `is_deleted = false` encoded and Discord snowflakes cast to text.
 | Path | Role |
 |---|---|
 | `schema/004_discord_message_fts.sql` | **Canonical additive/idempotent migration** — guard DO block + `CREATE INDEX CONCURRENTLY IF NOT EXISTS` + verification SELECT + rollback recipe. Elevation-free (runnable as the owner). |
-| `scripts/discord_message_fts.py` | **Pure importable module** — frozen index identity (cross-checked vs `executors.lexical_contract`), build/rollback SQL, preflight query set + verdict logic, evidence queries, EXPLAIN parser, rehearsal schema/seed. |
-| `scripts/rehearse_discord_fts.py` | **Isolated-cluster rehearsal harness** — throwaway PG 14 cluster, ~1.25M production-shaped rows, timed online build, sizes, plans, locks/headroom, cancellation/rollback, teardown. |
-| `scripts/live_discord_fts.py` | **Live driver** — task-0.1 session-mode preflight + online build (monitored) + evidence + rollback; all output redacted; `--apply` gated on a green preflight. |
+| `hivemind_scripts/discord_message_fts.py` | **Pure importable module** — frozen index identity (cross-checked vs `executors.lexical_contract`), build/rollback SQL, preflight query set + verdict logic, evidence queries, EXPLAIN parser, rehearsal schema/seed. |
+| `hivemind_scripts/rehearse_discord_fts.py` | **Isolated-cluster rehearsal harness** — throwaway PG 14 cluster, ~1.25M production-shaped rows, timed online build, sizes, plans, locks/headroom, cancellation/rollback, teardown. |
+| `hivemind_scripts/live_discord_fts.py` | **Live driver** — task-0.1 session-mode preflight + online build (monitored) + evidence + rollback; all output redacted; `--apply` gated on a green preflight. |
 | `tests/test_discord_message_fts.py` | **43 tests** — frozen identity, SQL/dry-run shape, schema-file consistency, preflight verdict logic, EXPLAIN parsing, rehearsal+live evidence, redaction, plus PG-gated idempotence & cancellation integration tests. |
 | `docs/hybrid-search/phase1-message-fts-rehearsal.json` | Rehearsal evidence (machine-readable). |
 | `docs/hybrid-search/phase1-message-fts-live.json` | Live preflight + build + evidence (machine-readable). |
@@ -159,7 +159,7 @@ DROP INDEX CONCURRENTLY IF EXISTS public.idx_discord_messages_content_fts_simple
 ```
 
 ```
-python3 scripts/live_discord_fts.py --rollback     # does SET ROLE postgres; DROP INDEX CONCURRENTLY IF EXISTS ...
+python3 hivemind_scripts/live_discord_fts.py --rollback     # does SET ROLE postgres; DROP INDEX CONCURRENTLY IF EXISTS ...
 ```
 
 The `english` index is retained throughout, so rolling back the simple index
@@ -169,7 +169,7 @@ returns the read path to the **exact pre-1.3 state** with zero source-data effec
 
 Every human-facing line from the live driver and rehearsal harness is routed
 through the task-0.1 `redact()` boundary (reused verbatim from
-`scripts/verify_access.py`): connection strings, JWTs, Supabase keys, contributor
+`hivemind_scripts/verify_access.py`): connection strings, JWTs, Supabase keys, contributor
 keys, `PGPASSWORD=…`, and 32+ char opaque tokens are masked. The CLI-login
 credential lives only in child-process env for the duration of the psql calls.
 No credential or connection string is printed, logged, or committed.
@@ -209,12 +209,12 @@ No credential or connection string is printed, logged, or committed.
 ## Reproduce
 
 ```bash
-python3 scripts/live_discord_fts.py --preflight        # read-only preflight
-python3 scripts/live_discord_fts.py --dry-run          # SQL it would run + preflight
-python3 scripts/live_discord_fts.py --evidence         # capture plans (index must exist)
-python3 scripts/live_discord_fts.py --apply            # build (only if preflight green)
-python3 scripts/live_discord_fts.py --rollback         # drop
-python3 scripts/rehearse_discord_fts.py --rows 1250000 # isolated rehearsal
+python3 hivemind_scripts/live_discord_fts.py --preflight        # read-only preflight
+python3 hivemind_scripts/live_discord_fts.py --dry-run          # SQL it would run + preflight
+python3 hivemind_scripts/live_discord_fts.py --evidence         # capture plans (index must exist)
+python3 hivemind_scripts/live_discord_fts.py --apply            # build (only if preflight green)
+python3 hivemind_scripts/live_discord_fts.py --rollback         # drop
+python3 hivemind_scripts/rehearse_discord_fts.py --rows 1250000 # isolated rehearsal
 python3 -m unittest tests.test_discord_message_fts -v  # this task's tests
 python3 -m unittest discover tests/                    # whole repo (766 green)
 ```

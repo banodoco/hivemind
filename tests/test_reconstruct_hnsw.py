@@ -1,4 +1,4 @@
-"""Tests for ``scripts.reconstruct_hnsw_representative`` (Task 2.16).
+"""Tests for ``hivemind_scripts.reconstruct_hnsw_representative`` (Task 2.16).
 
 These tests NEVER hit the network and NEVER touch the paid cache at
 ``.cache/hivemind-semantic-eval/``. The PostgREST reader is mocked, and cache
@@ -22,7 +22,7 @@ from unittest import mock
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import reconstruct_hnsw_representative as R  # noqa: E402
 from eval.retrieval import semantic as sem  # noqa: E402

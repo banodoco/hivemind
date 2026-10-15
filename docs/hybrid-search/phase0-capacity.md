@@ -7,8 +7,8 @@ database compute for 384- and 1536-dimensional candidates.
 **Prereqs:** 0.1 access (`phase0-access-audit.md`), 0.2 schema/eligibility
 (`phase0-schema-eligibility-map.md`), 0.3 inventory
 (`phase0-inventory.{md,json}`).
-**Reproduce:** `python3 scripts/capacity_model.py` (human summary);
-`python3 scripts/capacity_model.py --results docs/hybrid-search/phase0-capacity-results.json
+**Reproduce:** `python3 hivemind_scripts/capacity_model.py` (human summary);
+`python3 hivemind_scripts/capacity_model.py --results docs/hybrid-search/phase0-capacity-results.json
 --assumptions docs/hybrid-search/phase0-capacity-assumptions.json`.
 **Tests:** `python3 -m unittest tests.test_capacity_model`.
 **Artifacts:** `phase0-capacity-results.json`, `phase0-capacity-assumptions.json`.
@@ -53,7 +53,7 @@ starting candidate … 1536-dimensional index remains the quality fallback."
 ## 1. Scenarios
 
 Two corpora × two dimensions = four headline scenarios. The model
-(`scripts/capacity_model.py`) is deterministic and byte-reproducible.
+(`hivemind_scripts/capacity_model.py`) is deterministic and byte-reproducible.
 
 - **Pilot** — plan backfill order (task 2.13): all distillations + all external
   resources (prose) + all workflow Python representations + a representative
@@ -261,7 +261,7 @@ pgvector does not publish an HNSW index-size formula, so the index model is a
 
 ## 7. Reproducibility and tests
 
-- **Tool:** `scripts/capacity_model.py` — pure, deterministic, offline. Writes
+- **Tool:** `hivemind_scripts/capacity_model.py` — pure, deterministic, offline. Writes
   `--results` and `--assumptions` JSON; prints a human summary. Re-running
   produces byte-identical scenario numbers (the only time-derived field is the
   output `generated_at`).
@@ -284,7 +284,7 @@ pgvector does not publish an HNSW index-size formula, so the index model is a
 
 > Capacity report evaluates the `$25`, `12 GB`, and `$50/month` gates.
 
-**Met.** This report and `scripts/capacity_model.py` evaluate all three fixed
+**Met.** This report and `hivemind_scripts/capacity_model.py` evaluate all three fixed
 gates for 384- and 1536-dimensional candidates across the pilot and full
 eligible corpus, with dated primary-source citations, measured inputs, explicit
 heuristic ranges, sensitivity sweeps, and pass/fail/conditional verdicts. The

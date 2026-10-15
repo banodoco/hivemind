@@ -88,9 +88,9 @@ indexable and semantically equivalent, exactly what the brief required.
 |---|---|
 | `executors/selected_contract.py` | selected-contract identity surface; C7a (`raise` guards) |
 | `schema/033_selected_contract_hnsw.sql` | additive `hivemind_selected_contract_id` + upgraded canonical `hivemind_semantic_candidates`: **row-local baked-array eligibility** per arm so the partial HNSW index is the driver (iterative scan filters before LIMIT = C1), post-collapse source decoration, exact-mode GUC, selected-literal fail-closed gate |
-| `scripts/rehearse_hnsw_pilot.py` | D1–D5 preflight, isolated PG14 cluster, eligible-only 23,138-vector cohort, pre-build eligibility audit, CONCURRENTLY build w/ progress + capacity/invalid checks, **decisive actual-function HNSW proof** (strictly-positive `idx_scan` delta over broad calls; inner kNN diagnostic-only), sanitized evidence |
-| `scripts/benchmark_hnsw_pilot.py` | pre-registered manifest + ef sweep `[40,80,120,200]`, true exact baseline (GUC), recall/latency, `source_mutations` scoped |
-| `scripts/reconstruct_hnsw_representative.py` | **new** — read-only representative reconstruction CLI (`reconstruct-preflight`, `reconstruct`, `representative-benchmark`); reuses the accepted Task 2.14 architecture |
+| `hivemind_scripts/rehearse_hnsw_pilot.py` | D1–D5 preflight, isolated PG14 cluster, eligible-only 23,138-vector cohort, pre-build eligibility audit, CONCURRENTLY build w/ progress + capacity/invalid checks, **decisive actual-function HNSW proof** (strictly-positive `idx_scan` delta over broad calls; inner kNN diagnostic-only), sanitized evidence |
+| `hivemind_scripts/benchmark_hnsw_pilot.py` | pre-registered manifest + ef sweep `[40,80,120,200]`, true exact baseline (GUC), recall/latency, `source_mutations` scoped |
+| `hivemind_scripts/reconstruct_hnsw_representative.py` | **new** — read-only representative reconstruction CLI (`reconstruct-preflight`, `reconstruct`, `representative-benchmark`); reuses the accepted Task 2.14 architecture |
 | `tests/test_hnsw_pilot.py` | 60 tests (identity/gate/hygiene + static migration shape + SQL rehearsal/parity + adversarial-C1 + true-exact-vs-032 + real cache fail-closed + offline hash recompute) |
 | `tests/test_reconstruct_hnsw.py` | **new** — 21 tests (offline preflight, high-water pinning, drift/cache fail-closed, hygiene) |
 | `docs/hybrid-search/task-2.16-hnsw-{rehearsal,benchmark}.json` | sanitized structural/benchmark evidence |
@@ -126,12 +126,12 @@ one helper (no table/constraint changes, no production seeding).
 ```
 python3 -m unittest tests.test_hnsw_pilot tests.test_reconstruct_hnsw \
     tests.test_semantic_candidate_sql tests.test_embedding_pilot   # 114/114 OK
-python3 scripts/compare_embedding_candidates.py replay             # strict offline: 46 checks, 0 provider/network, winner 384-small
-python3 scripts/rehearse_hnsw_pilot.py                             # 31/31 checks; deterministic rerun (stable manifest_hash/verdict)
-python3 scripts/benchmark_hnsw_pilot.py                            # recall@10=1.0 (synthetic); hygiene clean
-python3 scripts/reconstruct_hnsw_representative.py --mode reconstruct-preflight   # 6/6 green (read-only)
-python3 scripts/reconstruct_hnsw_representative.py --mode reconstruct-offline      # GENUINELY OFFLINE representative rebuild (raw snapshot, network_calls=0); canonical idx_scan delta +12; recall ef120=0.979/ef200=0.988
-python3 scripts/build_v2_chunking_equivalence_proof.py                             # cohort no-op + 0 cache misses + 0 provider/network; winner 384-small
+python3 hivemind_scripts/compare_embedding_candidates.py replay             # strict offline: 46 checks, 0 provider/network, winner 384-small
+python3 hivemind_scripts/rehearse_hnsw_pilot.py                             # 31/31 checks; deterministic rerun (stable manifest_hash/verdict)
+python3 hivemind_scripts/benchmark_hnsw_pilot.py                            # recall@10=1.0 (synthetic); hygiene clean
+python3 hivemind_scripts/reconstruct_hnsw_representative.py --mode reconstruct-preflight   # 6/6 green (read-only)
+python3 hivemind_scripts/reconstruct_hnsw_representative.py --mode reconstruct-offline      # GENUINELY OFFLINE representative rebuild (raw snapshot, network_calls=0); canonical idx_scan delta +12; recall ef120=0.979/ef200=0.988
+python3 hivemind_scripts/build_v2_chunking_equivalence_proof.py                             # cohort no-op + 0 cache misses + 0 provider/network; winner 384-small
 python3 -m unittest discover -s tests                                                # 1629 OK (6 env-skipped)
 python3 -m py_compile <all changed/new .py>                        # OK
 git diff --check                                                   # clean

@@ -77,7 +77,7 @@ workflow Python never reaches chunking (`build_representations` excludes it).
 | `supabase/functions/embedding-worker/{index,protocol,protocol_test}.ts` | Task 2.9 — bounded Edge worker + injectable OpenAI transport + 384-d validation + Deno tests. |
 | `schema/028_embedding_worker_cron.sql` | Task 2.9 — Supabase Cron (pg_cron+pg_net) schedule, guarded/idempotent/reversible. |
 | `schema/029_embedding_cleanup.sql` | Task 2.10 — ineligible/deactivate/drop-contract/cleanup-superseded RPCs; active-contract refusal. |
-| `scripts/rehearse_embedding_lifecycle.py` | Isolated-cluster rehearsal of 2.7–2.10 (triggers, concurrency, state machine, worker surface, end-to-end protocol, cleanup). |
+| `hivemind_scripts/rehearse_embedding_lifecycle.py` | Isolated-cluster rehearsal of 2.7–2.10 (triggers, concurrency, state machine, worker surface, end-to-end protocol, cleanup). |
 | `tests/test_chunking.py` | 22 offline tests (2.6). |
 | `tests/test_embedding_jobs.py` | 22 offline tests (2.7 decision matrix). |
 | `tests/test_embedding_lifecycle_sql.py` | 6 discoverable SQL tests wrapping the rehearsal (auto-skip if no pgvector). |
@@ -205,7 +205,7 @@ Evidence: `docs/hybrid-search/phase2-embedding-lifecycle-rehearsal.json`
 tests.test_chunking                       22  offline                  PASS
 tests.test_embedding_jobs                 22  offline                  PASS
 tests.test_embedding_lifecycle_sql         6  isolated PG17 + pgvector PASS
-scripts/rehearse_embedding_lifecycle.py   52/52 lifecycle checks       PASS
+hivemind_scripts/rehearse_embedding_lifecycle.py   52/52 lifecycle checks       PASS
 embedding-worker/protocol_test.ts           7  npx deno                 PASS
 repository-wide discover                1057 tests, OK (5 skipped)     PASS (no regressions)
 ```

@@ -12,7 +12,7 @@ Three layers (mirrors the task-2.15 test discipline):
    m=16 / ef_construction=64 are in the frozen DDL, grants/search_path/SECURITY
    DEFINER are preserved, and the rollback DDL is exact and index-only.
 3. **Discoverable SQL rehearsal test** (auto-skips when PG binaries / pgvector are
-   unavailable): runs scripts/rehearse_hnsw_pilot.py and scripts/benchmark, asserts
+   unavailable): runs hivemind_scripts/rehearse_hnsw_pilot.py and hivemind_scripts/benchmark, asserts
    every structural gate + hygiene, proves SQL/Python selected-contract-id parity,
    and proves 033 preserves 032's filter/collapse/security output byte-for-byte.
 """
@@ -30,7 +30,7 @@ import unittest
 _HERE = pathlib.Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 from executors import selected_contract as sc  # noqa: E402
 import rehearse_hnsw_pilot as rh  # noqa: E402

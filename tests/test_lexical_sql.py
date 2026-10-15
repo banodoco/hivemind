@@ -4,7 +4,7 @@ These exercise the *storage* layer that offline unit tests cannot: the generated
 weighted ``tsvector`` columns, the GIN indexes (proven via ``EXPLAIN``), the
 ``lexical_documents`` constraints, the workflow-Python precedence/dedup/
 quarantine behavior end-to-end against real PostgreSQL, and migration
-idempotence. They reuse the shared harness in ``scripts/lexical_pg.py``.
+idempotence. They reuse the shared harness in ``hivemind_scripts/lexical_pg.py``.
 
 The cluster is a throwaway ``initdb --auth=trust`` instance on an ephemeral port
 with a temp data dir; it is torn down in ``tearDownClass``. No Docker, no
@@ -19,7 +19,7 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import lexical_pg  # noqa: E402
 

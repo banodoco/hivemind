@@ -28,12 +28,12 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 # Import the live refresh module (the module name starts with a digit-free path
-# but lives under scripts/; load it by file path to avoid any package clash).
+# but lives under hivemind_scripts/; load it by file path to avoid any package clash).
 _SPEC = importlib.util.spec_from_file_location(
-    "live_lexical_refresh", REPO / "scripts" / "live_lexical_refresh.py"
+    "live_lexical_refresh", REPO / "hivemind_scripts" / "live_lexical_refresh.py"
 )
 assert _SPEC is not None and _SPEC.loader is not None
 LLR = importlib.util.module_from_spec(_SPEC)

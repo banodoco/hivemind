@@ -87,7 +87,7 @@ Recommended VibeComfy ranking:
 Dry-run:
 
 ```bash
-python3 scripts/backfill_workflow_semantics.py \
+python3 hivemind_scripts/backfill_workflow_semantics.py \
   --limit 100 \
   --out-dir .codex_tmp/semantic_backfill \
   --write-llm-briefs
@@ -96,7 +96,7 @@ python3 scripts/backfill_workflow_semantics.py \
 Apply, when service-role credentials are available:
 
 ```bash
-SUPABASE_SERVICE_ROLE_KEY=... python3 scripts/backfill_workflow_semantics.py \
+SUPABASE_SERVICE_ROLE_KEY=... python3 hivemind_scripts/backfill_workflow_semantics.py \
   --apply \
   --limit 1000 \
   --out-dir .codex_tmp/semantic_backfill

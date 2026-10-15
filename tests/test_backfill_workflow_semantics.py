@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 
-from scripts import backfill_workflow_semantics as backfill
+from hivemind_scripts import backfill_workflow_semantics as backfill
 
 
 def _args(tmp_path, *, apply: bool = False) -> argparse.Namespace:

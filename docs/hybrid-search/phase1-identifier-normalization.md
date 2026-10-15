@@ -22,7 +22,7 @@ cluster; function immutability and index suitability are proven, not asserted.
 | `executors/identifier_normalization.py` | **Frozen reference module** — forms, casefold policy, alias registry (provenance/version/collision/priority/safe-update, no-NL-rewrite). Pure stdlib, offline. Re-exports the frozen 1.1 helpers (single source of truth). |
 | `schema/005_identifier_normalization.sql` | **IMMUTABLE SQL mirror** — `hivemind_normalize_identifier`, `hivemind_normalize_identifier_preserve`, `hivemind_identifier_alias_forms`, deterministic ICU collation, the `identifier_aliases` reference table, registration + collision-detection functions. |
 | `eval/retrieval/fixtures/identifier-normalization-v1.json` | **Versioned machine-readable fixture corpus** — 86 fixtures (77 accept + 9 distinct), grounded in the real 112 golden identifiers + expanded forms. |
-| `scripts/validate_identifier_normalization.py` | **Deterministic validator** — offline contract checks (always) + opt-in isolated-cluster SQL/Python parity + IMMUTABLE/index/locale-independence proof. |
+| `hivemind_scripts/validate_identifier_normalization.py` | **Deterministic validator** — offline contract checks (always) + opt-in isolated-cluster SQL/Python parity + IMMUTABLE/index/locale-independence proof. |
 | `tests/test_identifier_normalization.py` | **Offline tests** — 42 tests pinning every frozen rule, non-equivalence, alias behavior, and corpus self-consistency. |
 | `docs/hybrid-search/phase1-identifier-normalization.md` | **This report** (human). |
 | `docs/hybrid-search/phase1-identifier-normalization.json` | **Machine-readable summary** (version-pinned, `post_hoc_locked: true`). |
@@ -30,8 +30,8 @@ cluster; function immutability and index suitability are proven, not asserted.
 ## Commands
 
 ```bash
-python3 scripts/validate_identifier_normalization.py                  # offline contract checks
-HIVEMIND_EVAL_CLUSTER=1 python3 scripts/validate_identifier_normalization.py   # + isolated-cluster parity
+python3 hivemind_scripts/validate_identifier_normalization.py                  # offline contract checks
+HIVEMIND_EVAL_CLUSTER=1 python3 hivemind_scripts/validate_identifier_normalization.py   # + isolated-cluster parity
 python3 -m unittest tests.test_identifier_normalization -v            # this task's tests
 python3 -m unittest discover tests/                                   # whole repo
 ```
@@ -200,11 +200,11 @@ succeed — the operational proof of IMMUTABLE / index suitability.
 
 ```text
 python3 -m unittest tests.test_identifier_normalization      -> 42 tests OK
-python3 scripts/validate_identifier_normalization.py         -> OK (offline)
-HIVEMIND_EVAL_CLUSTER=1 python3 scripts/validate_identifier_normalization.py -> OK (cluster)
+python3 hivemind_scripts/validate_identifier_normalization.py         -> OK (offline)
+HIVEMIND_EVAL_CLUSTER=1 python3 hivemind_scripts/validate_identifier_normalization.py -> OK (cluster)
 python3 -m unittest discover tests/                          -> 723 tests OK (642 baseline + this task + concurrent 1.2/1.3)
-python3 scripts/validate_lexical_contract.py                 -> OK (1.1 still validates)
-python3 scripts/validate_workflow_contract.py                -> PASS (0.8 still validates)
+python3 hivemind_scripts/validate_lexical_contract.py                 -> OK (1.1 still validates)
+python3 hivemind_scripts/validate_workflow_contract.py                -> PASS (0.8 still validates)
 ```
 
 Coverage (42 offline tests): frozen metadata/versions, re-export identity,

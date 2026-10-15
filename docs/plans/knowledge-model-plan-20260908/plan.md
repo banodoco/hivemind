@@ -67,7 +67,7 @@ At a separately authorized deployment, briefly pause affected writers, export kn
 - `executors/{_common.py,entity_identity.py}`, contribution/search/get-item executors and all three ingestion executors.
 - Existing `postgres_backfill.py`, `embedding_jobs.py`, `embedding_backfill.py`, `canonical_representations.py`, `lexical_documents.py`, `lexical_contract.py`, and affected runtime/rehearsal callers. Update only for the new data contract; historical benchmark documents stay historical.
 - All seven executor descriptors, `pack.yaml`, `README.md`, `DESIGN.md`, `skill/SKILL.md`, `AGENTS.md`, and affected tests. Refresh-media behavior remains unchanged.
-- Reuse `scripts/rehearse_lexical_security.py` disposable PostgreSQL pattern. Existing local PG16 lacks pgvector; verify a matched PG14/17 binary/extension installation. Deno was absent during exploration. Resolve these ordinary test prerequisites during implementation without a tooling redesign.
+- Reuse `hivemind_scripts/rehearse_lexical_security.py` disposable PostgreSQL pattern. Existing local PG16 lacks pgvector; verify a matched PG14/17 binary/extension installation. Deno was absent during exploration. Resolve these ordinary test prerequisites during implementation without a tooling redesign.
 
 ## Coordination and oracle requests
 

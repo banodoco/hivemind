@@ -25,8 +25,8 @@ credentials, or anon keys are persisted.
 | `eval/retrieval/golden/curation-suggestions-v1.json` | Intermediate curation aid (per candidate query → matched real identities). Derivable from `evidence-v1.json`. |
 | `eval/retrieval/golden/validation-live-2026-07-28.json` | Opt-in live identity re-validation output (52/52 present). |
 | `eval/retrieval/golden/comparison_phase0-golden-v1.{json,md}` | One-command harness comparison (legacy vs oracle) over the snapshot — proves reportability. |
-| `scripts/golden_probe.py` | Read-only live discovery/evidence-capture tool. |
-| `scripts/validate_golden.py` | Deterministic offline validator + opt-in live identity check. |
+| `hivemind_scripts/golden_probe.py` | Read-only live discovery/evidence-capture tool. |
+| `hivemind_scripts/validate_golden.py` | Deterministic offline validator + opt-in live identity check. |
 | `tests/test_golden_set.py` | 27 deterministic offline tests (contract, validator, probe helpers, seed-untouched, harness reportability). |
 
 The task-0.5 seed fixture (`eval/retrieval/fixtures/golden.json`, 10 cases) is
@@ -37,14 +37,14 @@ versioned sibling, not an edit of the seed.
 
 ```bash
 # Offline validation (counts, categories, grades, filters, snowflakes, snapshot integrity)
-python3 scripts/validate_golden.py
+python3 hivemind_scripts/validate_golden.py
 
 # Opt-in read-only live identity re-validation (every judged id against unified_feed NOW)
-HIVEMIND_EVAL_NETWORK=1 python3 scripts/validate_golden.py --live
+HIVEMIND_EVAL_NETWORK=1 python3 hivemind_scripts/validate_golden.py --live
 
 # Re-run live discovery (read-only; regenerates evidence-v1.json)
-python3 scripts/golden_probe.py --dry-run      # plan only
-python3 scripts/golden_probe.py                # live capture
+python3 hivemind_scripts/golden_probe.py --dry-run      # plan only
+python3 hivemind_scripts/golden_probe.py                # live capture
 
 # One-command harness report over the production set (reportability)
 python3 -m eval.retrieval.compare \
@@ -107,7 +107,7 @@ never grade a system's current rank as truth.
 
 ### Grading process
 
-1. **Discover real identities (read-only).** `scripts/golden_probe.py` queried the
+1. **Discover real identities (read-only).** `hivemind_scripts/golden_probe.py` queried the
    live public corpus with the publishable anon key: every distillation + its
    cites, all 2,757 workflow resources (id, title, source, `has_python_source`
    cohort flag, model filenames, node-class names, aliases), bounded message
@@ -134,7 +134,7 @@ never grade a system's current rank as truth.
 
 ## Live validation evidence
 
-`HIVEMIND_EVAL_NETWORK=1 python3 scripts/validate_golden.py --live` re-checks each
+`HIVEMIND_EVAL_NETWORK=1 python3 hivemind_scripts/validate_golden.py --live` re-checks each
 distinct judged identity with one bounded read-only `unified_feed?item_id=eq.…`
 existence GET:
 
@@ -243,7 +243,7 @@ synthesized workflow bodies (public semantics only, no Python) and cannot model
   `tests/test_common.py`, and the untracked 0.4/0.7/VibeComfy artifacts) and the
   completed 0.7 capacity model were preserved untouched. No pre-existing file was
   modified; this task only adds new files under `eval/retrieval/golden/`,
-  `scripts/golden_probe.py`, `scripts/validate_golden.py`,
+  `hivemind_scripts/golden_probe.py`, `hivemind_scripts/validate_golden.py`,
   `tests/test_golden_set.py`, and this doc.
 
 ## Completion signal (0.6)

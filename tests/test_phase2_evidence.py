@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from scripts.rehearse_phase2_acceptance import scan_evidence  # noqa: E402
+from hivemind_scripts.rehearse_phase2_acceptance import scan_evidence  # noqa: E402
 
 
 class EvidenceBoundaryTests(unittest.TestCase):

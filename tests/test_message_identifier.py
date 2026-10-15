@@ -24,11 +24,11 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-for _p in (str(REPO_ROOT), str(REPO_ROOT / "scripts"), str(REPO_ROOT / "executors")):
+for _p in (str(REPO_ROOT), str(REPO_ROOT / "hivemind_scripts"), str(REPO_ROOT / "executors")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-import scripts.message_identifier_index as M  # noqa: E402
+import hivemind_scripts.message_identifier_index as M  # noqa: E402
 from executors import message_identifier_index as REF  # noqa: E402
 
 FIXTURES = REPO_ROOT / "eval" / "retrieval" / "fixtures" / "message-identifier-v1.json"

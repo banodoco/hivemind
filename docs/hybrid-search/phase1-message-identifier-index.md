@@ -78,11 +78,11 @@ score 5–15% of the corpus. The index expression, partial predicate, and length
 - `executors/message_identifier_index.py` — the frozen reference contract (choice, index
   expression, partial predicate, candidate-query contract, tie-break, storage gate, and the
   rejected-alternative extraction grammar kept as the parity-proven decision record).
-- `scripts/message_identifier_index.py` — pure driver (build/rollback SQL, candidate-query SQL,
+- `hivemind_scripts/message_identifier_index.py` — pure driver (build/rollback SQL, candidate-query SQL,
   read-only preflight query set + verdict logic, evidence EXPLAIN queries, rehearsal schema/seed).
-- `scripts/rehearse_message_identifier.py` — the production-shaped isolated-cluster rehearsal.
-- `scripts/live_message_identifier.py` — live preflight + gated apply + evidence + rollback.
-- `scripts/validate_message_identifier.py` — offline + cluster-gated validator.
+- `hivemind_scripts/rehearse_message_identifier.py` — the production-shaped isolated-cluster rehearsal.
+- `hivemind_scripts/live_message_identifier.py` — live preflight + gated apply + evidence + rollback.
+- `hivemind_scripts/validate_message_identifier.py` — offline + cluster-gated validator.
 - `tests/test_message_identifier.py` — 36 tests (31 offline + 5 cluster-gated).
 - `eval/retrieval/fixtures/message-identifier-v1.json` — frozen extraction-parity fixture corpus.
 
@@ -192,7 +192,7 @@ identifier), recorded so the latency is self-explaining:
 
 ## Cluster-gated validation + tests
 
-- `scripts/validate_message_identifier.py` (offline + `HIVEMIND_EVAL_CLUSTER=1`): **OK** —
+- `hivemind_scripts/validate_message_identifier.py` (offline + `HIVEMIND_EVAL_CLUSTER=1`): **OK** —
   schema/005 + pg_trgm + stub + schema/007 load cleanly; the chosen index builds valid; the
   containment candidate query uses it via Bitmap Index Scan; the rejected-alternative SQL extraction
   agrees byte-for-byte with the Python reference on all 14 fixtures (decision-record parity).
@@ -211,7 +211,7 @@ falsely reported the live index **absent (fresh build)**. It is now OID/regclass
 (`pg_relation_size(c.oid)`, scoped to the `public` namespace) and a regression test guards the
 shape (offline) plus the live readback (cluster).
 
-`scripts/live_message_identifier.py --preflight` (read-only) now correctly detects the existing
+`hivemind_scripts/live_message_identifier.py --preflight` (read-only) now correctly detects the existing
 index:
 
 ```
@@ -224,7 +224,7 @@ is the same valid, additive index.
 
 ## Live evidence (read-only; index applied and valid)
 
-`scripts/live_message_identifier.py --evidence` (`phase1-message-identifier-live.json`): index
+`hivemind_scripts/live_message_identifier.py --evidence` (`phase1-message-identifier-live.json`): index
 **200.7 MB** (the authoritative size — real lexeme diversity, larger than the 78 MB synthetic lower
 bound, still 0.14× the 1,481 MB table and ≪ the 12 GB gate), `indisvalid=true`, `indisready=true`.
 All three containment EXPLAINs use the index (Bitmap Index Scan, no seq scan) on the production
@@ -254,7 +254,7 @@ the genuinely common word `controlnet` (8,510 real matches, 0.7% of the corpus) 
 ## Rollback (one command)
 
 ```bash
-python3 scripts/live_message_identifier.py --rollback
+python3 hivemind_scripts/live_message_identifier.py --rollback
 # equivalent to: DROP INDEX CONCURRENTLY IF EXISTS public.idx_discord_messages_identifier_trgm;
 ```
 

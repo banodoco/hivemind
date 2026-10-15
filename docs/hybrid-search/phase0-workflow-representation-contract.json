@@ -6,7 +6,7 @@
   "status": "frozen",
   "decision_record": "docs/hybrid-search/phase0-workflow-representation-contract.md",
   "reference_implementation": "executors/workflow_representation.py",
-  "validator": "scripts/validate_workflow_contract.py",
+  "validator": "hivemind_scripts/validate_workflow_contract.py",
   "frozen_at_utc": "2026-07-28T00:00:00Z",
   "evidence_date": "2026-07-28",
   "evidence_timestamps": {

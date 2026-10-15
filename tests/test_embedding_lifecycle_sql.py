@@ -1,6 +1,6 @@
 """Discoverable SQL lifecycle test for tasks 2.7–2.10 (plan Phase 2 batch S2).
 
-Wraps scripts/rehearse_embedding_lifecycle.py (an isolated throwaway PostgreSQL
+Wraps hivemind_scripts/rehearse_embedding_lifecycle.py (an isolated throwaway PostgreSQL
 cluster + pgvector) so `python3 -m unittest discover` exercises the embedding
 job queue, SKIP LOCKED claim/complete/fail/recover/cancel RPCs, the worker SQL
 surface, the end-to-end worker protocol with the deterministic fake embedder,
@@ -17,7 +17,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
-sys.path.insert(0, str(REPO / "scripts"))
+sys.path.insert(0, str(REPO / "hivemind_scripts"))
 
 import lexical_pg  # noqa: E402
 

@@ -9,7 +9,7 @@ and host credentials are intentionally omitted.
 | `python3 -m unittest tests.test_contributor_auth -v` | PASS — 11 tests |
 | `deno check supabase/functions/contributor-auth/index.ts supabase/functions/contributor-auth/protocol.ts supabase/functions/contributor-auth/protocol_test.ts` | PASS |
 | `deno test --allow-net supabase/functions/contributor-auth/protocol_test.ts supabase/functions/contribute/protocol_test.ts supabase/functions/submit-vibecomfy-rating/protocol_test.ts` | PASS — 20 tests |
-| `python3 scripts/rehearse_contributor_auth.py` | PASS — disposable PostgreSQL cluster created and torn down; claim-pending, post-claim resolution, concurrent redemption, cleanup, replay, rate-limit, expiry, and per-key revoke assertions passed |
+| `python3 hivemind_scripts/rehearse_contributor_auth.py` | PASS — disposable PostgreSQL cluster created and torn down; claim-pending, post-claim resolution, concurrent redemption, cleanup, replay, rate-limit, expiry, and per-key revoke assertions passed |
 | `deno fmt --check supabase/functions/contributor-auth/index.ts supabase/functions/contributor-auth/protocol.ts supabase/functions/contributor-auth/protocol_test.ts` | PASS |
 | `python3 -m unittest tests.test_contributor_auth tests.test_contribute` | PASS — 18 tests |
 | `python3 -m unittest discover tests/` | PASS — 1,515 tests, 17 skipped, 157.768s |

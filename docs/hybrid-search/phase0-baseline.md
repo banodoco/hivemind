@@ -60,8 +60,8 @@ Under the deployed `executors/search/run.py`, only `urllib.error.HTTPError` is c
 ## Reproduce
 
 ```bash
-python3 scripts/baseline_search.py --dry-run                       # review the request plan
-python3 scripts/baseline_search.py \
+python3 hivemind_scripts/baseline_search.py --dry-run                       # review the request plan
+python3 hivemind_scripts/baseline_search.py \
   --out-json docs/hybrid-search/phase0-baseline-results-2026-07-28.json \
   --out-md  docs/hybrid-search/phase0-baseline.md
 python3 -m unittest tests.test_baseline_search                     # offline tests

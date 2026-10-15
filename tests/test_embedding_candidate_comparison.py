@@ -444,7 +444,7 @@ class TestEvidenceHygiene(unittest.TestCase):
 
 class TestOfflineByteStable(unittest.TestCase):
     def test_offline_deterministic_core_identical(self):
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
 
         with tempfile.TemporaryDirectory() as tmp:
             cache_a = Path(tmp) / "a"
@@ -876,7 +876,7 @@ class TestFutureFreezeArchitecture(unittest.TestCase):
         return snap, dict(contract)
 
     def test_snapshot_write_load_verify_and_fail_closed(self):
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         ent = _resource_entity("1", {"kind": "resource", "title": "T", "body": "a b c d", "metadata": {}})
@@ -903,7 +903,7 @@ class TestFutureFreezeArchitecture(unittest.TestCase):
 
     def test_snapshot_roundtrip_preserves_nested_semantics_order(self):
         """Raw freeze must not reorder v1's order-sensitive semantics mappings."""
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
 
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
@@ -940,7 +940,7 @@ class TestFutureFreezeArchitecture(unittest.TestCase):
     def test_incomplete_snapshot_only_manifest_rejected(self):
         # Gap 3: a manifest carrying ONLY raw_frozen_snapshot (no kind/version/
         # golden/grid/policy/chunk-facts) is rejected before any provider call.
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         ent = _resource_entity("1", {"kind": "resource", "title": "T", "body": "a b c d", "metadata": {}})
@@ -1056,7 +1056,7 @@ class TestReplayOfflineNoNetwork(unittest.TestCase):
     def test_replay_reproduces_when_live_reader_and_network_raise(self):
         if not (_REAL_DECISION.exists() and _REAL_BUNDLE.exists() and _REAL_MANIFEST.exists()):
             self.skipTest("private semantic evaluation artifacts absent")
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
 
         def _boom(*a, **k):
             raise AssertionError("live reader / network must not be touched in replay")
@@ -1213,7 +1213,7 @@ class TestSnapshotPathModeAudit(unittest.TestCase):
         self.assertNotIn(".cache/.cache", str(resolved))
 
     def test_binding_fail_closed_on_modes_missing_mismatch(self):
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         cache_dir = Path(tmp.name) / "cache"
@@ -1249,7 +1249,7 @@ class TestSnapshotDrivesEvaluate(unittest.TestCase):
     cohort from the snapshot and does NOT call the live reader (which raises)."""
 
     def test_evaluate_uses_snapshot_not_live_reader(self):
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         cache_dir = Path(tmp.name) / "cache"
@@ -1291,7 +1291,7 @@ class TestSnapshotDrivesEvaluate(unittest.TestCase):
         self.assertTrue((Path(tmp.name) / "out.json").exists())
 
     def test_evaluate_refuses_without_snapshot_or_live_flag(self):
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         args = cli.build_parser().parse_args([
@@ -1527,7 +1527,7 @@ class TestEvidencePairNeverOptional(unittest.TestCase):
             self.skipTest("private semantic evaluation artifacts absent")
         # Gap 1 CLI: explicit --decision-md; endpoint/proxy unreachable -> still
         # zero provider/network calls (strict evidence replay).
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
 
         def _boom(*a, **k):
             raise AssertionError("replay must make no network call")
@@ -1768,7 +1768,7 @@ class TestFreezeInputContractDrift(unittest.TestCase):
     policy / chunk-map / chunker / version, and rebuild facts are re-verified."""
 
     def _contract_env(self):
-        import scripts.compare_embedding_candidates as cli
+        import hivemind_scripts.compare_embedding_candidates as cli
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         cache_dir = Path(tmp.name) / "cache"

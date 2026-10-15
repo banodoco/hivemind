@@ -1,4 +1,4 @@
-"""Tests for ``scripts/capacity_model.py`` (plan task 0.7).
+"""Tests for ``hivemind_scripts/capacity_model.py`` (plan task 0.7).
 
 Pure and offline: no network, no database, no provider call, no secrets. These
 tests pin the storage/cost formulas, unit conversions, scenario determinism,
@@ -16,7 +16,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 import capacity_model as cm  # noqa: E402
 

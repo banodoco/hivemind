@@ -22,7 +22,7 @@ mutation is not owned by this concurrent task).
 |---|---|
 | `schema/003_lexical_resource_documents.sql` | **Migration** (additive, idempotent): IMMUTABLE SQL helpers mirroring `workflow_representation.py`; generated weighted `tsvector` columns on `distillations` + `external_resources`; `lexical_documents` table (durable chunk identity, offsets/hashes/version/quarantine, constraints); `lexical_resource_python_state` table; GIN + btree indexes; the `hivemind_workflow_python_state` accessor. |
 | `executors/lexical_documents.py` | **Bridge helper** (pure stdlib): reuses the frozen reference to resolve precedence, dedup, scan/quarantine, AST-aware chunking with no-silent-truncation, and refresh/upsert/drop with hash-skip behind an injected store. Never executes stored Python; never serializes matched secrets. |
-| `scripts/lexical_pg.py` | **Throwaway local PG cluster harness** + reproducible runner: lifecycle, deterministic fixtures (all task-1.2 families), assertions, `EXPLAIN (ANALYZE, BUFFERS)` capture. No Docker, no network, tears down. |
+| `hivemind_scripts/lexical_pg.py` | **Throwaway local PG cluster harness** + reproducible runner: lifecycle, deterministic fixtures (all task-1.2 families), assertions, `EXPLAIN (ANALYZE, BUFFERS)` capture. No Docker, no network, tears down. |
 | `tests/test_lexical_documents.py` | **27 offline unit tests** pinning precedence, no-duplication, quarantine/secret-non-leakage, chunking/coverage, refresh/upsert/drop/hash-skip, distillation eligibility. |
 | `tests/test_lexical_sql.py` | **12 SQL tests** on an isolated cluster: migration idempotence, generated columns, constraints, eligibility/quarantine, IMMUTABLE-helper↔Python parity, EXPLAIN index usage. |
 | `docs/hybrid-search/phase1-lexical-explain-evidence.json` | **Saved `EXPLAIN (ANALYZE, BUFFERS)` evidence** + assertion results (17/17). |
@@ -32,7 +32,7 @@ mutation is not owned by this concurrent task).
 ```bash
 python3 -m unittest tests.test_lexical_documents -v        # offline unit (27)
 python3 -m unittest tests.test_lexical_sql -v              # SQL on throwaway cluster (12)
-python3 scripts/lexical_pg.py                               # reproducible runner + evidence
+python3 hivemind_scripts/lexical_pg.py                               # reproducible runner + evidence
 python3 -m unittest discover tests/                         # whole repo
 ```
 

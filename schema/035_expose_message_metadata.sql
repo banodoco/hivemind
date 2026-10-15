@@ -43,7 +43,7 @@
 -- reactions keep their positions. representation_hash is content-only, so no
 -- embedding/hash is invalidated, and no consumer asserts the exact old shape.
 --
--- Rehearsal harness (scripts/rehearse_lexical_candidate.py) BASE_DDL now
+-- Rehearsal harness (hivemind_scripts/rehearse_lexical_candidate.py) BASE_DDL now
 -- mirrors the full live discord_messages / members / discord_reactions shape.
 -- ============================================================
 

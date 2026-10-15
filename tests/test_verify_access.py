@@ -1,4 +1,4 @@
-"""Tests for ``scripts/verify_access.py`` — the Hivemind access probe.
+"""Tests for ``hivemind_scripts/verify_access.py`` — the Hivemind access probe.
 
 Pure and offline: no network, no CLI, no secrets are printed. These tests pin
 the redactor so it can never let a credential through to the audit report, and
@@ -14,7 +14,7 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parent
 sys.path.insert(0, str(_REPO))
-sys.path.insert(0, str(_REPO / "scripts"))
+sys.path.insert(0, str(_REPO / "hivemind_scripts"))
 
 import verify_access as va  # noqa: E402
 

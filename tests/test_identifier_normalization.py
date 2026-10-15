@@ -10,7 +10,7 @@ priority/safe-update), and the no-silent-natural-language-rewrite guarantee.
 
 Offline only: no database, no network, no provider. The SQL/Python byte-for-byte
 parity and the IMMUTABLE/index-suitability proof live in
-``scripts/validate_identifier_normalization.py`` (opt-in isolated cluster); their
+``hivemind_scripts/validate_identifier_normalization.py`` (opt-in isolated cluster); their
 output is recorded in the task-1.4 report.
 """
 

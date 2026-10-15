@@ -76,7 +76,7 @@
 --   CREATE INDEX CONCURRENTLY may never run inside a migration transaction,
 --   function, or DO block. The build/drop below are executed ONLY by the
 --   operator/rehearsal as separate autocommit statements (see
---   scripts/rehearse_hnsw_pilot.py). They are documented here so the operator,
+--   hivemind_scripts/rehearse_hnsw_pilot.py). They are documented here so the operator,
 --   the rehearsal, and the catalog checks agree on one frozen contract:
 --
 --     create index concurrently if not exists

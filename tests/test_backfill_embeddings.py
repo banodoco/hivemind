@@ -4,7 +4,7 @@ historical embedding backfill engine and CLI.
 These tests freeze a coherent PUBLIC API for two modules that do not exist yet:
 
   * ``executors.embedding_backfill`` — the engine.
-  * ``scripts.backfill_embeddings`` — the CLI.
+  * ``hivemind_scripts.backfill_embeddings`` — the CLI.
 
 The suite is intentionally RED: importing those modules fails until they land,
 which clearly identifies the missing implementation. Everything else is pure
@@ -63,7 +63,7 @@ from executors import canonical_representations as canon  # noqa: E402
 from executors import chunking as ch  # noqa: E402
 from executors import embedding_contract as ec  # noqa: E402
 from executors import embedding_backfill as eb  # noqa: E402  (RED until 2.12b lands)
-from scripts import backfill_embeddings as cli  # noqa: E402  (RED until 2.12b lands)
+from hivemind_scripts import backfill_embeddings as cli  # noqa: E402  (RED until 2.12b lands)
 
 
 # ---------------------------------------------------------------------------

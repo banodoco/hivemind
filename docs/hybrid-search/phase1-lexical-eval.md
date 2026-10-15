@@ -84,7 +84,7 @@ lexical returns them in <130 ms.
 
 ## The 003 deployment blocker (handoff, not a lexical-gate failure)
 
-`scripts/live_lexical_search.py --preflight` (read-only) finds schema/003
+`hivemind_scripts/live_lexical_search.py --preflight` (read-only) finds schema/003
 (task 1.2: `lexical_documents`, `prose_tsv`, `lexical_tsv`,
 `hivemind_workflow_python_state`) **is not live on production** (004–007 are).
 The 008/009 apply therefore correctly refuses. The code is proven on the
